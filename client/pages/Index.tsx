@@ -11,11 +11,14 @@ import FaqSection from "@site/components/home/FaqSection";
 import ContactUsSection from "@site/components/home/ContactUsSection";
 import { useHomeContent } from "@site/hooks/useHomeContent";
 import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
-import { Loader2, Phone } from "lucide-react";
+import { Loader2, Phone, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
 
 export default function Index() {
   const { content, meta, isLoading } = useHomeContent();
   const { phoneNumber, phoneDisplay, phoneLabel } = useGlobalPhone();
+  const { settings } = useSiteSettings();
 
   if (isLoading) {
     return (
@@ -46,14 +49,20 @@ export default function Index() {
         pageContent={content}
       />
 
-      {/* Hero and Contact Form Section */}
-      <div className="max-w-[2560px] mx-auto w-[95%] py-[13px] my-[10px] md:my-[20px]">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-[3%]">
-          {/* Left Side: Headline and Call Box */}
-          <div className="lg:w-[65.667%]">
-            <div className="mb-[30px] md:mb-[40px]">
-              <div className="relative">
-                <p className="font-playfair text-[clamp(2.5rem,7vw,68.8px)] font-light leading-[1.2] text-white text-left">
+      {/* Hero Section — left-to-right gradient, image bottom-anchored */}
+      <section
+        className="w-full overflow-hidden"
+        style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 50%, #1a2d4a 100%)" }}
+      >
+        <div className="max-w-[2560px] mx-auto w-[95%] pt-[20px] md:pt-[30px]">
+          <div className="flex flex-col lg:flex-row lg:items-end gap-6 lg:gap-0">
+
+            {/* Left column — 55% */}
+            <div className="lg:w-[55%] pb-[40px] md:pb-[60px]">
+
+              {/* 1. Tagline — all caps */}
+              <div className="mb-[30px] md:mb-[40px]">
+                <p className="font-playfair text-[clamp(2.5rem,7vw,68.8px)] font-light leading-[1.2] text-white text-left uppercase">
                   {heroContent.highlightedText && heroContent.headline.includes(heroContent.highlightedText)
                     ? (() => {
                         const idx = heroContent.headline.indexOf(heroContent.highlightedText);
@@ -78,47 +87,73 @@ export default function Index() {
                   }
                 </p>
               </div>
-              {/* H1 Title - All caps, positioned between headline and phone button */}
+
+              {/* 2. CTA Boxes — phone + book consultation side by side */}
+              <div className="flex flex-col sm:flex-row gap-2 items-start mb-[30px] md:mb-[40px]">
+                {/* Phone CTA */}
+                <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block p-[8px] cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <span
+                      className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
+                      style={{ backgroundColor: "#A1134C" }}
+                    >
+                      <Phone className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
+                    </span>
+                    <div className="flex-1">
+                      <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px] font-normal">
+                        {phoneLabel}
+                      </h4>
+                      <p className="font-outfit text-[clamp(1.75rem,5vw,40px)] text-white leading-tight whitespace-nowrap">
+                        {phoneDisplay}
+                      </p>
+                    </div>
+                  </div>
+                </a>
+
+                {/* Book a Consultation CTA */}
+                <Link to={settings.headerCtaUrl?.trim() || "/contact"} className="block p-[8px] cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px] font-normal">
+                        Free Consultation
+                      </h4>
+                      <p className="font-outfit text-[clamp(1.25rem,3vw,28px)] text-white leading-tight whitespace-nowrap">
+                        {settings.headerCtaText?.trim() || "Book a Consultation"}
+                      </p>
+                    </div>
+                    <span
+                      className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
+                      style={{ backgroundColor: "#A1134C" }}
+                    >
+                      <ArrowRight className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
+                    </span>
+                  </div>
+                </Link>
+              </div>
+
+              {/* 3. H1 — title case */}
               {heroContent.h1Title && (
-                <h1 className="font-outfit text-[18px] md:text-[20px] font-medium tracking-wider uppercase text-white mt-[20px] md:mt-[30px]">
+                <h1 className="font-outfit text-[18px] md:text-[20px] font-medium tracking-wider capitalize text-white">
                   {heroContent.h1Title}
                 </h1>
               )}
             </div>
 
-            {/* Call Box */}
-            <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block p-[8px] w-full max-w-[400px] cursor-pointer">
-              <div className="flex items-center gap-4">
-                <span
-                  className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
-                  style={{ backgroundColor: "#A1134C" }}
-                >
-                  <Phone className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
-                </span>
-                <div className="flex-1">
-                  <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px] font-normal">
-                    {phoneLabel}
-                  </h4>
-                  <p className="font-outfit text-[clamp(1.75rem,5vw,40px)] text-white leading-tight">
-                    {phoneDisplay}
-                  </p>
-                </div>
-              </div>
-            </a>
-          </div>
+            {/* Right column — 45%, image bottom-anchored */}
+            <div className="lg:w-[45%] self-end">
+              {heroContent.heroImage && (
+                <img
+                  src={heroContent.heroImage}
+                  alt={heroContent.heroImageAlt || ""}
+                  className="w-full h-auto block object-bottom"
+                  style={{ display: "block", marginBottom: 0 }}
+                />
+              )}
+            </div>
 
-          {/* Right Side: Hero Image */}
-          <div className="lg:w-[31.3333%]">
-            {heroContent.heroImage && (
-              <img
-                src={heroContent.heroImage}
-                alt={heroContent.heroImageAlt || ""}
-                className="w-full h-auto object-cover"
-              />
-            )}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Partner Badges Section - Bottom of Hero */}
       {partnerLogos.length > 0 && (
