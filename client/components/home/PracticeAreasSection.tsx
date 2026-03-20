@@ -41,13 +41,13 @@ export default function PracticeAreasSection({ content }: PracticeAreasSectionPr
               >
                 <div className="flex items-start gap-4">
                   <div className="bg-white p-[15px] mt-1 flex items-center justify-center group-hover:bg-black transition-colors duration-300">
-                    <Scale className="w-8 h-8 text-black group-hover:text-white transition-colors duration-300" />
+                    <Scale className="w-8 h-8 text-brand-accent group-hover:text-white transition-colors duration-300" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[10px] group-hover:text-white transition-colors duration-300">
+                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[10px]">
                       {data.buttonTextLine1}
                     </h4>
-                    <p className="font-outfit text-[18px] md:text-[24px] text-black leading-none group-hover:text-white transition-colors duration-300">
+                    <p className="font-outfit text-[18px] md:text-[24px] text-white leading-none">
                       {data.buttonTextLine2}
                     </p>
                   </div>

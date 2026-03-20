@@ -18,7 +18,7 @@ export default function AboutSection({ content }: AboutSectionProps) {
   const { phoneNumber, phoneAvailability: phoneLabel, phoneDisplay } = useGlobalPhone();
 
   return (
-    <div className="pt-[15px] md:pt-[27px]" style={{ backgroundColor: "#EFF0EB" }}>
+    <div className="pt-[15px] md:pt-[27px] pb-[40px] md:pb-[60px]" style={{ backgroundColor: "#EFF0EB" }}>
       <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] pt-[20px] md:pt-[27px]">
 
         {/* Row 1 — Section label + Heading (full width) */}
