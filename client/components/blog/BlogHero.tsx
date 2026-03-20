@@ -24,7 +24,7 @@ export default function BlogHero({ hero }: BlogHeroProps) {
             <h1 className="font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px] text-brand-accent mb-[10px]">
               {sectionLabel}
             </h1>
-            <p className="font-playfair text-[clamp(2.5rem,7vw,68.8px)] font-light leading-[1.2] text-white mb-[20px] md:mb-[30px]">
+            <p className="font-playfair text-[clamp(2.5rem,7vw,68.8px)] leading-[1.2] text-white mb-[20px] md:mb-[30px]">
               {tagline}
             </p>
           </div>

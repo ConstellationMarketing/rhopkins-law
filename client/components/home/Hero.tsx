@@ -11,7 +11,7 @@ export default function Hero() {
         <div className="lg:w-[65.667%]">
           <div className="mb-[40px]">
             <div className="relative">
-              <p className="font-playfair text-[clamp(2rem,5vw,68.8px)] font-light leading-[1.2] text-white text-left">
+              <p className="font-playfair text-[clamp(2rem,5vw,68.8px)] leading-[1.2] text-white text-left">
                 {phoneLabel}
               </p>
             </div>

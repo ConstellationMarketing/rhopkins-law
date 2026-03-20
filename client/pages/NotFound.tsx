@@ -24,7 +24,7 @@ const NotFound = () => {
       
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-2xl mx-auto px-4">
-          <h1 className="font-playfair text-[clamp(4rem,10vw,120px)] font-light text-brand-accent mb-4">
+          <h1 className="font-playfair text-[clamp(4rem,10vw,120px)] text-brand-accent mb-4">
             404
           </h1>
           <p className="font-outfit text-[28px] text-white mb-4">

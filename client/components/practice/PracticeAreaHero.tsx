@@ -30,7 +30,7 @@ export default function PracticeAreaHero({
               {content.sectionLabel}
             </DynamicHeading>
 
-            <p className="font-playfair text-[clamp(2.5rem,7vw,68.8px)] font-light leading-[1.2] text-white mb-[20px] md:mb-[30px]">
+            <p className="font-playfair text-[clamp(2.5rem,7vw,68.8px)] leading-[1.2] text-white mb-[20px] md:mb-[30px]">
               {content.tagline}
             </p>
 
