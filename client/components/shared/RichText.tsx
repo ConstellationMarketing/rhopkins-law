@@ -10,6 +10,7 @@
  */
 
 import { useMemo, type HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 import CmsFormRenderer from "@site/components/shared/CmsFormRenderer";
 
 const FORM_SHORTCODE_RE = /\{\{form:([a-f0-9-]+)\}\}/gi;
@@ -34,7 +35,13 @@ export default function RichText({
 
   if (!hasShortcodes) {
     const Tag = inline ? "span" : "div";
-    return <Tag {...rest} dangerouslySetInnerHTML={{ __html: html }} />;
+    return (
+      <Tag
+        {...rest}
+        className={cn("rich-text", rest.className)}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
   }
 
   return <RichTextWithForms html={html} inline={inline} {...rest} />;
@@ -56,7 +63,7 @@ function RichTextWithForms({
   const Tag = inline ? "span" : "div";
 
   return (
-    <Tag {...rest}>
+    <Tag {...rest} className={cn("rich-text", rest.className)}>
       {segments.map((seg, i) =>
         seg.type === "html" ? (
           <span key={i} dangerouslySetInnerHTML={{ __html: seg.content }} />
