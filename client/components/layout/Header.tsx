@@ -28,14 +28,14 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full">
       <div className="px-[30px] py-[10px] flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center w-[300px]">
+        <div className="flex items-center w-[180px]">
           <Link to="/" className="mr-[30px]">
             {logoUrl ? (
               <img
                 src={logoUrl}
                 alt={logoAlt}
-                className="w-[306px] max-w-full"
-                width={306}
+                className="w-[154px] max-w-full"
+                width={154}
                 height={50}
               />
             ) : (
@@ -58,12 +58,12 @@ export default function Header() {
               )}
               {phoneDisplay && (
                 <>
-                  <span className="flex items-center justify-center w-[22px] h-[22px] rounded-full bg-red-500 flex-shrink-0">
-                    <Phone className="w-[12px] h-[12px] text-white" />
+                  <span className="flex items-center justify-center w-[30px] h-[30px] rounded-full bg-red-500 flex-shrink-0">
+                    <Phone className="w-[16px] h-[16px] text-white" />
                   </span>
                   <a
                     href={`tel:${phoneNumber || phoneDisplay}`}
-                    className="font-outfit font-semibold text-white text-[20px] leading-none hover:opacity-80 transition-opacity"
+                    className="font-outfit font-semibold text-white text-[28px] leading-none hover:opacity-80 transition-opacity"
                   >
                     {phoneDisplay}
                   </a>
@@ -89,7 +89,7 @@ export default function Header() {
                         rel={
                           item.openInNewTab ? "noopener noreferrer" : undefined
                         }
-                        className="font-outfit text-[18px] text-white py-[6px] whitespace-nowrap hover:opacity-80 transition-opacity duration-400"
+                        className="font-outfit text-[16px] text-white py-[4px] whitespace-nowrap hover:opacity-80 transition-opacity duration-400"
                       >
                         {item.label}
                       </Link>
@@ -106,7 +106,7 @@ export default function Header() {
           {ctaText ? (
             <Button
               asChild
-              className="bg-brand-accent text-white font-outfit text-[16px] py-[22px] px-[20px] h-auto hover:bg-brand-accent/90 transition-all duration-300 flex items-center justify-center gap-2 uppercase tracking-wide"
+              className="bg-brand-accent text-white font-outfit text-[16px] py-[30px] px-[20px] h-auto hover:bg-brand-accent/90 transition-all duration-300 flex items-center justify-center gap-2 uppercase tracking-wide"
             >
               <Link to={ctaUrl}>{ctaText}</Link>
             </Button>
