@@ -151,6 +151,17 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Divider — right-anchored, spans 60% of screen width */}
+      <div className="w-full flex justify-end overflow-hidden">
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets%2F50bd0f2438824f8ea1271cf7dd2c508e%2F870edef9ac1b45fca64a1bcbadb1a17c?format=webp&width=800&height=1200"
+          alt=""
+          aria-hidden="true"
+          className="w-[60%] block"
+          style={{ display: "block" }}
+        />
+      </div>
+
       {/* Partner Badges Section - Bottom of Hero */}
       {partnerLogos.length > 0 && (
         <div className="bg-brand-dark py-[20px] md:py-[30px]">
