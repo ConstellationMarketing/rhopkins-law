@@ -133,7 +133,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
         <Sheet>
           <SheetTrigger asChild className="lg:hidden">
             <Button variant="ghost" size="icon" className="text-white">
-              <Menu className="h-8 w-8" />
+              <Menu size={32} />
             </Button>
           </SheetTrigger>
           <SheetContent

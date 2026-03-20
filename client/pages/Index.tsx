@@ -62,7 +62,7 @@ export default function Index() {
 
               {/* 1. Tagline — all caps */}
               <div className="mb-[30px] md:mb-[40px]">
-                <p className="font-playfair text-[clamp(1.8rem,5.5vw,60px)] font-light leading-[1.2] text-white text-left uppercase">
+                <p className="font-playfair text-[clamp(2.1rem,5.5vw,60px)] font-light leading-[1.2] text-white text-left uppercase">
                   {heroContent.highlightedText && heroContent.headline.includes(heroContent.highlightedText)
                     ? (() => {
                         const idx = heroContent.headline.indexOf(heroContent.highlightedText);
