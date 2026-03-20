@@ -127,6 +127,14 @@ function AboutSectionEditor({ content, update }: SectionProps) {
           tag={ht.get("about.heading")}
           onTagChange={(t) => ht.set("about.heading", t)}
         />
+        <div>
+          <Label>Sub-heading</Label>
+          <Textarea
+            value={about.subheading ?? ""}
+            onChange={(e) => set({ subheading: e.target.value })}
+            placeholder="Larger intro text displayed above the description"
+          />
+        </div>
         <RichTextField label="Description" value={about.description} onChange={(v) => set({ description: v })} />
         <p className="text-xs text-gray-500 italic">Phone number is managed in Site Settings &gt; Contact Info</p>
         <div className="grid grid-cols-2 gap-4">
@@ -144,29 +152,6 @@ function AboutSectionEditor({ content, update }: SectionProps) {
           <Label>Attorney Image Alt</Label>
           <Input value={about.attorneyImageAlt} onChange={(e) => set({ attorneyImageAlt: e.target.value })} />
         </div>
-
-        <h4 className="font-medium mt-2">Features</h4>
-        <ArrayEditor
-          items={about.features}
-          onChange={(items) => set({ features: items })}
-          itemLabel="Feature"
-          newItem={() => ({ number: String(about.features.length + 1), title: "", description: "" })}
-          renderItem={(item, _, upd) => (
-            <div className="grid gap-3">
-              <div className="grid grid-cols-4 gap-3">
-                <div>
-                  <Label>Number</Label>
-                  <Input value={item.number} onChange={(e) => upd({ ...item, number: e.target.value })} />
-                </div>
-                <div className="col-span-3">
-                  <Label>Title</Label>
-                  <Input value={item.title} onChange={(e) => upd({ ...item, title: e.target.value })} />
-                </div>
-              </div>
-              <RichTextField label="Description" value={item.description} onChange={(v) => upd({ ...item, description: v })} />
-            </div>
-          )}
-        />
 
         <h4 className="font-medium mt-2">Stats</h4>
         <ArrayEditor

@@ -30,6 +30,7 @@ export interface AboutStat {
 export interface AboutContent {
   sectionLabel: string;
   heading: string;
+  subheading?: string;
   description: string;
   phone: string;
   phoneLabel: string;
@@ -164,6 +165,7 @@ export const defaultHomeContent: HomePageContent = {
   about: {
     sectionLabel: "",
     heading: "",
+    subheading: "",
     description: "",
     phone: "",
     phoneLabel: "",

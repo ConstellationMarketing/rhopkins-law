@@ -1,7 +1,7 @@
 import { Phone, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { AboutContent } from "@site/lib/cms/homePageTypes";
-import { useSiteSettings, useGlobalPhone } from "@/hooks/useSiteSettings";
+import { useGlobalPhone } from "@/hooks/useSiteSettings";
 import RichText from "@site/components/shared/RichText";
 
 interface AboutSectionProps {
@@ -9,47 +9,79 @@ interface AboutSectionProps {
 }
 
 export default function AboutSection({ content }: AboutSectionProps) {
-  // Guard: if no meaningful content, don't render
   if (!content || (!content.heading && !content.description)) {
     return null;
   }
 
   const data = content;
-  const features = data.features || [];
   const stats = data.stats || [];
   const { phoneNumber, phoneAvailability: phoneLabel, phoneDisplay } = useGlobalPhone();
 
   return (
     <div className="bg-white pt-[15px] md:pt-[27px]">
-      {/* Main Content Section */}
       <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] pt-[20px] md:pt-[27px]">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-[5.5%]">
-          {/* Left Column - About Text and CTAs */}
-          <div className="md:w-full">
-            {/* About Us Label */}
-            {data.sectionLabel && (
-              <div className="text-[rgb(107,141,12)] font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px] mb-[10px]">
-                {data.sectionLabel}
-              </div>
+
+        {/* Row 1 — Section label + Heading (full width) */}
+        <div className="mb-[24px] md:mb-[36px]">
+          {data.sectionLabel && (
+            <div className="text-brand-accent font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px] mb-[10px]">
+              {data.sectionLabel}
+            </div>
+          )}
+          {data.heading && (
+            <h2 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black">
+              {data.heading}
+            </h2>
+          )}
+        </div>
+
+        {/* Row 2 — Two equal columns: image (left) + content (right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-[5%] items-start">
+
+          {/* Left column — Attorney image */}
+          {data.attorneyImage && (
+            <div className="flex justify-center lg:justify-start">
+              <img
+                src={data.attorneyImage}
+                alt={data.attorneyImageAlt}
+                className="max-w-full w-auto h-auto object-contain"
+                loading="lazy"
+              />
+            </div>
+          )}
+
+          {/* Right column — Sub-heading, divider, description, CTAs */}
+          <div className="flex flex-col justify-start">
+
+            {/* Sub-heading */}
+            {data.subheading && (
+              <>
+                <p className="font-playfair text-[22px] md:text-[30px] leading-snug text-black mb-[16px]">
+                  {data.subheading}
+                </p>
+                {/* Crimson divider */}
+                <img
+                  src="https://cdn.builder.io/api/v1/image/assets%2F50bd0f2438824f8ea1271cf7dd2c508e%2F4539924385de498486af39ac35ce9bcb?format=webp&width=800&height=1200"
+                  alt=""
+                  aria-hidden="true"
+                  style={{ height: "5px" }}
+                  className="w-auto block mb-[16px]"
+                />
+              </>
             )}
 
-            {/* Heading */}
-            <div className="mb-[20px] md:mb-[9.27%]">
-              {data.heading && (
-                <h2 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black pb-[10px]">
-                  {data.heading}
-                </h2>
-              )}
-              {data.description && (
+            {/* Description */}
+            {data.description && (
+              <div className="mb-[24px] md:mb-[32px]">
                 <RichText
                   html={data.description}
                   className="font-outfit text-[16px] md:text-[20px] leading-[24px] md:leading-[30px] text-black"
                 />
-              )}
-            </div>
+              </div>
+            )}
 
-            {/* Call Us 24/7 Box */}
-            <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block mb-[9.27%]">
+            {/* Phone CTA */}
+            <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block mb-[20px] md:mb-[24px]">
               <div className="p-[8px] w-full max-w-[400px] cursor-pointer">
                 <div className="flex items-center gap-4">
                   <span
@@ -70,7 +102,7 @@ export default function AboutSection({ content }: AboutSectionProps) {
               </div>
             </a>
 
-            {/* Contact Us Box — original square-icon style */}
+            {/* Contact Us CTA */}
             {data.contactLabel && (
               <Link to="/contact/" className="block">
                 <div className="bg-brand-accent hover:bg-brand-accent-dark group p-[8px] w-full max-w-[400px] cursor-pointer transition-all duration-300">
@@ -91,44 +123,6 @@ export default function AboutSection({ content }: AboutSectionProps) {
               </Link>
             )}
           </div>
-
-          {/* Middle Column - Image */}
-          {data.attorneyImage && (
-            <div className="md:w-full flex justify-center md:justify-start">
-              <img
-                src={data.attorneyImage}
-                alt={data.attorneyImageAlt}
-                className="max-w-full w-auto h-auto object-contain"
-                width={462}
-                height={631}
-                loading="lazy"
-              />
-            </div>
-          )}
-
-          {/* Right Column - Features */}
-          {features.length > 0 && (
-            <div className="md:w-full space-y-[20px] md:space-y-[30px]">
-              {features.map((feature, index) => (
-                <div key={index}>
-                  <div className="mb-[20px] md:mb-[30px]">
-                    <h3 className="font-outfit text-[22px] md:text-[28px] leading-tight md:leading-[28px] text-black pb-[10px]">
-                      {feature.number}. {feature.title}
-                    </h3>
-                    <RichText
-                      html={feature.description}
-                      className="font-outfit text-[16px] md:text-[20px] leading-[24px] md:leading-[30px] text-black"
-                    />
-                  </div>
-                  {index < features.length - 1 && (
-                    <div className="h-[23px]">
-                      <div className="inline-block w-full"></div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
