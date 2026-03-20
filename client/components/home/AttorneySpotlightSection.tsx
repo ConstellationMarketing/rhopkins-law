@@ -52,36 +52,61 @@ export default function AttorneySpotlightSection({ content }: AttorneySpotlightS
           {/* Right column — image with decorative frame */}
           {data.image && (
             <div className="lg:w-[35%] flex-shrink-0 flex justify-center lg:justify-end">
-              {/* Outer wrapper provides space for the offset border */}
-              <div className="relative" style={{ paddingBottom: "16px", paddingRight: "16px" }}>
-                {/* Decorative offset blue border — sits behind and offset bottom-right */}
+              {/*
+                Outer wrapper: padding-right + padding-bottom creates the
+                "canvas" area where the decorative border can peek out.
+                The image card fills the content area (top-left portion).
+                The border div is absolute, offset 16px from top-left of the
+                wrapper's padding box, reaching to the outer right/bottom edges.
+              */}
+              <div
+                className="relative"
+                style={{ paddingRight: "16px", paddingBottom: "16px" }}
+              >
+                {/* Decorative blue border — offset from image, visible only outside it */}
                 <div
-                  className="absolute bottom-0 right-0 w-full h-full"
-                  style={{ border: "2px solid #365d96" }}
+                  className="absolute"
+                  style={{
+                    top: "16px",
+                    left: "16px",
+                    right: "0",
+                    bottom: "0",
+                    border: "2px solid #365d96",
+                  }}
                 />
 
-                {/* Image card with crimson background */}
+                {/* Image card — sits above the border in z-order */}
                 <div
                   className="relative overflow-hidden"
-                  style={{ backgroundColor: "#A1134C" }}
+                  style={{ backgroundColor: "#A1134C", zIndex: 1 }}
                 >
                   <img
                     src={data.image}
                     alt={data.imageAlt || ""}
-                    className="w-full block object-cover relative z-10"
+                    className="w-full block"
                   />
+
+                  {/* Name / title overlay — absolute over the image, centered */}
                   {(data.attorneyName || data.attorneyTitle) && (
                     <div
-                      className="relative z-10 px-[20px] py-[16px]"
-                      style={{ backgroundColor: "rgba(10, 20, 50, 0.82)" }}
+                      className="absolute bottom-0 left-0 right-0 text-center"
+                      style={{
+                        background:
+                          "linear-gradient(to bottom, transparent 0%, rgba(8, 18, 46, 0.90) 55%)",
+                        padding: "60px 20px 22px",
+                        zIndex: 2,
+                      }}
                     >
                       {data.attorneyName && (
-                        <p className="font-playfair text-white text-[20px] md:text-[24px] leading-tight">
+                        <p className="font-playfair text-white text-[22px] md:text-[26px] leading-tight">
                           {data.attorneyName}
                         </p>
                       )}
                       {data.attorneyTitle && (
-                        <p className="font-outfit text-white/80 text-[13px] md:text-[14px] mt-[2px] uppercase tracking-wide">
+                        <p
+                          className="font-outfit text-[13px] uppercase tracking-widest mt-[5px]"
+                          style={{ color: "rgba(255,255,255,0.75)" }}
+                        >
                           {data.attorneyTitle}
                         </p>
                       )}
