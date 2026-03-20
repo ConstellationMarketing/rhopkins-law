@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, ArrowRight, ChevronDown, Phone } from "lucide-react";
@@ -8,6 +8,13 @@ import NavDropdown from "./NavDropdown";
 
 export default function Header() {
   const { settings } = useSiteSettings();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const logoUrl = settings.logoUrl?.trim() || "";
   const logoAlt =
@@ -26,7 +33,10 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full">
-      <div className="px-[30px] py-[10px] flex items-center justify-between">
+      <div
+        className="px-[30px] py-[10px] flex items-center justify-between transition-colors duration-300"
+        style={scrolled ? { backgroundColor: "#365d96" } : {}}
+      >
         {/* Logo */}
         <div className="flex items-center w-[180px]">
           <Link to="/" className="mr-[30px]">
