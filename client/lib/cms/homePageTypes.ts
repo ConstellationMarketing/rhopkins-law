@@ -133,11 +133,24 @@ export interface ContactContent {
   imageAlt: string;
 }
 
+export interface AttorneySpotlightContent {
+  sectionLabel: string;
+  heading: string;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+  image: string;
+  imageAlt: string;
+  attorneyName: string;
+  attorneyTitle: string;
+}
+
 // Complete homepage content structure
 export interface HomePageContent {
   hero: HeroContent;
   partnerLogos: PartnerLogo[];
   about: AboutContent;
+  attorneySpotlight: AttorneySpotlightContent;
   practiceAreasIntro: PracticeAreasIntroContent;
   practiceAreas: PracticeAreaItem[];
   awards: AwardsContent;
@@ -175,6 +188,17 @@ export const defaultHomeContent: HomePageContent = {
     attorneyImageAlt: "",
     features: [],
     stats: [],
+  },
+  attorneySpotlight: {
+    sectionLabel: "",
+    heading: "",
+    description: "",
+    buttonText: "Meet The Attorney",
+    buttonLink: "/about/",
+    image: "",
+    imageAlt: "",
+    attorneyName: "",
+    attorneyTitle: "",
   },
   practiceAreasIntro: {
     sectionLabel: "",

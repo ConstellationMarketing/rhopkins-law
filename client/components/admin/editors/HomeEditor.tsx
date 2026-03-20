@@ -16,6 +16,7 @@ export default function HomeEditor({ content, onChange }: HomeEditorProps) {
       <HeroSection content={content} update={update} />
       <PartnerLogosSection content={content} update={update} />
       <AboutSectionEditor content={content} update={update} />
+      <AttorneySpotlightEditor content={content} update={update} />
       <PracticeAreasIntroSection content={content} update={update} />
       <PracticeAreasItemsSection content={content} update={update} />
       <AwardsSection content={content} update={update} />
@@ -172,6 +173,53 @@ function AboutSectionEditor({ content, update }: SectionProps) {
             </div>
           )}
         />
+      </div>
+    </Section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+function AttorneySpotlightEditor({ content, update }: SectionProps) {
+  const s = content.attorneySpotlight;
+  const set = (patch: Partial<typeof s>) => update("attorneySpotlight", { ...s, ...patch });
+
+  return (
+    <Section title="Attorney Spotlight Section" defaultOpen={false}>
+      <div className="grid gap-4">
+        <div>
+          <Label>Section Label</Label>
+          <Input value={s.sectionLabel} onChange={(e) => set({ sectionLabel: e.target.value })} placeholder="e.g. Meet The Attorney" />
+        </div>
+        <div>
+          <Label>Heading</Label>
+          <Input value={s.heading} onChange={(e) => set({ heading: e.target.value })} />
+        </div>
+        <RichTextField label="Description" value={s.description} onChange={(v) => set({ description: v })} />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Button Text</Label>
+            <Input value={s.buttonText} onChange={(e) => set({ buttonText: e.target.value })} placeholder="Meet The Attorney" />
+          </div>
+          <div>
+            <Label>Button Link</Label>
+            <Input value={s.buttonLink} onChange={(e) => set({ buttonLink: e.target.value })} placeholder="/about/" />
+          </div>
+        </div>
+        <ImageField label="Attorney Image" value={s.image} onChange={(url) => set({ image: url })} folder="team" />
+        <div>
+          <Label>Image Alt Text</Label>
+          <Input value={s.imageAlt} onChange={(e) => set({ imageAlt: e.target.value })} placeholder="Describe the image" />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Attorney Name</Label>
+            <Input value={s.attorneyName} onChange={(e) => set({ attorneyName: e.target.value })} placeholder="e.g. Robert R. Hopkins" />
+          </div>
+          <div>
+            <Label>Attorney Title</Label>
+            <Input value={s.attorneyTitle} onChange={(e) => set({ attorneyTitle: e.target.value })} placeholder="e.g. Divorce Attorney" />
+          </div>
+        </div>
       </div>
     </Section>
   );
