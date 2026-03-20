@@ -42,7 +42,7 @@ export default function AttorneySpotlightSection({ content }: AttorneySpotlightS
             <Link
               to={buttonLink}
               className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[24px] py-[18px] hover:opacity-90 transition-opacity self-start mt-[8px]"
-              style={{ backgroundColor: "#A1134C" }}
+              style={{ backgroundColor: "#365D96" }}
             >
               {buttonText}
               <ArrowRight className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
