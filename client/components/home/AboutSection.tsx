@@ -40,7 +40,7 @@ export default function AboutSection({ content }: AboutSectionProps) {
 
           {/* Left column — Attorney image stretches to match right column height */}
           {data.attorneyImage && (
-            <div className="flex justify-center lg:justify-start">
+            <div className="flex items-center justify-center lg:justify-start">
               <img
                 src={data.attorneyImage}
                 alt={data.attorneyImageAlt}
@@ -111,13 +111,13 @@ export default function AboutSection({ content }: AboutSectionProps) {
                   <div className="bg-brand-accent hover:bg-brand-accent-dark group p-[8px] cursor-pointer transition-all duration-300 h-full">
                     <div className="flex items-center gap-3 h-full">
                       <div className="flex items-center justify-center p-[12px] flex-shrink-0 bg-white group-hover:bg-black transition-colors duration-300">
-                        <MessageCircle className="w-7 h-7 text-black group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
+                        <MessageCircle className="w-7 h-7 text-brand-accent group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-outfit text-[14px] md:text-[16px] leading-tight text-black group-hover:text-white pb-[4px] transition-colors duration-300">
+                        <h4 className="font-outfit text-[14px] md:text-[16px] leading-tight text-white pb-[4px]">
                           {data.contactLabel}
                         </h4>
-                        <p className="font-outfit text-[16px] md:text-[20px] text-black group-hover:text-white leading-none transition-colors duration-300">
+                        <p className="font-outfit text-[16px] md:text-[20px] text-white leading-none">
                           {data.contactText}
                         </p>
                       </div>

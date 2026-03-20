@@ -71,22 +71,22 @@ export default function CallBox({
             className={`w-8 h-8 transition-colors duration-300 ${
               isDark
                 ? "text-black group-hover:text-white"
-                : "text-black group-hover:text-white"
+                : "text-brand-accent group-hover:text-white"
             }`}
             strokeWidth={1.5}
           />
         </div>
         <div className="flex-1">
           <h4
-            className={`font-outfit text-[16px] md:text-[18px] leading-tight pb-[10px] transition-colors duration-300 ${
-              isDark ? "text-white" : "text-black group-hover:text-white"
+            className={`font-outfit text-[16px] md:text-[18px] leading-tight pb-[10px] ${
+              isDark ? "text-white" : "text-white"
             }`}
           >
             {title}
           </h4>
           <p
-            className={`font-outfit text-[18px] md:text-[24px] leading-none whitespace-nowrap transition-colors duration-300 ${
-              isDark ? "text-white" : "text-black group-hover:text-white"
+            className={`font-outfit text-[18px] md:text-[24px] leading-none whitespace-nowrap ${
+              isDark ? "text-white" : "text-white"
             }`}
           >
             {subtitle}
