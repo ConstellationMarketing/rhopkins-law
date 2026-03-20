@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         playfair: [
-          '"Playfair Display"',
+          '"Cormorant Garamond"',
           "Georgia",
           '"Times New Roman"',
           "serif",
