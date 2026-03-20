@@ -200,6 +200,14 @@ function mergeWithDefaults(
       ...defaults.attorneySpotlight,
       ...cmsContent.attorneySpotlight,
     },
+    homeCta: {
+      ...defaults.homeCta,
+      ...cmsContent.homeCta,
+      secondaryButton: {
+        ...defaults.homeCta.secondaryButton,
+        ...cmsContent.homeCta?.secondaryButton,
+      },
+    },
     contact: { ...defaults.contact, ...cmsContent.contact },
   };
 }

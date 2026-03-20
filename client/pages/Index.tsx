@@ -2,6 +2,7 @@ import Seo from "@site/components/Seo";
 import Layout from "@site/components/layout/Layout";
 import AboutSection from "@site/components/home/AboutSection";
 import AttorneySpotlightSection from "@site/components/home/AttorneySpotlightSection";
+import HomeCTASection from "@site/components/home/HomeCTASection";
 import PracticeAreasSection from "@site/components/home/PracticeAreasSection";
 import PracticeAreasGrid from "@site/components/home/PracticeAreasGrid";
 import AwardsSection from "@site/components/home/AwardsSection";
@@ -196,6 +197,9 @@ export default function Index() {
 
       {/* Attorney Spotlight Section */}
       <AttorneySpotlightSection content={content.attorneySpotlight} />
+
+      {/* CTA Section */}
+      <HomeCTASection content={content.homeCta} />
 
       {/* Practice Areas Section */}
       <PracticeAreasSection content={content.practiceAreasIntro} />

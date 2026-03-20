@@ -17,6 +17,7 @@ export default function HomeEditor({ content, onChange }: HomeEditorProps) {
       <PartnerLogosSection content={content} update={update} />
       <AboutSectionEditor content={content} update={update} />
       <AttorneySpotlightEditor content={content} update={update} />
+      <HomeCTAEditor content={content} update={update} />
       <PracticeAreasIntroSection content={content} update={update} />
       <PracticeAreasItemsSection content={content} update={update} />
       <AwardsSection content={content} update={update} />
@@ -218,6 +219,41 @@ function AttorneySpotlightEditor({ content, update }: SectionProps) {
           <div>
             <Label>Attorney Title</Label>
             <Input value={s.attorneyTitle} onChange={(e) => set({ attorneyTitle: e.target.value })} placeholder="e.g. Divorce Attorney" />
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+function HomeCTAEditor({ content, update }: SectionProps) {
+  const cta = content.homeCta;
+  const set = (patch: Partial<typeof cta>) => update("homeCta", { ...cta, ...patch });
+
+  return (
+    <Section title="Call to Action" defaultOpen={false}>
+      <div className="grid gap-4">
+        <div>
+          <Label>Heading</Label>
+          <Input value={cta.heading} onChange={(e) => set({ heading: e.target.value })} />
+        </div>
+        <RichTextField label="Description" value={cta.description} onChange={(v) => set({ description: v })} />
+        <p className="text-xs text-gray-500 italic">Phone number is managed in Site Settings &gt; Contact Info</p>
+        <hr />
+        <h4 className="font-medium">Secondary Button</h4>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Label>Label</Label>
+            <Input value={cta.secondaryButton.label} onChange={(e) => set({ secondaryButton: { ...cta.secondaryButton, label: e.target.value } })} />
+          </div>
+          <div>
+            <Label>Sublabel</Label>
+            <Input value={cta.secondaryButton.sublabel} onChange={(e) => set({ secondaryButton: { ...cta.secondaryButton, sublabel: e.target.value } })} />
+          </div>
+          <div>
+            <Label>Link</Label>
+            <Input value={cta.secondaryButton.link} onChange={(e) => set({ secondaryButton: { ...cta.secondaryButton, link: e.target.value } })} />
           </div>
         </div>
       </div>
