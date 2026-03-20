@@ -121,9 +121,16 @@ export default function Index() {
                 </Link>
               </div>
 
-              {/* 3. H1 — title case */}
+              {/* 3. H1 — title case with decorative accent bar */}
               {heroContent.h1Title && (
-                <h1 className="font-outfit text-[18px] md:text-[20px] font-medium tracking-wider capitalize text-white">
+                <h1 className="font-outfit text-[18px] md:text-[20px] font-medium tracking-wider capitalize text-white flex items-center gap-3">
+                  <img
+                    src="https://cdn.builder.io/api/v1/image/assets%2F50bd0f2438824f8ea1271cf7dd2c508e%2Fffa54af5f7044e0f807e6ead48cedd46?format=webp&width=800&height=1200"
+                    alt=""
+                    aria-hidden="true"
+                    className="flex-shrink-0 w-auto"
+                    style={{ height: "5px" }}
+                  />
                   {heroContent.h1Title}
                 </h1>
               )}
