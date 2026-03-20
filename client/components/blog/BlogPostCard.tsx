@@ -32,7 +32,7 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
           />
         </div>
       ) : (
-        <div className="aspect-[16/9] bg-gradient-to-br from-[#183658] to-[#0f2742] flex items-center justify-center">
+        <div className="aspect-[16/9] bg-gradient-to-br from-[#2a4a7a] to-[#1e3760] flex items-center justify-center">
           <span
             className="text-white/30 text-6xl font-light"
             style={{ fontFamily: "Playfair Display, serif" }}
@@ -47,7 +47,7 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
         {/* Category + Date */}
         <div className="flex items-center gap-3 mb-3 text-sm text-gray-500">
           {post.post_categories?.name && (
-            <span className="flex items-center gap-1 text-[#6b8d0c] font-medium">
+            <span className="flex items-center gap-1 text-[#a1134c] font-medium">
               <Tag className="h-3 w-3" />
               {post.post_categories.name}
             </span>
@@ -64,7 +64,7 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
 
         {/* Title */}
         <h2
-          className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-[#183658] transition-colors line-clamp-2"
+          className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-[#2a4a7a] transition-colors line-clamp-2"
           style={{ fontFamily: "Archivo, sans-serif" }}
         >
           {post.title}
@@ -76,7 +76,7 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
         )}
 
         {/* Read More */}
-        <span className="inline-block mt-4 text-sm font-semibold text-[#183658] group-hover:text-[#6b8d0c] transition-colors">
+        <span className="inline-block mt-4 text-sm font-semibold text-[#2a4a7a] group-hover:text-[#a1134c] transition-colors">
           Read More →
         </span>
       </div>

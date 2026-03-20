@@ -24,11 +24,11 @@ export default {
       },
       colors: {
         // TEMPLATE: Update brand colors for each new project
-        "brand-dark": "rgb(6, 29, 27)",
-        "brand-card": "rgb(20, 41, 40)",
-        "brand-border": "rgb(97, 111, 111)",
-        "brand-accent": "rgb(186, 234, 160)",
-        "brand-accent-dark": "rgb(45, 70, 58)",
+        "brand-dark": "#365d96",
+        "brand-card": "#2a4a7a",
+        "brand-border": "#4a72b0",
+        "brand-accent": "#a1134c",
+        "brand-accent-dark": "#7a0e38",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

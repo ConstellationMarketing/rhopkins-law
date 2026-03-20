@@ -47,7 +47,7 @@ export default function TestimonialsSection({
               tag={headingTag}
               defaultTag="h2"
               className="font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px]"
-              style={{ color: "#6b8d0c" }}
+              style={{ color: "#a1134c" }}
             >
               {data.sectionLabel}
             </DynamicHeading>

@@ -80,7 +80,7 @@ export default function BlogPost() {
     return (
       <Layout>
         <div className="flex items-center justify-center py-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#183658]" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2a4a7a]" />
         </div>
       </Layout>
     );
@@ -118,7 +118,7 @@ export default function BlogPost() {
           {/* Back to Blog */}
           <Link
             to="/blog/"
-            className="inline-flex items-center gap-2 text-sm text-[#183658] hover:text-[#6b8d0c] transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-sm text-[#2a4a7a] hover:text-[#a1134c] transition-colors mb-8"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Blog
@@ -132,13 +132,13 @@ export default function BlogPost() {
                 <div
                   className="prose prose-lg max-w-none
                     prose-headings:font-semibold prose-headings:text-gray-900
-                    prose-a:text-[#183658] prose-a:underline hover:prose-a:text-[#6b8d0c]
-                    prose-blockquote:border-l-4 prose-blockquote:border-[#6b8d0c] prose-blockquote:text-gray-600
+                    prose-a:text-[#2a4a7a] prose-a:underline hover:prose-a:text-[#a1134c]
+                    prose-blockquote:border-l-4 prose-blockquote:border-[#a1134c] prose-blockquote:text-gray-600
                     prose-img:rounded-lg prose-img:shadow-md"
                   dangerouslySetInnerHTML={{ __html: post.body }}
                 />
               ) : post.excerpt ? (
-                <p className="text-xl text-gray-600 leading-relaxed border-l-4 border-[#6b8d0c] pl-4">
+                <p className="text-xl text-gray-600 leading-relaxed border-l-4 border-[#a1134c] pl-4">
                   {post.excerpt}
                 </p>
               ) : (
