@@ -15,8 +15,8 @@ export default function PracticeAreasSection({ content }: PracticeAreasSectionPr
   const data = content;
 
   return (
-    <div className="bg-brand-dark py-[15px] md:py-[20px]">
-      <div className="max-w-[2560px] mx-auto w-[95%] md:w-[85%] lg:w-[80%] py-[20px] md:py-[27px]">
+    <div className="bg-brand-dark py-[7px] md:py-[10px]">
+      <div className="max-w-[2560px] mx-auto w-[95%] md:w-[85%] lg:w-[80%] py-[10px] md:py-[13px]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 md:gap-[5.5%]">
           {/* Left Column - Section Label + Heading */}
           <div className="md:w-full">

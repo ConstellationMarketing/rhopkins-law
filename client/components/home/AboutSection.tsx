@@ -20,7 +20,7 @@ export default function AboutSection({ content }: AboutSectionProps) {
   const { phoneNumber, phoneAvailability: phoneLabel, phoneDisplay } = useGlobalPhone();
 
   return (
-    <div className="bg-white pt-[30px] md:pt-[54px]">
+    <div className="bg-white pt-[15px] md:pt-[27px]">
       {/* Main Content Section */}
       <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] pt-[20px] md:pt-[27px]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-[5.5%]">

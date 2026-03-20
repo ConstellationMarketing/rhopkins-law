@@ -48,7 +48,7 @@ export default function Index() {
       />
 
       {/* Hero and Contact Form Section */}
-      <div className="max-w-[2560px] mx-auto w-[95%] py-[27px] my-[20px] md:my-[40px]">
+      <div className="max-w-[2560px] mx-auto w-[95%] py-[13px] my-[10px] md:my-[20px]">
         <div className="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-[3%]">
           {/* Left Side: Headline and Call Box */}
           <div className="lg:w-[65.667%]">
