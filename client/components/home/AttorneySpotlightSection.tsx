@@ -16,7 +16,7 @@ export default function AttorneySpotlightSection({ content }: AttorneySpotlightS
 
   return (
     <section className="w-full" style={{ backgroundColor: "#EFF0EB" }}>
-      <div className="max-w-[2560px] mx-auto w-[95%] pt-[20px] md:pt-[30px] pb-[40px] md:pb-[60px]">
+      <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] pt-[20px] md:pt-[30px] pb-[40px] md:pb-[60px]">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-[5%] items-center">
 
           {/* Left column — ~65% */}
@@ -34,7 +34,7 @@ export default function AttorneySpotlightSection({ content }: AttorneySpotlightS
             )}
 
             {data.description && (
-              <div className="font-outfit text-[15px] md:text-[16px] text-gray-700 leading-relaxed rich-text">
+              <div className="font-outfit text-[16px] md:text-[20px] leading-[24px] md:leading-[30px] text-black rich-text">
                 <RichText html={data.description} />
               </div>
             )}
