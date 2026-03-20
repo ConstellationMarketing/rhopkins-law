@@ -196,6 +196,10 @@ function mergeWithDefaults(
         ? cmsContent.faq.items
         : defaults.faq.items,
     },
+    attorneySpotlight: {
+      ...defaults.attorneySpotlight,
+      ...cmsContent.attorneySpotlight,
+    },
     contact: { ...defaults.contact, ...cmsContent.contact },
   };
 }
