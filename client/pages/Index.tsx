@@ -54,7 +54,7 @@ export default function Index() {
         className="w-full overflow-hidden"
         style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 28%, #060d1a 100%)" }}
       >
-        <div className="max-w-[2560px] mx-auto w-[95%] pt-[80px] lg:pt-[105px]">
+        <div className="max-w-[2560px] mx-auto w-[95%] pt-[120px] lg:pt-[105px]">
           <div className="flex flex-col lg:flex-row lg:items-end gap-8 lg:gap-[3%]">
 
             {/* Left column */}
@@ -113,7 +113,7 @@ export default function Index() {
                 {/* Book a Consultation CTA — matches header button style */}
                 <Link
                   to={settings.headerCtaUrl?.trim() || "/contact"}
-                  className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[24px] hover:opacity-90 transition-opacity self-stretch"
+                  className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[24px] py-[20px] sm:py-0 hover:opacity-90 transition-opacity self-stretch"
                   style={{ backgroundColor: "#A1134C" }}
                 >
                   {settings.headerCtaText?.trim() || "Book a Consultation"}
