@@ -162,6 +162,15 @@
   .rich-text a {
     text-decoration: underline;
   }
+  /* In highlight-underline containers, swap accent color for a crimson underline */
+  .highlight-underline .text-brand-accent {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: #a1134c;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 4px;
+  }
+
   /* All Garamond (font-playfair) text should be bold */
   .font-playfair { font-weight: 700; }
 

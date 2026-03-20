@@ -74,14 +74,14 @@ export default function Index() {
                         return (
                           <>
                             {before}
-                            <span className="text-brand-accent">{match}</span>
+                            <span className="underline decoration-brand-accent decoration-[3px] underline-offset-4">{match}</span>
                             {after}
                           </>
                         );
                       })()
                     : (
                       <>
-                        <span className="text-brand-accent">{heroContent.highlightedText}</span>
+                        <span className="underline decoration-brand-accent decoration-[3px] underline-offset-4">{heroContent.highlightedText}</span>
                         <br />
                         {heroContent.headline}
                       </>

@@ -58,12 +58,12 @@ const enabledSocialLinks = (settings.socialLinks ?? []).filter((s) => s.enabled)
           <div>
 {footerTaglineHtml ? (
   <div
-    className="font-playfair text-[clamp(2rem,6vw,59.136px)] leading-tight md:leading-[70.9632px] text-white"
+    className="font-playfair text-[clamp(2rem,6vw,59.136px)] leading-tight md:leading-[70.9632px] text-white highlight-underline"
     dangerouslySetInnerHTML={{ __html: footerTaglineHtml }}
   />
 ) : (
   <p className="font-playfair text-[clamp(2rem,6vw,59.136px)] leading-tight md:leading-[70.9632px] text-white">
-    <span className="text-brand-accent">Your rights. Our mission.</span>
+    <span className="underline decoration-brand-accent decoration-[3px] underline-offset-4">Your rights. Our mission.</span>
     <br />
     Backed by integrity and relentless representation.
   </p>
