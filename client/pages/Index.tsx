@@ -62,7 +62,7 @@ export default function Index() {
 
               {/* 1. Tagline — all caps */}
               <div className="mb-[30px] md:mb-[40px]">
-                <p className="font-playfair text-[clamp(2.5rem,7vw,68.8px)] font-light leading-[1.2] text-white text-left uppercase">
+                <p className="font-playfair text-[clamp(1.8rem,5.5vw,60px)] font-light leading-[1.2] text-white text-left uppercase">
                   {heroContent.highlightedText && heroContent.headline.includes(heroContent.highlightedText)
                     ? (() => {
                         const idx = heroContent.headline.indexOf(heroContent.highlightedText);
@@ -91,7 +91,7 @@ export default function Index() {
               {/* 2. CTA Boxes — phone + book consultation side by side */}
               <div className="flex flex-col sm:flex-row gap-8 items-stretch mb-[30px] md:mb-[40px]">
                 {/* Phone CTA */}
-                <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block p-[8px] cursor-pointer">
+                <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block py-[8px] cursor-pointer">
                   <div className="flex items-center gap-4">
                     <span
                       className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
@@ -135,7 +135,7 @@ export default function Index() {
                 <img
                   src={heroContent.heroImage}
                   alt={heroContent.heroImageAlt || ""}
-                  className="max-h-[280px] lg:max-h-[340px] w-auto block object-bottom ml-auto"
+                  className="max-h-[640px] w-auto block object-bottom ml-auto"
                 />
               )}
             </div>
