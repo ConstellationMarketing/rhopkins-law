@@ -34,7 +34,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full">
       <div
-        className="px-[30px] py-[10px] flex items-center justify-between transition-colors duration-300"
+        className="px-[30px] py-[5px] flex items-center justify-between transition-colors duration-300"
         style={scrolled ? { backgroundColor: "#365d96" } : {}}
       >
         {/* Logo */}
@@ -68,7 +68,7 @@ export default function Header() {
               )}
               {phoneDisplay && (
                 <>
-                  <span className="flex items-center justify-center w-[30px] h-[30px] rounded-full bg-red-500 flex-shrink-0">
+                  <span className="flex items-center justify-center w-[30px] h-[30px] rounded-full flex-shrink-0" style={{backgroundColor:'#A1134C'}}>
                     <Phone className="w-[16px] h-[16px] text-white" />
                   </span>
                   <a
@@ -116,7 +116,7 @@ export default function Header() {
           {ctaText ? (
             <Button
               asChild
-              className="bg-brand-accent text-white font-outfit text-[16px] py-[30px] px-[20px] h-auto hover:bg-brand-accent/90 transition-all duration-300 flex items-center justify-center gap-2 uppercase tracking-wide"
+              className="text-white font-outfit text-[16px] py-[30px] px-[20px] h-auto transition-all duration-300 flex items-center justify-center gap-2 uppercase tracking-wide hover:opacity-90" style={{backgroundColor:'#A1134C'}}
             >
               <Link to={ctaUrl}>{ctaText}</Link>
             </Button>
