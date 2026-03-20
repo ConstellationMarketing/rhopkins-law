@@ -35,7 +35,7 @@ export default function Index() {
   const partnerLogos = content.partnerLogos;
 
   return (
-    <Layout>
+    <Layout headerOverlay>
       <Seo
         title={meta.meta_title || "Home"}
         description={meta.meta_description || undefined}
@@ -52,9 +52,9 @@ export default function Index() {
       {/* Hero Section — left-to-right gradient, image bottom-anchored */}
       <section
         className="w-full overflow-hidden"
-        style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 40%, #0e1e33 100%)" }}
+        style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 28%, #060d1a 100%)" }}
       >
-        <div className="max-w-[2560px] mx-auto w-[95%] pt-[20px] md:pt-[30px]">
+        <div className="max-w-[2560px] mx-auto w-[95%] pt-[80px] lg:pt-[105px]">
           <div className="flex flex-col lg:flex-row lg:items-end gap-8 lg:gap-[3%]">
 
             {/* Left column */}
@@ -89,7 +89,7 @@ export default function Index() {
               </div>
 
               {/* 2. CTA Boxes — phone + book consultation side by side */}
-              <div className="flex flex-col sm:flex-row gap-2 items-start mb-[30px] md:mb-[40px]">
+              <div className="flex flex-col sm:flex-row gap-8 items-stretch mb-[30px] md:mb-[40px]">
                 {/* Phone CTA */}
                 <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block p-[8px] cursor-pointer">
                   <div className="flex items-center gap-4">
@@ -113,11 +113,11 @@ export default function Index() {
                 {/* Book a Consultation CTA — matches header button style */}
                 <Link
                   to={settings.headerCtaUrl?.trim() || "/contact"}
-                  className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[20px] py-[18px] hover:opacity-90 transition-opacity self-center"
+                  className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[24px] hover:opacity-90 transition-opacity self-stretch"
                   style={{ backgroundColor: "#A1134C" }}
                 >
                   {settings.headerCtaText?.trim() || "Book a Consultation"}
-                  <ArrowRight className="w-4 h-4" strokeWidth={2} />
+                  <ArrowRight className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
                 </Link>
               </div>
 
@@ -135,8 +135,7 @@ export default function Index() {
                 <img
                   src={heroContent.heroImage}
                   alt={heroContent.heroImageAlt || ""}
-                  className="w-full h-auto block object-bottom"
-                  style={{ display: "block", marginBottom: 0 }}
+                  className="max-h-[280px] lg:max-h-[340px] w-auto block object-bottom ml-auto"
                 />
               )}
             </div>

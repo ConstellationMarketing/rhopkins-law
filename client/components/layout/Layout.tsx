@@ -5,13 +5,15 @@ import GlobalScripts from './GlobalScripts';
 
 interface LayoutProps {
   children: ReactNode;
+  /** When true the header uses absolute→fixed positioning so it overlays the hero */
+  headerOverlay?: boolean;
 }
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children, headerOverlay = false }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-brand-dark">
       <GlobalScripts />
-      <Header />
+      <Header overlay={headerOverlay} />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

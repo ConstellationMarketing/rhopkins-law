@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
 import NavDropdown from "./NavDropdown";
 
-export default function Header() {
+export default function Header({ overlay = false }: { overlay?: boolean }) {
   const { settings } = useSiteSettings();
   const [scrolled, setScrolled] = useState(false);
 
@@ -32,8 +32,13 @@ export default function Header() {
     (a, b) => (a.order ?? 0) - (b.order ?? 0),
   );
 
+  // overlay mode: absolute at top (overlays hero), switches to fixed once scrolled
+  const positionClass = overlay
+    ? scrolled ? "fixed top-0 left-0 right-0 z-50" : "absolute top-0 left-0 right-0 z-50"
+    : "sticky top-0 z-50";
+
   return (
-    <header className="sticky top-0 z-50 w-full">
+    <header className={`w-full ${positionClass}`}>
       <div
         className="px-[30px] py-[5px] flex items-center justify-between transition-colors duration-300"
         style={scrolled ? { backgroundColor: "#365d96" } : {}}
