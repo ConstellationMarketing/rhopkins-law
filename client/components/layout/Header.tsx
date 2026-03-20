@@ -132,8 +132,8 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
         {/* Mobile Menu */}
         <Sheet>
           <SheetTrigger asChild className="lg:hidden">
-            <Button variant="ghost" size="icon" className="text-white">
-              <Menu size={32} />
+            <Button variant="ghost" className="text-white h-auto w-auto p-1">
+              <Menu size={44} />
             </Button>
           </SheetTrigger>
           <SheetContent
