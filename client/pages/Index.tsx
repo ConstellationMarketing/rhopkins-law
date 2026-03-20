@@ -52,13 +52,13 @@ export default function Index() {
       {/* Hero Section — left-to-right gradient, image bottom-anchored */}
       <section
         className="w-full overflow-hidden"
-        style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 50%, #1a2d4a 100%)" }}
+        style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 40%, #0e1e33 100%)" }}
       >
         <div className="max-w-[2560px] mx-auto w-[95%] pt-[20px] md:pt-[30px]">
-          <div className="flex flex-col lg:flex-row lg:items-end gap-6 lg:gap-0">
+          <div className="flex flex-col lg:flex-row lg:items-end gap-8 lg:gap-[3%]">
 
-            {/* Left column — 55% */}
-            <div className="lg:w-[55%] pb-[40px] md:pb-[60px]">
+            {/* Left column */}
+            <div className="lg:w-[65.667%] pb-[40px] md:pb-[60px]">
 
               {/* 1. Tagline — all caps */}
               <div className="mb-[30px] md:mb-[40px]">
@@ -110,24 +110,14 @@ export default function Index() {
                   </div>
                 </a>
 
-                {/* Book a Consultation CTA */}
-                <Link to={settings.headerCtaUrl?.trim() || "/contact"} className="block p-[8px] cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px] font-normal">
-                        Free Consultation
-                      </h4>
-                      <p className="font-outfit text-[clamp(1.25rem,3vw,28px)] text-white leading-tight whitespace-nowrap">
-                        {settings.headerCtaText?.trim() || "Book a Consultation"}
-                      </p>
-                    </div>
-                    <span
-                      className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
-                      style={{ backgroundColor: "#A1134C" }}
-                    >
-                      <ArrowRight className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
-                    </span>
-                  </div>
+                {/* Book a Consultation CTA — matches header button style */}
+                <Link
+                  to={settings.headerCtaUrl?.trim() || "/contact"}
+                  className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[20px] py-[18px] hover:opacity-90 transition-opacity self-center"
+                  style={{ backgroundColor: "#A1134C" }}
+                >
+                  {settings.headerCtaText?.trim() || "Book a Consultation"}
+                  <ArrowRight className="w-4 h-4" strokeWidth={2} />
                 </Link>
               </div>
 
@@ -139,8 +129,8 @@ export default function Index() {
               )}
             </div>
 
-            {/* Right column — 45%, image bottom-anchored */}
-            <div className="lg:w-[45%] self-end">
+            {/* Right column — original width, image bottom-anchored */}
+            <div className="lg:w-[31.3333%] self-end">
               {heroContent.heroImage && (
                 <img
                   src={heroContent.heroImage}
