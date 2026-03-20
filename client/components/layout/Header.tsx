@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, ArrowRight, ChevronDown, Phone } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
 import NavDropdown from "./NavDropdown";
 
@@ -140,6 +140,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
             side="right"
             className="bg-brand-card border-brand-border"
           >
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <nav className="flex flex-col gap-4 mt-8">
               {/* Mobile info bar */}
               {(headerServiceText || phoneDisplay) && (
