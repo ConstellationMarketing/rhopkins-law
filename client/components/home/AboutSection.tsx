@@ -51,15 +51,15 @@ export default function AboutSection({ content }: AboutSectionProps) {
             {/* Call Us 24/7 Box */}
             <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block mb-[9.27%]">
               <div className="p-[8px] w-full max-w-[400px] cursor-pointer">
-                <div className="flex items-start gap-4">
+                <div className="flex items-center gap-4">
                   <span
-                    className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
+                    className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
                     style={{ backgroundColor: "#A1134C" }}
                   >
-                    <Phone className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
+                    <Phone className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
                   </span>
                   <div className="flex-1">
-                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[10px]">
+                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[4px]">
                       {phoneLabel}
                     </h4>
                     <p className="font-outfit text-[28px] md:text-[40px] text-black leading-none">
@@ -70,23 +70,22 @@ export default function AboutSection({ content }: AboutSectionProps) {
               </div>
             </a>
 
-            {/* Contact Us Box */}
+            {/* Contact Us Box — original square-icon style */}
             {data.contactLabel && (
-              <Link to="/contact/" className="p-[8px] w-full max-w-[400px] cursor-pointer block">
-                <div className="flex items-start gap-4">
-                  <span
-                    className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
-                    style={{ backgroundColor: "#A1134C" }}
-                  >
-                    <MessageCircle className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
-                  </span>
-                  <div className="flex-1">
-                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[10px]">
-                      {data.contactLabel}
-                    </h4>
-                    <p className="font-outfit text-[18px] md:text-[24px] text-black leading-none">
-                      {data.contactText}
-                    </p>
+              <Link to="/contact/" className="block">
+                <div className="bg-brand-accent hover:bg-brand-accent-dark group p-[8px] w-full max-w-[400px] cursor-pointer transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="flex items-center justify-center p-[15px] mt-1 flex-shrink-0 bg-white group-hover:bg-black transition-colors duration-300">
+                      <MessageCircle className="w-8 h-8 text-black group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black group-hover:text-white pb-[10px] transition-colors duration-300">
+                        {data.contactLabel}
+                      </h4>
+                      <p className="font-outfit text-[18px] md:text-[24px] text-black group-hover:text-white leading-none transition-colors duration-300">
+                        {data.contactText}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </Link>

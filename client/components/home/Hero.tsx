@@ -22,15 +22,15 @@ export default function Hero() {
             href={`tel:${phoneNumber.replace(/\D/g, "")}`}
             className="p-[8px] w-full max-w-[400px] cursor-pointer block"
           >
-            <div className="flex items-start gap-4">
+            <div className="flex items-center gap-4">
               <span
-                className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
+                className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
                 style={{ backgroundColor: "#A1134C" }}
               >
-                <Phone className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
+                <Phone className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
               </span>
               <div className="flex-1">
-                <h4 className="font-outfit text-[18px] leading-[18px] text-white pb-[10px] font-normal">
+                <h4 className="font-outfit text-[18px] leading-tight text-white pb-[4px] font-normal">
                   {phoneLabel}
                 </h4>
                 <p className="font-outfit text-[clamp(1.5rem,4vw,40px)] text-white leading-tight">

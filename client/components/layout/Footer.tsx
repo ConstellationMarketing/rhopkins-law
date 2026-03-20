@@ -75,15 +75,15 @@ const enabledSocialLinks = (settings.socialLinks ?? []).filter((s) => s.enabled)
         {/* Right: Call Us Box */}
         <div className="lg:w-[25%]">
           <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block p-[8px] w-full cursor-pointer">
-            <div className="flex items-start gap-4">
+            <div className="flex items-center gap-4">
               <span
-                className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
+                className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
                 style={{ backgroundColor: "#A1134C" }}
               >
-                <Phone className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
+                <Phone className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
               </span>
               <div className="flex-1">
-                <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[10px]">
+                <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px]">
                   {phoneLabel}
                 </h4>
                 <p className="font-outfit text-[28px] md:text-[40px] leading-tight md:leading-[44px] text-white whitespace-nowrap">

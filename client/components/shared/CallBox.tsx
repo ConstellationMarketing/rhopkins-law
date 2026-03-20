@@ -27,34 +27,74 @@ export default function CallBox({
   className = "",
   variant = "light",
 }: CallBoxProps) {
+  const isPhone = !!phone;
+
+  // ── Phone variant: transparent bg, circular crimson badge ──────────────────
+  if (isPhone) {
+    const digits = toRawDigits(phone!);
+    const content = (
+      <div className={`p-[8px] w-full lg:w-[340px] cursor-pointer ${className}`}>
+        <div className="flex items-center gap-4">
+          <span
+            className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
+            style={{ backgroundColor: "#A1134C" }}
+          >
+            <Icon className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
+          </span>
+          <div className="flex-1">
+            <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px]">
+              {title}
+            </h4>
+            <p className="font-outfit text-[18px] md:text-[24px] text-white leading-none whitespace-nowrap">
+              {subtitle}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+    return <a href={`tel:${digits}`} className="block">{content}</a>;
+  }
+
+  // ── Link/static variant: original square-icon box ──────────────────────────
+  const isDark = variant === "dark";
+  const outerBg = isDark ? className : `bg-brand-accent hover:bg-brand-accent-dark group ${className}`;
+
   const content = (
-    <div
-      className={`p-[8px] w-full lg:w-[340px] cursor-pointer ${className}`}
-    >
+    <div className={`p-[8px] w-full lg:w-[340px] cursor-pointer transition-all duration-300 ${outerBg}`}>
       <div className="flex items-start gap-4">
-        <span
-          className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
-          style={{ backgroundColor: "#A1134C" }}
+        <div
+          className={`flex items-center justify-center p-[15px] mt-1 flex-shrink-0 transition-colors duration-300 ${
+            isDark ? "bg-white group-hover:bg-black" : "bg-white group-hover:bg-black"
+          }`}
         >
-          <Icon className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
-        </span>
+          <Icon
+            className={`w-8 h-8 transition-colors duration-300 ${
+              isDark
+                ? "text-black group-hover:text-white"
+                : "text-black group-hover:text-white"
+            }`}
+            strokeWidth={1.5}
+          />
+        </div>
         <div className="flex-1">
-          <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[10px]">
+          <h4
+            className={`font-outfit text-[16px] md:text-[18px] leading-tight pb-[10px] transition-colors duration-300 ${
+              isDark ? "text-white" : "text-black group-hover:text-white"
+            }`}
+          >
             {title}
           </h4>
-          <p className="font-outfit text-[18px] md:text-[24px] text-white leading-none whitespace-nowrap">
+          <p
+            className={`font-outfit text-[18px] md:text-[24px] leading-none whitespace-nowrap transition-colors duration-300 ${
+              isDark ? "text-white" : "text-black group-hover:text-white"
+            }`}
+          >
             {subtitle}
           </p>
         </div>
       </div>
     </div>
   );
-
-  // Phone link takes priority over route link
-  if (phone) {
-    const digits = toRawDigits(phone);
-    return <a href={`tel:${digits}`} className="block">{content}</a>;
-  }
 
   if (link) {
     return <Link to={link} className="block">{content}</Link>;
