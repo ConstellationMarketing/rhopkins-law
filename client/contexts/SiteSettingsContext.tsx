@@ -17,6 +17,7 @@ interface SiteSettings {
   applyPhoneGlobally: boolean;
   headerCtaText: string;
   headerCtaUrl: string;
+  headerServiceText: string;
   navigationItems: {
     label: string;
     href: string;
@@ -55,6 +56,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
   applyPhoneGlobally: true,
   headerCtaText: "",
   headerCtaUrl: "",
+  headerServiceText: "",
   navigationItems: [],
   footerAboutLinks: [],
   footerPracticeLinks: [],
@@ -143,6 +145,7 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
             headerCtaText:
               row.header_cta_text || DEFAULT_SETTINGS.headerCtaText,
             headerCtaUrl: row.header_cta_url || DEFAULT_SETTINGS.headerCtaUrl,
+            headerServiceText: row.header_service_text || DEFAULT_SETTINGS.headerServiceText,
             navigationItems: row.navigation_items?.length
               ? row.navigation_items
               : DEFAULT_SETTINGS.navigationItems,

@@ -439,7 +439,32 @@ export default function AdminSiteSettings() {
         </TabsContent>
 
         {/* Navigation Tab */}
-        <TabsContent value="navigation" className="mt-6">
+        <TabsContent value="navigation" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Header Info Bar</CardTitle>
+              <CardDescription>
+                Text displayed above the navigation links (e.g. service area). The phone number is pulled from Contact Info settings.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="headerServiceText">Service Area Text</Label>
+                <Input
+                  id="headerServiceText"
+                  value={settings.headerServiceText}
+                  onChange={(e) =>
+                    updateSettings({ headerServiceText: e.target.value })
+                  }
+                  placeholder="Serving: Delaware County"
+                />
+                <p className="text-sm text-gray-500">
+                  This text appears before the phone icon and number in the header info bar.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Navigation Menu</CardTitle>
