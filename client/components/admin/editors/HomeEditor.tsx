@@ -66,6 +66,18 @@ function HeroSection({ content, update }: SectionProps) {
           <Input value={hero.highlightedText} onChange={(e) => set({ highlightedText: e.target.value })} />
           <p className="text-xs text-gray-500 mt-1">Enter the exact portion of the headline to display in accent color</p>
         </div>
+        <ImageField
+          label="Hero Image"
+          value={hero.heroImage}
+          onChange={(v) => set({ heroImage: v })}
+        />
+        <div>
+          <Label>Hero Image Alt Text</Label>
+          <Input
+            value={hero.heroImageAlt}
+            onChange={(e) => set({ heroImageAlt: e.target.value })}
+          />
+        </div>
         <p className="text-xs text-gray-500 italic">Phone number is managed in Site Settings &gt; Contact Info</p>
       </div>
     </Section>

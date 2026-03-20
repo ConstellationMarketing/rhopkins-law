@@ -74,29 +74,21 @@ const enabledSocialLinks = (settings.socialLinks ?? []).filter((s) => s.enabled)
 
         {/* Right: Call Us Box */}
         <div className="lg:w-[25%]">
-          <a href={`tel:${phoneNumber.replace(/\D/g, "")}`}>
-            <div className="bg-brand-accent p-[8px] w-full ml-auto cursor-pointer transition-all duration-300 hover:bg-brand-accent-dark group">
-              <div className="table w-full mx-auto max-w-full flex-row-reverse">
-                <div className="table-cell w-[32px] leading-[0] mb-[30px]">
-                  <span className="m-auto">
-                    <span className="inline-block bg-white p-[15px] text-black group-hover:bg-black transition-colors duration-300">
-                      <Phone
-                        className="w-[31px] h-[31px] [&>*]:fill-none [&>*]:stroke-black group-hover:[&>*]:stroke-white transition-colors duration-300"
-                        strokeWidth={1.5}
-                      />
-                    </span>
-                  </span>
-                </div>
-                <div className="table-cell align-top pl-[15px]">
-                  <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[10px] group-hover:text-white transition-colors duration-300">
-                    {phoneLabel}
-                  </h4>
-                  <div>
-                    <p className="font-outfit text-[28px] md:text-[40px] leading-tight md:leading-[44px] text-black group-hover:text-white transition-colors duration-300 whitespace-nowrap">
-                      {phoneDisplay}
-                    </p>
-                  </div>
-                </div>
+          <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block p-[8px] w-full cursor-pointer">
+            <div className="flex items-start gap-4">
+              <span
+                className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
+                style={{ backgroundColor: "#A1134C" }}
+              >
+                <Phone className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
+              </span>
+              <div className="flex-1">
+                <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[10px]">
+                  {phoneLabel}
+                </h4>
+                <p className="font-outfit text-[28px] md:text-[40px] leading-tight md:leading-[44px] text-white whitespace-nowrap">
+                  {phoneDisplay}
+                </p>
               </div>
             </div>
           </a>

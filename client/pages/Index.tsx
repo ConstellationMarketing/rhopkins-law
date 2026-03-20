@@ -1,6 +1,5 @@
 import Seo from "@site/components/Seo";
 import Layout from "@site/components/layout/Layout";
-import ContactForm from "@site/components/home/ContactForm";
 import AboutSection from "@site/components/home/AboutSection";
 import PracticeAreasSection from "@site/components/home/PracticeAreasSection";
 import PracticeAreasGrid from "@site/components/home/PracticeAreasGrid";
@@ -12,7 +11,7 @@ import FaqSection from "@site/components/home/FaqSection";
 import ContactUsSection from "@site/components/home/ContactUsSection";
 import { useHomeContent } from "@site/hooks/useHomeContent";
 import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, Phone } from "lucide-react";
 
 export default function Index() {
   const { content, meta, isLoading } = useHomeContent();
@@ -88,34 +87,35 @@ export default function Index() {
             </div>
 
             {/* Call Box */}
-            <a href={`tel:${phoneNumber.replace(/\D/g, "")}`}>
-              <div className="bg-brand-accent p-[8px] w-full max-w-[400px] cursor-pointer transition-all duration-300 hover:bg-brand-accent-dark group">
-                <div className="flex items-start gap-4">
-                  <div className="bg-white p-[15px] mt-1 flex items-center justify-center group-hover:bg-black transition-colors duration-300">
-                    <svg
-                      className="w-8 h-8 text-black group-hover:text-white transition-colors duration-300"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[10px] font-normal group-hover:text-white transition-colors duration-300">
-                      {phoneLabel}
-                    </h4>
-                    <p className="font-outfit text-[clamp(1.75rem,5vw,40px)] text-black leading-tight group-hover:text-white transition-colors duration-300">
-                      {phoneDisplay}
-                    </p>
-                  </div>
+            <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block p-[8px] w-full max-w-[400px] cursor-pointer">
+              <div className="flex items-start gap-4">
+                <span
+                  className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
+                  style={{ backgroundColor: "#A1134C" }}
+                >
+                  <Phone className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
+                </span>
+                <div className="flex-1">
+                  <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[10px] font-normal">
+                    {phoneLabel}
+                  </h4>
+                  <p className="font-outfit text-[clamp(1.75rem,5vw,40px)] text-white leading-tight">
+                    {phoneDisplay}
+                  </p>
                 </div>
               </div>
             </a>
           </div>
 
-          {/* Right Side: Contact Form */}
+          {/* Right Side: Hero Image */}
           <div className="lg:w-[31.3333%]">
-            <ContactForm />
+            {heroContent.heroImage && (
+              <img
+                src={heroContent.heroImage}
+                alt={heroContent.heroImageAlt || ""}
+                className="w-full h-auto object-cover"
+              />
+            )}
           </div>
         </div>
       </div>

@@ -49,20 +49,20 @@ export default function AboutSection({ content }: AboutSectionProps) {
             </div>
 
             {/* Call Us 24/7 Box */}
-            <a href={`tel:${phoneNumber.replace(/\D/g, "")}`}>
-              <div className="bg-brand-accent p-[8px] w-full max-w-[400px] mb-[9.27%] cursor-pointer transition-all duration-300 hover:bg-brand-accent-dark group">
+            <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block mb-[9.27%]">
+              <div className="p-[8px] w-full max-w-[400px] cursor-pointer">
                 <div className="flex items-start gap-4">
-                  <div className="bg-white p-[15px] mt-1 flex items-center justify-center group-hover:bg-black transition-colors duration-300">
-                    <Phone
-                      className="w-8 h-8 [&>*]:fill-none [&>*]:stroke-black group-hover:[&>*]:stroke-white transition-colors duration-300"
-                      strokeWidth={1.5}
-                    />
-                  </div>
+                  <span
+                    className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
+                    style={{ backgroundColor: "#A1134C" }}
+                  >
+                    <Phone className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
+                  </span>
                   <div className="flex-1">
-                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[10px] group-hover:text-white transition-colors duration-300">
+                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[10px]">
                       {phoneLabel}
                     </h4>
-                    <p className="font-outfit text-[28px] md:text-[40px] text-black leading-none group-hover:text-white transition-colors duration-300">
+                    <p className="font-outfit text-[28px] md:text-[40px] text-black leading-none">
                       {phoneDisplay}
                     </p>
                   </div>
@@ -72,19 +72,19 @@ export default function AboutSection({ content }: AboutSectionProps) {
 
             {/* Contact Us Box */}
             {data.contactLabel && (
-              <Link to="/contact/" className="bg-brand-accent p-[8px] w-full max-w-[400px] cursor-pointer transition-all duration-300 hover:bg-brand-accent-dark group block">
+              <Link to="/contact/" className="p-[8px] w-full max-w-[400px] cursor-pointer block">
                 <div className="flex items-start gap-4">
-                  <div className="bg-white p-[15px] mt-1 flex items-center justify-center group-hover:bg-black transition-colors duration-300">
-                    <MessageCircle
-                      className="w-8 h-8 [&>*]:fill-none [&>*]:stroke-black group-hover:[&>*]:stroke-white transition-colors duration-300"
-                      strokeWidth={1.5}
-                    />
-                  </div>
+                  <span
+                    className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
+                    style={{ backgroundColor: "#A1134C" }}
+                  >
+                    <MessageCircle className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
+                  </span>
                   <div className="flex-1">
-                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[10px] group-hover:text-white transition-colors duration-300">
+                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[10px]">
                       {data.contactLabel}
                     </h4>
-                    <p className="font-outfit text-[18px] md:text-[24px] text-black leading-none group-hover:text-white transition-colors duration-300">
+                    <p className="font-outfit text-[18px] md:text-[24px] text-black leading-none">
                       {data.contactText}
                     </p>
                   </div>

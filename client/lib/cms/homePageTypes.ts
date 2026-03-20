@@ -7,6 +7,8 @@ export interface HeroContent {
   highlightedText: string;
   phone: string;
   phoneLabel: string;
+  heroImage: string;
+  heroImageAlt: string;
 }
 
 export interface PartnerLogo {
@@ -155,6 +157,8 @@ export const defaultHomeContent: HomePageContent = {
     highlightedText: "",
     phone: "",
     phoneLabel: "",
+    heroImage: "",
+    heroImageAlt: "",
   },
   partnerLogos: [],
   about: {

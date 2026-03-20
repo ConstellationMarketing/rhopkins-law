@@ -20,20 +20,20 @@ export default function Hero() {
           {/* Call Box */}
           <a
             href={`tel:${phoneNumber.replace(/\D/g, "")}`}
-            className="bg-brand-accent p-[8px] w-full max-w-[400px] cursor-pointer transition-all duration-300 hover:bg-brand-accent-dark group block"
+            className="p-[8px] w-full max-w-[400px] cursor-pointer block"
           >
             <div className="flex items-start gap-4">
-              <div className="bg-white p-[15px] mt-1 flex items-center justify-center group-hover:bg-black transition-colors duration-300">
-                <Phone
-                  className="w-8 h-8 [&>*]:fill-none [&>*]:stroke-black group-hover:[&>*]:stroke-white transition-colors duration-300"
-                  strokeWidth={1.5}
-                />
-              </div>
+              <span
+                className="flex items-center justify-center w-[44px] h-[44px] rounded-full flex-shrink-0 mt-1"
+                style={{ backgroundColor: "#A1134C" }}
+              >
+                <Phone className="w-[22px] h-[22px] text-white" strokeWidth={1.5} />
+              </span>
               <div className="flex-1">
-                <h4 className="font-outfit text-[18px] leading-[18px] text-black pb-[10px] font-normal group-hover:text-white transition-colors duration-300">
+                <h4 className="font-outfit text-[18px] leading-[18px] text-white pb-[10px] font-normal">
                   {phoneLabel}
                 </h4>
-                <p className="font-outfit text-[clamp(1.5rem,4vw,40px)] text-black leading-tight group-hover:text-white transition-colors duration-300">
+                <p className="font-outfit text-[clamp(1.5rem,4vw,40px)] text-white leading-tight">
                   {phoneDisplay}
                 </p>
               </div>
