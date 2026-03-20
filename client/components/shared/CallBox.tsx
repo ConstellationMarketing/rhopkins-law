@@ -11,6 +11,8 @@ interface CallBoxProps {
   phone?: string;
   className?: string;
   variant?: "light" | "dark"; // light = black text on light bg, dark = white text on dark bg
+  /** When true, the icon square uses crimson accent colour */
+  accentIcon?: boolean;
 }
 
 /** Strip all non-digit characters for use in tel: href */
@@ -26,6 +28,7 @@ export default function CallBox({
   phone,
   className = "",
   variant = "light",
+  accentIcon = false,
 }: CallBoxProps) {
   const isPhone = !!phone;
 
@@ -64,14 +67,18 @@ export default function CallBox({
       <div className="flex items-start gap-4">
         <div
           className={`flex items-center justify-center p-[15px] mt-1 flex-shrink-0 transition-colors duration-300 ${
-            isDark ? "bg-white group-hover:bg-black" : "bg-white group-hover:bg-black"
+            accentIcon
+              ? "bg-white"
+              : isDark ? "bg-white group-hover:bg-black" : "bg-white group-hover:bg-black"
           }`}
         >
           <Icon
             className={`w-8 h-8 transition-colors duration-300 ${
-              isDark
-                ? "text-black group-hover:text-white"
-                : "text-brand-accent group-hover:text-white"
+              accentIcon
+                ? "text-brand-accent"
+                : isDark
+                  ? "text-black group-hover:text-white"
+                  : "text-brand-accent group-hover:text-white"
             }`}
             strokeWidth={1.5}
           />
