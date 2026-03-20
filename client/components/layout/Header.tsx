@@ -50,7 +50,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
               <img
                 src={logoUrl}
                 alt={logoAlt}
-                className="w-[154px] max-w-full"
+                className="w-[100px] lg:w-[154px] max-w-full"
                 width={154}
                 height={50}
               />
@@ -133,7 +133,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
         <Sheet>
           <SheetTrigger asChild className="lg:hidden">
             <Button variant="ghost" size="icon" className="text-white">
-              <Menu className="h-6 w-6" />
+              <Menu className="h-8 w-8" />
             </Button>
           </SheetTrigger>
           <SheetContent

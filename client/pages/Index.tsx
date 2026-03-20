@@ -55,10 +55,10 @@ export default function Index() {
         style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 28%, #060d1a 100%)" }}
       >
         <div className="max-w-[2560px] mx-auto w-[95%] pt-[120px] lg:pt-[105px]">
-          <div className="flex flex-col lg:flex-row lg:items-end gap-8 lg:gap-[3%]">
+          <div className="flex flex-col lg:flex-row lg:items-end gap-4 lg:gap-[3%]">
 
             {/* Left column */}
-            <div className="lg:w-[65.667%] pb-[40px] md:pb-[60px]">
+            <div className="lg:w-[65.667%] pb-[20px] md:pb-[60px]">
 
               {/* 1. Tagline — all caps */}
               <div className="mb-[30px] md:mb-[40px]">
