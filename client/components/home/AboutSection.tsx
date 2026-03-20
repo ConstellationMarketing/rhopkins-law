@@ -24,14 +24,14 @@ export default function AboutSection({ content }: AboutSectionProps) {
         {/* Row 1 — Section label + Heading (full width) */}
         <div className="mb-[24px] md:mb-[36px]">
           {data.sectionLabel && (
-            <div className="text-brand-accent font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px] mb-[10px]">
+            <h2 className="text-brand-accent font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px] mb-[10px]">
               {data.sectionLabel}
-            </div>
+            </h2>
           )}
           {data.heading && (
-            <h2 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black">
+            <h3 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black">
               {data.heading}
-            </h2>
+            </h3>
           )}
         </div>
 
