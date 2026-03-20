@@ -52,9 +52,6 @@ export interface PracticeAreaItem {
 export interface PracticeAreasIntroContent {
   sectionLabel: string;
   heading: string;
-  buttonLink: string;
-  buttonTextLine1: string;
-  buttonTextLine2: string;
 }
 
 export interface AwardsContent {
