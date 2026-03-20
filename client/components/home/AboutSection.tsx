@@ -36,15 +36,16 @@ export default function AboutSection({ content }: AboutSectionProps) {
         </div>
 
         {/* Row 2 — Two equal columns: image (left) + content (right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-[5%] items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-[5%] items-stretch">
 
-          {/* Left column — Attorney image */}
+          {/* Left column — Attorney image stretches to match right column height */}
           {data.attorneyImage && (
             <div className="flex justify-center lg:justify-start">
               <img
                 src={data.attorneyImage}
                 alt={data.attorneyImageAlt}
-                className="max-w-full w-auto h-auto object-contain"
+                className="max-w-full w-auto object-cover object-top"
+                style={{ height: "100%", maxHeight: "700px" }}
                 loading="lazy"
               />
             </div>
@@ -80,48 +81,51 @@ export default function AboutSection({ content }: AboutSectionProps) {
               </div>
             )}
 
-            {/* Phone CTA */}
-            <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block mb-[20px] md:mb-[24px]">
-              <div className="p-[8px] w-full max-w-[400px] cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <span
-                    className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
-                    style={{ backgroundColor: "#A1134C" }}
-                  >
-                    <Phone className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
-                  </span>
-                  <div className="flex-1">
-                    <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black pb-[4px]">
-                      {phoneLabel}
-                    </h4>
-                    <p className="font-outfit text-[28px] md:text-[40px] text-black leading-none">
-                      {phoneDisplay}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </a>
-
-            {/* Contact Us CTA */}
-            {data.contactLabel && (
-              <Link to="/contact/" className="block">
-                <div className="bg-brand-accent hover:bg-brand-accent-dark group p-[8px] w-full max-w-[400px] cursor-pointer transition-all duration-300">
-                  <div className="flex items-start gap-4">
-                    <div className="flex items-center justify-center p-[15px] mt-1 flex-shrink-0 bg-white group-hover:bg-black transition-colors duration-300">
-                      <MessageCircle className="w-8 h-8 text-black group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
-                    </div>
+            {/* CTAs — always inline side by side */}
+            <div className="flex flex-row items-stretch gap-4 flex-wrap">
+              {/* Phone CTA */}
+              <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="flex-1 min-w-[180px]">
+                <div className="p-[8px] cursor-pointer h-full">
+                  <div className="flex items-center gap-3 h-full">
+                    <span
+                      className="flex items-center justify-center w-[52px] h-[52px] rounded-full flex-shrink-0"
+                      style={{ backgroundColor: "#A1134C" }}
+                    >
+                      <Phone className="w-[26px] h-[26px] text-white" strokeWidth={1.5} />
+                    </span>
                     <div className="flex-1">
-                      <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-black group-hover:text-white pb-[10px] transition-colors duration-300">
-                        {data.contactLabel}
+                      <h4 className="font-outfit text-[14px] md:text-[16px] leading-tight text-black pb-[2px]">
+                        {phoneLabel}
                       </h4>
-                      <p className="font-outfit text-[18px] md:text-[24px] text-black group-hover:text-white leading-none transition-colors duration-300">
-                        {data.contactText}
+                      <p className="font-outfit text-[22px] md:text-[32px] text-black leading-none">
+                        {phoneDisplay}
                       </p>
                     </div>
                   </div>
                 </div>
-              </Link>
-            )}
+              </a>
+
+              {/* Contact Us CTA */}
+              {data.contactLabel && (
+                <Link to="/contact/" className="flex-1 min-w-[160px]">
+                  <div className="bg-brand-accent hover:bg-brand-accent-dark group p-[8px] cursor-pointer transition-all duration-300 h-full">
+                    <div className="flex items-center gap-3 h-full">
+                      <div className="flex items-center justify-center p-[12px] flex-shrink-0 bg-white group-hover:bg-black transition-colors duration-300">
+                        <MessageCircle className="w-7 h-7 text-black group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-outfit text-[14px] md:text-[16px] leading-tight text-black group-hover:text-white pb-[4px] transition-colors duration-300">
+                          {data.contactLabel}
+                        </h4>
+                        <p className="font-outfit text-[16px] md:text-[20px] text-black group-hover:text-white leading-none transition-colors duration-300">
+                          {data.contactText}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
