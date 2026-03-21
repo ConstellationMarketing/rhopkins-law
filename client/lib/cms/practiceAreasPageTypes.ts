@@ -2,11 +2,14 @@
 // Each section maps directly to a static component's data needs
 
 export interface PracticeAreasHeroContent {
-  sectionLabel: string; // "– Practice Areas" (H1)
-  tagline: string; // "Comprehensive Legal Expertise" (styled text)
+  sectionLabel: string; // H1 title text
+  tagline: string; // Large headline
+  highlightedText: string; // Portion of tagline to underline
   description: string; // Description paragraph
   phone: string;
   phoneLabel: string;
+  heroImage: string;
+  heroImageAlt: string;
 }
 
 export interface PracticeAreaGridItem {
@@ -69,9 +72,12 @@ export const defaultPracticeAreasContent: PracticeAreasPageContent = {
   hero: {
     sectionLabel: "",
     tagline: "",
+    highlightedText: "",
     description: "",
     phone: "",
     phoneLabel: "",
+    heroImage: "",
+    heroImageAlt: "",
   },
   grid: {
     heading: "",

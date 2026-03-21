@@ -2,9 +2,12 @@
 // Each section maps directly to a static component's data needs
 
 export interface ContactHeroContent {
-  sectionLabel: string; // "– Contact Us" (H1)
-  tagline: string; // "Let's Talk About Your Case" (styled paragraph)
+  sectionLabel: string; // H1 title text
+  tagline: string; // Large headline
+  highlightedText: string; // Portion of tagline to underline
   description: string; // Description paragraph
+  heroImage: string;
+  heroImageAlt: string;
 }
 
 export interface ContactMethodItem {
@@ -85,7 +88,10 @@ export const defaultContactContent: ContactPageContent = {
   hero: {
     sectionLabel: "",
     tagline: "",
+    highlightedText: "",
     description: "",
+    heroImage: "",
+    heroImageAlt: "",
   },
   contactMethods: {
     methods: [],

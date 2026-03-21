@@ -2,11 +2,14 @@
 // Each section maps directly to a static component's data needs
 
 export interface AboutHeroContent {
-  sectionLabel: string; // "– About Us" (H1)
-  tagline: string; // "Dedicated to Justice & Excellence" (styled paragraph)
+  sectionLabel: string; // H1 title text
+  tagline: string; // Large headline
+  highlightedText: string; // Portion of tagline to underline
   description: string; // Description paragraph
   phone: string;
   phoneLabel: string;
+  heroImage: string;
+  heroImageAlt: string;
 }
 
 export interface StoryContent {
@@ -113,9 +116,12 @@ export const defaultAboutContent: AboutPageContent = {
   hero: {
     sectionLabel: "",
     tagline: "",
+    highlightedText: "",
     description: "",
     phone: "",
     phoneLabel: "",
+    heroImage: "",
+    heroImageAlt: "",
   },
   story: {
     sectionLabel: "",

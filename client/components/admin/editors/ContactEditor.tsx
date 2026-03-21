@@ -1,5 +1,5 @@
 import type { ContactPageContent } from "@/lib/cms/contactPageTypes";
-import { Section, ArrayEditor, GlobalSectionInfo, RichTextField, HeadingField, Input, Label, Textarea } from "./EditorShared";
+import { Section, ArrayEditor, GlobalSectionInfo, ImageField, RichTextField, HeadingField, Input, Label, Textarea } from "./EditorShared";
 
 interface ContactEditorProps {
   content: ContactPageContent;
@@ -45,18 +45,33 @@ function HeroSection({ content, update }: SectionProps) {
   return (
     <Section title="Hero Section">
       <div className="grid gap-4">
-        <div>
-          <Label>Section Label</Label>
-          <Input value={hero.sectionLabel} onChange={(e) => set({ sectionLabel: e.target.value })} />
-        </div>
         <HeadingField
-          label="Tagline"
-          value={hero.tagline}
-          onChange={(v) => set({ tagline: v })}
-          tag={ht.get("hero.tagline")}
-          onTagChange={(t) => ht.set("hero.tagline", t)}
+          label="H1 Title"
+          value={hero.sectionLabel}
+          onChange={(v) => set({ sectionLabel: v })}
+          tag={ht.get("hero.sectionLabel") === "h2" ? "h1" : ht.get("hero.sectionLabel")}
+          onTagChange={(t) => ht.set("hero.sectionLabel", t)}
         />
-        <RichTextField label="Description" value={hero.description} onChange={(v) => set({ description: v })} />
+        <div>
+          <Label>Full Headline</Label>
+          <Input value={hero.tagline} onChange={(e) => set({ tagline: e.target.value })} />
+          <p className="text-xs text-gray-500 mt-1">The complete headline sentence displayed in the hero</p>
+        </div>
+        <div>
+          <Label>Highlighted Text</Label>
+          <Input value={hero.highlightedText || ""} onChange={(e) => set({ highlightedText: e.target.value })} />
+          <p className="text-xs text-gray-500 mt-1">Enter the exact portion of the headline to display with accent underline</p>
+        </div>
+        <ImageField
+          label="Hero Image"
+          value={hero.heroImage || ""}
+          onChange={(v) => set({ heroImage: v })}
+        />
+        <div>
+          <Label>Hero Image Alt Text</Label>
+          <Input value={hero.heroImageAlt || ""} onChange={(e) => set({ heroImageAlt: e.target.value })} />
+        </div>
+        <p className="text-xs text-gray-500 italic">Phone number is managed in Site Settings &gt; Contact Info</p>
       </div>
     </Section>
   );
