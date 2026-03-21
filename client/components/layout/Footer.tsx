@@ -1,6 +1,5 @@
 import React from "react";
 
-import * as LucideIcons from "lucide-react";
 import {
   Facebook,
   Instagram,
@@ -8,20 +7,20 @@ import {
   Linkedin,
   Twitter,
   Phone,
+  icons as lucideIconSet,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
 
-/** Resolve a lucide icon by kebab-case name (e.g. "book-open" → BookOpen) */
-function getLucideIcon(name: string): React.ComponentType<React.SVGProps<SVGSVGElement>> | null {
+/** Resolve a lucide icon by name. Accepts kebab-case ("map-pin") or PascalCase ("MapPin"). */
+function getLucideIcon(name: string): React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>> | null {
   if (!name) return null;
-  // Convert kebab-case to PascalCase
-  const pascal = name
-    .split("-")
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join("");
-  const icon = (LucideIcons as Record<string, unknown>)[pascal];
-  return typeof icon === "function" ? (icon as React.ComponentType<React.SVGProps<SVGSVGElement>>) : null;
+  // Convert kebab-case to PascalCase if needed
+  const pascal = name.includes("-")
+    ? name.split("-").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join("")
+    : name.charAt(0).toUpperCase() + name.slice(1);
+  const icon = lucideIconSet[pascal as keyof typeof lucideIconSet];
+  return icon || null;
 }
 
 
