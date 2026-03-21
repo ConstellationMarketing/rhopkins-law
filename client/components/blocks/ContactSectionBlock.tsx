@@ -24,8 +24,8 @@ export default function ContactSectionBlock({ block }: ContactSectionBlockProps)
           />
         </div>
 
-        {/* Crimson form panel — left side */}
-        <div className="relative z-10 max-w-[1600px] mx-auto w-[95%] md:w-[90%] lg:w-[85%]">
+        {/* Crimson form panel — left side, with top margin so bg image is visible */}
+        <div className="relative z-10 max-w-[1600px] mx-auto w-[95%] md:w-[90%] lg:w-[85%] mt-[100px]">
           <div className="lg:w-[45%] bg-brand-accent p-8 md:p-10 lg:p-12 pt-10 md:pt-14 pb-0 flex flex-col min-h-full">
             {/* Heading — centered */}
             {block.sectionLabel && (
@@ -51,10 +51,10 @@ export default function ContactSectionBlock({ block }: ContactSectionBlockProps)
           </div>
         </div>
 
-        {/* Tagline strip — overlaid at bottom right */}
+        {/* Tagline strip — bottom right, normal flow */}
         {block.tagline && (
-          <div className="absolute bottom-0 right-0 z-10 lg:w-[60%] w-full">
-            <div className="bg-brand-dark py-6 px-8 text-left">
+          <div className="relative z-10 flex justify-end">
+            <div className="bg-brand-dark py-6 px-8 lg:w-[60%] w-full text-left">
               <div
                 className="font-playfair text-[clamp(1.5rem,4vw,48px)] leading-tight text-white font-bold highlight-underline"
                 dangerouslySetInnerHTML={{ __html: block.tagline }}
