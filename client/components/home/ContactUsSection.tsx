@@ -33,27 +33,30 @@ export default function ContactUsSection({ content, headingTag }: ContactUsSecti
 
         {/* Crimson form panel — left side */}
         <div className="relative z-10 max-w-[1600px] mx-auto w-[95%] md:w-[90%] lg:w-[85%]">
-          <div className="lg:w-[45%] bg-brand-accent p-8 md:p-10 lg:p-12 py-10 md:py-14">
-            {/* Heading */}
+          <div className="lg:w-[45%] bg-brand-accent p-8 md:p-10 lg:p-12 pt-10 md:pt-14 pb-0 flex flex-col min-h-full">
+            {/* Heading — centered */}
             {data.sectionLabel && (
               <DynamicHeading
                 tag={headingTag}
                 defaultTag="h2"
-                className="font-playfair text-[24px] md:text-[32px] lg:text-[36px] leading-tight text-white font-bold mb-2"
+                className="font-playfair text-[24px] md:text-[32px] lg:text-[36px] leading-tight text-white font-bold mb-2 text-center"
               >
                 {data.sectionLabel}
               </DynamicHeading>
             )}
 
-            {/* Description paragraph */}
+            {/* Description paragraph — centered */}
             {data.heading && (
-              <p className="font-playfair text-[18px] md:text-[22px] lg:text-[26px] leading-tight text-white mb-8">
+              <p className="font-playfair text-[18px] md:text-[22px] lg:text-[26px] leading-tight text-white mb-8 text-center">
                 {data.heading}
               </p>
             )}
 
-            {/* Form */}
-            <div className="contact-form-white">
+            {/* Spacer pushes form to bottom */}
+            <div className="flex-1" />
+
+            {/* Form — flush to bottom */}
+            <div className="contact-form-white pb-0">
               <CmsFormRenderer formId="contact" className="space-y-[20px]" />
             </div>
           </div>
@@ -62,7 +65,7 @@ export default function ContactUsSection({ content, headingTag }: ContactUsSecti
         {/* Tagline strip — bottom right */}
         {data.tagline && (
           <div className="relative z-10 max-w-[1600px] mx-auto w-[95%] md:w-[90%] lg:w-[85%] flex justify-end">
-            <div className="bg-brand-dark py-6 px-8 lg:w-[60%] text-right">
+            <div className="bg-brand-dark py-6 px-8 lg:w-[60%] text-left">
               <div
                 className="font-playfair text-[clamp(1.5rem,4vw,48px)] leading-tight text-white font-bold highlight-underline"
                 dangerouslySetInnerHTML={{ __html: data.tagline }}
