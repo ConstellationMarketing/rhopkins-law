@@ -212,7 +212,7 @@ export default function AboutUs() {
       )}
 
       {/* Divider between CTA and footer */}
-      <div className="w-full h-[1px] bg-black/15" />
+      <div className="w-full h-[3px]" style={{ backgroundColor: "#A1134C" }} />
     </Layout>
   );
 }
