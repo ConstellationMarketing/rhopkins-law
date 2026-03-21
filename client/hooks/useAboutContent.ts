@@ -142,22 +142,19 @@ function mergeWithDefaults(
 
   return {
     hero: { ...defaults.hero, ...cmsContent.hero },
-    story: {
-      ...defaults.story,
-      ...cmsContent.story,
-      paragraphs: cmsContent.story?.paragraphs?.length
-        ? cmsContent.story.paragraphs
-        : defaults.story.paragraphs,
+    about: {
+      ...defaults.about,
+      ...cmsContent.about,
+      features: cmsContent.about?.features?.length
+        ? cmsContent.about.features
+        : defaults.about.features,
+      stats: cmsContent.about?.stats?.length
+        ? cmsContent.about.stats
+        : defaults.about.stats,
     },
-    missionVision: {
-      mission: {
-        ...defaults.missionVision.mission,
-        ...cmsContent.missionVision?.mission,
-      },
-      vision: {
-        ...defaults.missionVision.vision,
-        ...cmsContent.missionVision?.vision,
-      },
+    attorneySpotlight: {
+      ...defaults.attorneySpotlight,
+      ...cmsContent.attorneySpotlight,
     },
     team: {
       ...defaults.team,
@@ -183,9 +180,6 @@ function mergeWithDefaults(
     whyChooseUs: {
       ...defaults.whyChooseUs,
       ...cmsContent.whyChooseUs,
-      items: cmsContent.whyChooseUs?.items?.length
-        ? cmsContent.whyChooseUs.items
-        : defaults.whyChooseUs.items,
     },
     cta: {
       ...defaults.cta,

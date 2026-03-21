@@ -89,7 +89,7 @@ export function usePracticeAreasContent(): UsePracticeAreasContentResult {
           defaultPracticeAreasContent,
         );
 
-        // Fetch About page for globally-shared sections (whyChooseUs, cta)
+        // Fetch About page for globally-shared sections (cta)
         try {
           const aboutResp = await fetch(
             `${SUPABASE_URL}/rest/v1/pages?url_path=eq./about/&status=eq.published&select=content`,
@@ -104,22 +104,6 @@ export function usePracticeAreasContent(): UsePracticeAreasContentResult {
             const aboutData = await aboutResp.json();
             if (Array.isArray(aboutData) && aboutData.length > 0) {
               const aboutContent = aboutData[0].content as Partial<AboutPageContent>;
-              if (aboutContent?.whyChooseUs) {
-                mergedContent = {
-                  ...mergedContent,
-                  whyChoose: {
-                    sectionLabel: aboutContent.whyChooseUs.sectionLabel || mergedContent.whyChoose.sectionLabel,
-                    heading: aboutContent.whyChooseUs.heading || mergedContent.whyChoose.heading,
-                    subtitle: mergedContent.whyChoose.subtitle,
-                    description: aboutContent.whyChooseUs.description || mergedContent.whyChoose.description,
-                    image: aboutContent.whyChooseUs.image || mergedContent.whyChoose.image,
-                    imageAlt: aboutContent.whyChooseUs.imageAlt || mergedContent.whyChoose.imageAlt,
-                    items: aboutContent.whyChooseUs.items?.length
-                      ? aboutContent.whyChooseUs.items
-                      : mergedContent.whyChoose.items,
-                  },
-                };
-              }
               if (aboutContent?.cta) {
                 mergedContent = {
                   ...mergedContent,

@@ -1,6 +1,8 @@
 // Type definitions for structured About page content
 // Each section maps directly to a static component's data needs
 
+import type { AboutContent, AttorneySpotlightContent } from "./homePageTypes";
+
 export interface AboutHeroContent {
   sectionLabel: string; // H1 title text
   tagline: string; // Large headline
@@ -10,25 +12,6 @@ export interface AboutHeroContent {
   phoneLabel: string;
   heroImage: string;
   heroImageAlt: string;
-}
-
-export interface StoryContent {
-  sectionLabel: string; // "– Our Story"
-  heading: string; // "Building Trust Since 1999"
-  paragraphs: string[]; // Array of paragraph texts
-  image: string;
-  imageAlt: string;
-}
-
-export interface MissionVisionContent {
-  mission: {
-    heading: string; // "Our Mission"
-    text: string; // Mission paragraph
-  };
-  vision: {
-    heading: string; // "Our Vision"
-    text: string; // Vision paragraph
-  };
 }
 
 export interface TeamMember {
@@ -55,7 +38,7 @@ export interface ValueItem {
 export interface ValuesContent {
   sectionLabel: string; // "– Our Values"
   heading: string; // "Principles That Guide Our Practice"
-  subtitle: string; // Subtitle text (NEW)
+  subtitle: string; // Subtitle text
   items: ValueItem[];
 }
 
@@ -68,19 +51,9 @@ export interface StatsContent {
   stats: StatItem[];
 }
 
-export interface WhyChooseUsItem {
-  number: string;
-  title: string;
-  description: string;
-}
-
 export interface WhyChooseUsContent {
-  sectionLabel: string; // "– Why Choose Us"
-  heading: string; // "What Sets Us Apart"
-  description: string; // Intro paragraph
-  image: string; // Section image
-  imageAlt: string; // Image alt text
-  items: WhyChooseUsItem[];
+  heading: string;
+  body: string; // rich text HTML
 }
 
 export interface CTAContent {
@@ -100,14 +73,14 @@ export interface CTAContent {
 // Complete About page content structure
 export interface AboutPageContent {
   hero: AboutHeroContent;
-  story: StoryContent;
-  missionVision: MissionVisionContent;
+  about: AboutContent;
+  attorneySpotlight: AttorneySpotlightContent;
   team: TeamContent;
   values: ValuesContent;
   stats: StatsContent;
   whyChooseUs: WhyChooseUsContent;
   cta: CTAContent;
-  /** Maps heading keys (e.g. "story.heading") to HTML tag names (e.g. "h2") */
+  /** Maps heading keys (e.g. "about.heading") to HTML tag names (e.g. "h2") */
   headingTags?: Record<string, string>;
 }
 
@@ -123,22 +96,30 @@ export const defaultAboutContent: AboutPageContent = {
     heroImage: "",
     heroImageAlt: "",
   },
-  story: {
+  about: {
     sectionLabel: "",
     heading: "",
-    paragraphs: [],
+    subheading: "",
+    description: "",
+    phone: "",
+    phoneLabel: "",
+    contactLabel: "",
+    contactText: "",
+    attorneyImage: "",
+    attorneyImageAlt: "",
+    features: [],
+    stats: [],
+  },
+  attorneySpotlight: {
+    sectionLabel: "",
+    heading: "",
+    description: "",
+    buttonText: "",
+    buttonLink: "",
     image: "",
     imageAlt: "",
-  },
-  missionVision: {
-    mission: {
-      heading: "",
-      text: "",
-    },
-    vision: {
-      heading: "",
-      text: "",
-    },
+    attorneyName: "",
+    attorneyTitle: "",
   },
   team: {
     sectionLabel: "",
@@ -155,12 +136,8 @@ export const defaultAboutContent: AboutPageContent = {
     stats: [],
   },
   whyChooseUs: {
-    sectionLabel: "",
     heading: "",
-    description: "",
-    image: "",
-    imageAlt: "",
-    items: [],
+    body: "",
   },
   cta: {
     heading: "",
