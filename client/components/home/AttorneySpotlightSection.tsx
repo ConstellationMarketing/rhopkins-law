@@ -5,9 +5,10 @@ import RichText from "@site/components/shared/RichText";
 
 interface AttorneySpotlightSectionProps {
   content?: AttorneySpotlightContent;
+  hideButton?: boolean;
 }
 
-export default function AttorneySpotlightSection({ content }: AttorneySpotlightSectionProps) {
+export default function AttorneySpotlightSection({ content, hideButton }: AttorneySpotlightSectionProps) {
   if (!content || (!content.heading && !content.description)) return null;
 
   const data = content;
@@ -39,14 +40,16 @@ export default function AttorneySpotlightSection({ content }: AttorneySpotlightS
               </div>
             )}
 
-            <Link
-              to={buttonLink}
-              className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[24px] py-[18px] hover:opacity-90 transition-opacity self-start mt-[8px]"
-              style={{ backgroundColor: "#365D96" }}
-            >
-              {buttonText}
-              <ArrowRight className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
-            </Link>
+            {!hideButton && (
+              <Link
+                to={buttonLink}
+                className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[24px] py-[18px] hover:opacity-90 transition-opacity self-start mt-[8px]"
+                style={{ backgroundColor: "#365D96" }}
+              >
+                {buttonText}
+                <ArrowRight className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
+              </Link>
+            )}
           </div>
 
           {/* Right column — image with decorative frame */}
