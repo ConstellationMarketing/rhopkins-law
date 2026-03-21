@@ -67,7 +67,7 @@ const Col3Icon = getLucideIcon(col3IconName);
 
 
   return (
-    <footer className="bg-brand-dark relative">
+    <footer className="bg-brand-dark relative mt-16">
       {/* Footer Links Section */}
       <div className="border-b border-[#838383] max-w-[2560px] mx-auto w-[95%] py-[20px] md:py-[27px] flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-[3%]">
         {/* Logo + Phone Column */}
