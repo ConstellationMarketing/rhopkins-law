@@ -212,16 +212,7 @@ export default function AboutUs() {
       )}
 
       {/* Divider between CTA and footer */}
-      <div className="w-full h-0 relative z-10">
-        <div className="absolute left-0 right-0" style={{ transform: "translateY(-50%)" }}>
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets%2F50bd0f2438824f8ea1271cf7dd2c508e%2F870edef9ac1b45fca64a1bcbadb1a17c?format=webp&width=800&height=1200"
-            alt=""
-            aria-hidden="true"
-            className="w-full block"
-          />
-        </div>
-      </div>
+      <div className="w-full h-[1px] bg-black/15" />
     </Layout>
   );
 }

@@ -200,20 +200,11 @@
     color: #fff;
   }
 
-  /* When rich-text is inside a text-center container, make lists look good centered */
+  /* When rich-text is inside a text-center container, left-align lists inline */
   .text-center .rich-text ul,
   .text-center .rich-text ol {
-    list-style: none;
-    padding-left: 0;
-    text-align: center;
-  }
-  .text-center .rich-text li {
-    margin: 0.5em 0;
-  }
-  .text-center .rich-text li::before {
-    content: "—  ";
-    color: #a1134c;
-    font-weight: 700;
+    display: inline-block;
+    text-align: left;
   }
 
   .rich-text h1 { font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif; font-size: 2em; font-weight: 700; margin: 0.67em 0 0.25em; }
