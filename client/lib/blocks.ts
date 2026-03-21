@@ -56,6 +56,9 @@ export type ContentBlock =
       heading: string;
       description: string;
       formHeading: string;
+      tagline?: string;
+      backgroundImage?: string;
+      backgroundImageAlt?: string;
     }
   | {
       type: "map";

@@ -174,6 +174,32 @@
   /* All Garamond (font-playfair) text should be bold */
   .font-playfair { font-weight: 700; }
 
+  /* Contact form on crimson panel — white inputs and white submit button */
+  .contact-form-white input,
+  .contact-form-white textarea,
+  .contact-form-white select {
+    background-color: #fff !important;
+    border-color: #d4d4d4 !important;
+    color: #333 !important;
+  }
+  .contact-form-white input::placeholder,
+  .contact-form-white textarea::placeholder {
+    color: #999 !important;
+  }
+  .contact-form-white button[type="submit"] {
+    background-color: #fff !important;
+    color: #000 !important;
+    border-color: #fff !important;
+  }
+  .contact-form-white button[type="submit"]:hover {
+    background-color: #f0f0f0 !important;
+  }
+  .contact-form-white .font-outfit,
+  .contact-form-white legend,
+  .contact-form-white label {
+    color: #fff;
+  }
+
   .rich-text h1 { font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif; font-size: 2em; font-weight: 700; margin: 0.67em 0 0.25em; }
   .rich-text h2 { font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif; font-size: 1.5em; font-weight: 700; margin: 0.75em 0 0.25em; }
   .rich-text h3 { font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif; font-size: 1.25em; font-weight: 700; margin: 0.6em 0 0.2em; }

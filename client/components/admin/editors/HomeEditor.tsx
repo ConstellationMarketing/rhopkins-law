@@ -573,11 +573,12 @@ function ContactSectionEditor({ content, update }: SectionProps) {
           <Input value={c.heading} onChange={(e) => set({ heading: e.target.value })} />
         </div>
         <RichTextField label="Description" value={c.description} onChange={(v) => set({ description: v })} />
-        <ImageField label="Section Image" value={c.image} onChange={(url) => set({ image: url })} folder="team" />
+        <ImageField label="Background Image" value={c.image} onChange={(url) => set({ image: url })} folder="backgrounds" />
         <div>
-          <Label>Image Alt Text</Label>
-          <Input value={c.imageAlt} onChange={(e) => set({ imageAlt: e.target.value })} placeholder="Describe the image" />
+          <Label>Background Image Alt Text</Label>
+          <Input value={c.imageAlt} onChange={(e) => set({ imageAlt: e.target.value })} placeholder="Describe the background image" />
         </div>
+        <RichTextField label="Tagline" value={c.tagline || ""} onChange={(v) => set({ tagline: v })} />
         <p className="text-xs text-gray-500 italic">Phone and address are managed in Site Settings &gt; Contact Info</p>
         <div>
           <Label>Form Heading</Label>

@@ -44,62 +44,15 @@ const mapEmbedUrl = settings.mapEmbedUrl?.trim() || "";
 
 const resourceLinks = settings.footerAboutLinks ?? [];
 const practiceLinks = settings.footerPracticeLinks ?? [];
-const footerTaglineHtml = settings.footerTaglineHtml || "";
-
-const enabledSocialLinks = (settings.socialLinks ?? []).filter((s) => s.enabled);
 
 
   return (
     <footer className="bg-brand-dark relative">
-      {/* Top Section: Tagline and Call Box */}
-      <div className="max-w-[2560px] mx-auto w-[95%] py-[20px] md:py-[27px] flex flex-col lg:flex-row lg:items-center gap-8">
-        {/* Left: Tagline */}
-        <div className="lg:w-[75%]">
-          <div>
-{footerTaglineHtml ? (
-  <div
-    className="font-playfair text-[clamp(2rem,6vw,59.136px)] leading-tight md:leading-[70.9632px] text-white highlight-underline"
-    dangerouslySetInnerHTML={{ __html: footerTaglineHtml }}
-  />
-) : (
-  <p className="font-playfair text-[clamp(2rem,6vw,59.136px)] leading-tight md:leading-[70.9632px] text-white">
-    <span className="underline decoration-brand-accent decoration-[3px] underline-offset-4">Your rights. Our mission.</span>
-    <br />
-    Backed by integrity and relentless representation.
-  </p>
-)}
-
-          </div>
-        </div>
-
-        {/* Right: Call Us Box */}
-        <div className="lg:w-[25%]">
-          <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block p-[8px] w-full cursor-pointer">
-            <div className="flex items-center gap-4">
-              <span
-                className="flex items-center justify-center w-[60px] h-[60px] rounded-full flex-shrink-0"
-                style={{ backgroundColor: "#A1134C" }}
-              >
-                <Phone className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
-              </span>
-              <div className="flex-1">
-                <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px]">
-                  {phoneLabel}
-                </h4>
-                <p className="font-outfit text-[28px] md:text-[40px] leading-tight md:leading-[44px] text-white whitespace-nowrap">
-                  {phoneDisplay}
-                </p>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-
       {/* Footer Links Section */}
-      <div className="border-t border-b border-[#838383] max-w-[2560px] mx-auto w-[95%] py-[20px] md:py-[27px] flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-[3%]">
-        {/* Logo Column */}
+      <div className="border-b border-[#838383] max-w-[2560px] mx-auto w-[95%] py-[20px] md:py-[27px] flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-[3%]">
+        {/* Logo + Phone Column */}
         <div className="lg:w-[20%] lg:mr-[3%]">
-          <Link to="/" className="block">
+          <Link to="/" className="block mb-6">
             {logoUrl ? (
               <img
                 src={logoUrl}
@@ -115,6 +68,29 @@ const enabledSocialLinks = (settings.socialLinks ?? []).filter((s) => s.enabled)
             )}
           </Link>
 
+          {/* Phone / Call Box */}
+          {phoneNumber && (
+            <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block cursor-pointer">
+              <div className="flex items-center gap-3">
+                <span
+                  className="flex items-center justify-center w-[48px] h-[48px] rounded-full flex-shrink-0"
+                  style={{ backgroundColor: "#A1134C" }}
+                >
+                  <Phone className="w-[24px] h-[24px] text-white" strokeWidth={1.5} />
+                </span>
+                <div className="flex-1">
+                  {phoneLabel && (
+                    <h4 className="font-outfit text-[14px] md:text-[16px] leading-tight text-white pb-[2px]">
+                      {phoneLabel}
+                    </h4>
+                  )}
+                  <p className="font-outfit text-[20px] md:text-[26px] leading-tight text-white whitespace-nowrap">
+                    {phoneDisplay}
+                  </p>
+                </div>
+              </div>
+            </a>
+          )}
         </div>
 
         {/* Resources Column */}

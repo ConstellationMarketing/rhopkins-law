@@ -129,6 +129,7 @@ export interface ContactContent {
   availabilityText: string;
   image: string;
   imageAlt: string;
+  tagline: string;
 }
 
 export interface AttorneySpotlightContent {
@@ -270,5 +271,6 @@ export const defaultHomeContent: HomePageContent = {
     availabilityText: "",
     image: "",
     imageAlt: "",
+    tagline: "",
   },
 };
