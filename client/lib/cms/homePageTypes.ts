@@ -44,6 +44,7 @@ export interface AboutContent {
 
 export interface PracticeAreaItem {
   title: string;
+  description: string;
   image: string;
   imageAlt: string;
   link: string;

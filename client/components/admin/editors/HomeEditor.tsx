@@ -294,13 +294,14 @@ function PracticeAreasItemsSection({ content, update }: SectionProps) {
         items={content.practiceAreas}
         onChange={(items) => update("practiceAreas", items)}
         itemLabel="Practice Area"
-        newItem={() => ({ title: "", image: "", imageAlt: "", link: "/practice-areas" })}
+        newItem={() => ({ title: "", description: "", image: "", imageAlt: "", link: "/practice-areas" })}
         renderItem={(item, _, upd) => (
           <div className="grid gap-3">
             <div>
               <Label>Title</Label>
               <Input value={item.title} onChange={(e) => upd({ ...item, title: e.target.value })} />
             </div>
+            <RichTextField label="Description" value={item.description || ""} onChange={(v) => upd({ ...item, description: v })} />
             <ImageField label="Image" value={item.image} onChange={(url) => upd({ ...item, image: url })} folder="practice-areas" />
             <div>
               <Label>Image Alt Text</Label>
