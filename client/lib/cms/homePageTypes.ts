@@ -126,7 +126,6 @@ export interface ContactContent {
   phoneLabel: string;
   address: string;
   formHeading: string;
-  availabilityText: string;
   image: string;
   imageAlt: string;
   tagline: string;
@@ -268,7 +267,6 @@ export const defaultHomeContent: HomePageContent = {
     phoneLabel: "",
     address: "",
     formHeading: "",
-    availabilityText: "",
     image: "",
     imageAlt: "",
     tagline: "",

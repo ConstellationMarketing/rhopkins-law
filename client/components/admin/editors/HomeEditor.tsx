@@ -584,10 +584,6 @@ function ContactSectionEditor({ content, update }: SectionProps) {
           <Label>Form Heading</Label>
           <Input value={c.formHeading} onChange={(e) => set({ formHeading: e.target.value })} />
         </div>
-        <div>
-          <Label>Availability Text</Label>
-          <Input value={c.availabilityText || ""} onChange={(e) => set({ availabilityText: e.target.value })} placeholder="Our intake team is available 24 hours a day, seven days a week" />
-        </div>
       </div>
     </Section>
   );
