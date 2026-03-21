@@ -53,6 +53,15 @@ export interface SiteSettings {
   footerAboutLinks: FooterLink[];
   footerPracticeLinks: FooterLink[];
 
+  // Footer Column Labels & Icons
+  footerAboutLabel: string;
+  footerAboutIcon: string;
+  footerPracticeLabel: string;
+  footerPracticeIcon: string;
+
+  // Footer Column 3 Rich Text (replaces practice links)
+  footerColumn3Html: string;
+
   // Address
   addressLine1: string;
   addressLine2: string;
@@ -98,6 +107,11 @@ export interface SiteSettingsRow {
   navigation_items: NavigationItem[];
   footer_about_links: FooterLink[];
   footer_practice_links: FooterLink[];
+  footer_about_label: string | null;
+  footer_about_icon: string | null;
+  footer_practice_label: string | null;
+  footer_practice_icon: string | null;
+  footer_column3_html: string | null;
   address_line1: string | null;
   address_line2: string | null;
   map_embed_url: string | null;
@@ -132,12 +146,13 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   headerServiceText: "",
   navigationItems: [
   ],
-  footerAboutLinks: [
-    
-  ],
-  footerPracticeLinks: [
-   
-  ],
+  footerAboutLinks: [],
+  footerPracticeLinks: [],
+  footerAboutLabel: "",
+  footerAboutIcon: "",
+  footerPracticeLabel: "",
+  footerPracticeIcon: "",
+  footerColumn3Html: "",
   addressLine1: "",
   addressLine2: "",
   mapEmbedUrl:
@@ -181,6 +196,11 @@ export function rowToSiteSettings(row: SiteSettingsRow): SiteSettings {
     footerPracticeLinks: row.footer_practice_links?.length
       ? row.footer_practice_links
       : DEFAULT_SITE_SETTINGS.footerPracticeLinks,
+    footerAboutLabel: row.footer_about_label || "",
+    footerAboutIcon: row.footer_about_icon || "",
+    footerPracticeLabel: row.footer_practice_label || "",
+    footerPracticeIcon: row.footer_practice_icon || "",
+    footerColumn3Html: row.footer_column3_html || "",
     addressLine1: row.address_line1 || DEFAULT_SITE_SETTINGS.addressLine1,
     addressLine2: row.address_line2 || DEFAULT_SITE_SETTINGS.addressLine2,
     mapEmbedUrl: row.map_embed_url || DEFAULT_SITE_SETTINGS.mapEmbedUrl,
@@ -217,6 +237,11 @@ export function siteSettingsToRow(
     navigation_items: settings.navigationItems,
     footer_about_links: settings.footerAboutLinks,
     footer_practice_links: settings.footerPracticeLinks,
+    footer_about_label: settings.footerAboutLabel || null,
+    footer_about_icon: settings.footerAboutIcon || null,
+    footer_practice_label: settings.footerPracticeLabel || null,
+    footer_practice_icon: settings.footerPracticeIcon || null,
+    footer_column3_html: settings.footerColumn3Html || null,
     address_line1: settings.addressLine1,
     address_line2: settings.addressLine2,
     map_embed_url: settings.mapEmbedUrl,

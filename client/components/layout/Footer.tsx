@@ -1,5 +1,6 @@
 import React from "react";
 
+import * as LucideIcons from "lucide-react";
 import {
   Facebook,
   Instagram,
@@ -10,6 +11,18 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
+
+/** Resolve a lucide icon by kebab-case name (e.g. "book-open" → BookOpen) */
+function getLucideIcon(name: string): React.ComponentType<React.SVGProps<SVGSVGElement>> | null {
+  if (!name) return null;
+  // Convert kebab-case to PascalCase
+  const pascal = name
+    .split("-")
+    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+    .join("");
+  const icon = (LucideIcons as Record<string, unknown>)[pascal];
+  return typeof icon === "function" ? (icon as React.ComponentType<React.SVGProps<SVGSVGElement>>) : null;
+}
 
 
 const SOCIAL_ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
@@ -43,7 +56,14 @@ const copyrightText = copyrightRaw.replace(/\{year\}/gi, String(new Date().getFu
 const mapEmbedUrl = settings.mapEmbedUrl?.trim() || "";
 
 const resourceLinks = settings.footerAboutLinks ?? [];
-const practiceLinks = settings.footerPracticeLinks ?? [];
+const col2Label = settings.footerAboutLabel?.trim() || "";
+const col2IconName = settings.footerAboutIcon?.trim() || "";
+const col3Label = settings.footerPracticeLabel?.trim() || "";
+const col3IconName = settings.footerPracticeIcon?.trim() || "";
+const col3Html = settings.footerColumn3Html?.trim() || "";
+
+const Col2Icon = getLucideIcon(col2IconName);
+const Col3Icon = getLucideIcon(col3IconName);
 
 
   return (
@@ -57,9 +77,9 @@ const practiceLinks = settings.footerPracticeLinks ?? [];
               <img
                 src={logoUrl}
                 alt={logoAlt}
-                className="w-[200px] max-w-full"
-                width={200}
-                height={33}
+                className="w-[140px] max-w-full"
+                width={140}
+                height={23}
               />
             ) : (
               <span className="font-outfit text-white text-[24px] leading-none">
@@ -93,50 +113,47 @@ const practiceLinks = settings.footerPracticeLinks ?? [];
           )}
         </div>
 
-        {/* Resources Column */}
+        {/* Column 2 — Links */}
         <div className="lg:w-[20%] lg:mr-[3%]">
           <div className="font-outfit text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] text-white">
-            <h3 className="font-outfit text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px]">
-              Resources
-            </h3>
-              {resourceLinks.length > 0 ? (
-                <ul className="text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] space-y-1">
-                  {resourceLinks.map((link) => (
-                    <li key={link.label}>
-                      <Link
-                        to={link.href || "#"}
-                        className="hover:text-brand-accent transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-
+            {col2Label && (
+              <h3 className="font-outfit text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px] flex items-center gap-2">
+                {Col2Icon && <Col2Icon className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] flex-shrink-0" strokeWidth={1.5} />}
+                {col2Label}
+              </h3>
+            )}
+            {resourceLinks.length > 0 ? (
+              <ul className="text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] space-y-1">
+                {resourceLinks.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.href || "#"}
+                      className="hover:text-brand-accent transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         </div>
 
-        {/* Practice Areas Column */}
+        {/* Column 3 — Rich Text */}
         <div className="lg:w-[20%] lg:mr-[3%]">
           <div className="font-outfit text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] text-white">
-            <h3 className="font-outfit text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px]">
-              Practice Areas
-            </h3>
-              {practiceLinks.length > 0 ? (
-                <ul className="text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] space-y-1">
-                  {practiceLinks.map((link) => (
-                    <li key={link.label}>
-                      <Link
-                        to={link.href || "/practice-areas/"}
-                        className="hover:text-brand-accent transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
+            {col3Label && (
+              <h3 className="font-outfit text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px] flex items-center gap-2">
+                {Col3Icon && <Col3Icon className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] flex-shrink-0" strokeWidth={1.5} />}
+                {col3Label}
+              </h3>
+            )}
+            {col3Html ? (
+              <div
+                className="text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] prose prose-invert max-w-none [&_a]:text-brand-accent [&_a]:hover:underline"
+                dangerouslySetInnerHTML={{ __html: col3Html }}
+              />
+            ) : null}
           </div>
         </div>
 

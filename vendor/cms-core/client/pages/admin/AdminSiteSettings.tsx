@@ -532,48 +532,32 @@ export default function AdminSiteSettings() {
         <TabsContent value="footer" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Footer Tagline</CardTitle>
+              <CardTitle>Column 2 — Links</CardTitle>
               <CardDescription>
-                Rich text tagline displayed in the footer area
+                Links column in the footer. Label and icon are optional.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Tagline (HTML)</Label>
-                  <RichTextEditor
-                    value={settings.footerTaglineHtml}
-                    onChange={(html) => updateSettings({ footerTaglineHtml: html })}
-                    placeholder="Enter footer tagline..."
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="flex-1 space-y-1">
+                  <Label>Column Label</Label>
+                  <Input
+                    value={settings.footerAboutLabel}
+                    onChange={(e) => updateSettings({ footerAboutLabel: e.target.value })}
+                    placeholder="e.g. Resources (leave empty to hide)"
                   />
-                  <p className="text-xs text-gray-500">
-                    Use the <strong>paint brush</strong> button to highlight text with the accent color.
-                  </p>
                 </div>
-
-                {/* Live preview */}
-                {settings.footerTaglineHtml && (
-                  <div className="space-y-2">
-                    <Label className="text-xs text-gray-500">Preview (as it appears in footer)</Label>
-                    <div className="bg-[#1a1a2e] rounded-lg p-6">
-                      <div
-                        className="font-playfair text-[24px] md:text-[32px] leading-tight text-white [&_.text-law-accent]:text-[#c8b560]"
-                        dangerouslySetInnerHTML={{ __html: settings.footerTaglineHtml }}
-                      />
-                    </div>
-                  </div>
-                )}
+                <div className="flex-1 space-y-1">
+                  <Label>Lucide Icon Name</Label>
+                  <Input
+                    value={settings.footerAboutIcon}
+                    onChange={(e) => updateSettings({ footerAboutIcon: e.target.value })}
+                    placeholder="e.g. book-open (optional)"
+                  />
+                  <p className="text-xs text-gray-500">Browse icons at lucide.dev/icons</p>
+                </div>
               </div>
             </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>About Column Links</CardTitle>
-              <CardDescription>
-                Links in the "About" section of the footer
-              </CardDescription>
-            </CardHeader>
             <CardContent className="space-y-4">
               {settings.footerAboutLinks.map((item, index) => (
                 <div key={index} className="flex items-center gap-3">
@@ -618,50 +602,39 @@ export default function AdminSiteSettings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Practice Areas Column Links</CardTitle>
+              <CardTitle>Column 3 — Rich Text</CardTitle>
               <CardDescription>
-                Links in the "Practice Areas" section of the footer
+                Free-form text content for the third footer column. Label and icon are optional.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {settings.footerPracticeLinks.map((item, index) => (
-                <div key={index} className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex-1 space-y-1">
+                  <Label>Column Label</Label>
                   <Input
-                    value={item.label}
-                    onChange={(e) =>
-                      updatePracticeLink(index, { label: e.target.value })
-                    }
-                    placeholder="Link text"
-                    className="flex-1"
+                    value={settings.footerPracticeLabel}
+                    onChange={(e) => updateSettings({ footerPracticeLabel: e.target.value })}
+                    placeholder="e.g. Practice Areas (leave empty to hide)"
                   />
-                  <Input
-                    value={item.href || ""}
-                    onChange={(e) =>
-                      updatePracticeLink(index, {
-                        href: e.target.value || undefined,
-                      })
-                    }
-                    placeholder="/page-url (optional)"
-                    className="flex-1"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removePracticeLink(index)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
-              ))}
-              <Button
-                variant="outline"
-                onClick={addPracticeLink}
-                className="w-full"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Link
-              </Button>
+                <div className="flex-1 space-y-1">
+                  <Label>Lucide Icon Name</Label>
+                  <Input
+                    value={settings.footerPracticeIcon}
+                    onChange={(e) => updateSettings({ footerPracticeIcon: e.target.value })}
+                    placeholder="e.g. scale (optional)"
+                  />
+                  <p className="text-xs text-gray-500">Browse icons at lucide.dev/icons</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label>Content</Label>
+                <RichTextEditor
+                  value={settings.footerColumn3Html}
+                  onChange={(html) => updateSettings({ footerColumn3Html: html })}
+                  placeholder="Enter column content..."
+                />
+              </div>
             </CardContent>
           </Card>
 

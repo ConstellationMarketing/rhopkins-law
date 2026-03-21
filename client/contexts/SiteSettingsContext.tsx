@@ -27,6 +27,11 @@ interface SiteSettings {
   }[];
   footerAboutLinks: { label: string; href?: string }[];
   footerPracticeLinks: { label: string; href?: string }[];
+  footerAboutLabel: string;
+  footerAboutIcon: string;
+  footerPracticeLabel: string;
+  footerPracticeIcon: string;
+  footerColumn3Html: string;
   footerTaglineHtml: string;
   addressLine1: string;
   addressLine2: string;
@@ -60,6 +65,11 @@ const DEFAULT_SETTINGS: SiteSettings = {
   navigationItems: [],
   footerAboutLinks: [],
   footerPracticeLinks: [],
+  footerAboutLabel: "",
+  footerAboutIcon: "",
+  footerPracticeLabel: "",
+  footerPracticeIcon: "",
+  footerColumn3Html: "",
   footerTaglineHtml: "",
   addressLine1: "",
   addressLine2: "",
@@ -153,6 +163,11 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
               row.footer_about_links || DEFAULT_SETTINGS.footerAboutLinks,
             footerPracticeLinks:
               row.footer_practice_links || DEFAULT_SETTINGS.footerPracticeLinks,
+            footerAboutLabel: row.footer_about_label || "",
+            footerAboutIcon: row.footer_about_icon || "",
+            footerPracticeLabel: row.footer_practice_label || "",
+            footerPracticeIcon: row.footer_practice_icon || "",
+            footerColumn3Html: row.footer_column3_html || "",
             addressLine1: row.address_line1 || DEFAULT_SETTINGS.addressLine1,
             addressLine2: row.address_line2 || DEFAULT_SETTINGS.addressLine2,
             mapEmbedUrl: row.map_embed_url || DEFAULT_SETTINGS.mapEmbedUrl,
