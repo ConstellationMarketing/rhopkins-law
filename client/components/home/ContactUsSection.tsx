@@ -17,7 +17,7 @@ export default function ContactUsSection({ content, headingTag }: ContactUsSecti
 
   return (
     <section className="bg-brand-dark relative">
-      <div className="relative min-h-[600px]">
+      <div className="relative min-h-[600px] overflow-hidden">
         {/* Background image — starts at ~45% from left (aligned with form panel left edge), extends to right */}
         <div
           className="absolute top-0 right-0 bottom-0 hidden lg:block"
@@ -62,10 +62,10 @@ export default function ContactUsSection({ content, headingTag }: ContactUsSecti
           </div>
         </div>
 
-        {/* Tagline strip — bottom right */}
+        {/* Tagline strip — overlaid at bottom right */}
         {data.tagline && (
-          <div className="relative z-10 max-w-[1600px] mx-auto w-[95%] md:w-[90%] lg:w-[85%] flex justify-end">
-            <div className="bg-brand-dark py-6 px-8 lg:w-[60%] text-left">
+          <div className="absolute bottom-0 right-0 z-10 lg:w-[60%] w-full">
+            <div className="bg-brand-dark py-6 px-8 text-left">
               <div
                 className="font-playfair text-[clamp(1.5rem,4vw,48px)] leading-tight text-white font-bold highlight-underline"
                 dangerouslySetInnerHTML={{ __html: data.tagline }}
