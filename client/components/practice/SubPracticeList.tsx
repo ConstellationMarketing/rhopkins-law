@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import * as LucideIcons from "lucide-react";
 import type { SubPracticeItem } from "@site/lib/cms/practiceAreasPageTypes";
+import RichText from "@site/components/shared/RichText";
 
 interface SubPracticeListProps {
   items: SubPracticeItem[];
@@ -8,7 +9,14 @@ interface SubPracticeListProps {
 
 function getIcon(name: string): LucideIcons.LucideIcon {
   const icon = (LucideIcons as Record<string, unknown>)[name];
-  return (typeof icon === "function" ? icon : LucideIcons.FileText) as LucideIcons.LucideIcon;
+  // Lucide icons are forwardRef objects, not plain functions
+  if (icon && typeof icon === "object" && "render" in icon) {
+    return icon as unknown as LucideIcons.LucideIcon;
+  }
+  if (icon && typeof icon === "function") {
+    return icon as unknown as LucideIcons.LucideIcon;
+  }
+  return LucideIcons.FileText;
 }
 
 export default function SubPracticeList({ items }: SubPracticeListProps) {
@@ -40,9 +48,10 @@ export default function SubPracticeList({ items }: SubPracticeListProps) {
                 </span>
               </Link>
               {sub.description && (
-                <p className="font-outfit text-[13px] md:text-[14px] leading-[20px] text-black/60 mt-1 pl-6">
-                  {sub.description}
-                </p>
+                <RichText
+                  html={sub.description}
+                  className="font-outfit text-[13px] md:text-[14px] leading-[20px] text-black/60 mt-1 pl-6"
+                />
               )}
             </li>
           );
