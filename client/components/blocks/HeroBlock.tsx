@@ -43,14 +43,16 @@ export default function HeroBlock({ block }: HeroBlockProps) {
           </div>
 
           {/* Right Side - CallBox */}
-          <div className="w-full lg:w-[30%] lg:flex lg:items-center">
-            <CallBox
-              icon={Phone}
-              title={phoneLabel}
-              subtitle={phoneDisplay}
-              phone={phoneNumber}
-            />
-          </div>
+          {block.showPhoneCTA !== false && (
+            <div className="w-full lg:w-[30%] lg:flex lg:items-center">
+              <CallBox
+                icon={Phone}
+                title={phoneLabel}
+                subtitle={phoneDisplay}
+                phone={phoneNumber}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

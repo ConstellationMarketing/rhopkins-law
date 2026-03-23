@@ -264,6 +264,10 @@ function HeroFields({ block, onUpdate }: { block: Extract<ContentBlock, { type: 
         <Label>Background Image Alt Text</Label>
         <Input value={block.backgroundImageAlt || ''} onChange={(e) => onUpdate({ backgroundImageAlt: e.target.value })} placeholder="Describe the background image" />
       </div>
+      <div className="flex items-center gap-2">
+        <Switch checked={block.showPhoneCTA !== false} onCheckedChange={(checked) => onUpdate({ showPhoneCTA: checked })} />
+        <Label>Show Phone CTA Box</Label>
+      </div>
     </div>
   );
 }

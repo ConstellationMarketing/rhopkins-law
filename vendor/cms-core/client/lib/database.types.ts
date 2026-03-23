@@ -6,6 +6,7 @@ export type ContentBlock =
       description: string;
       backgroundImage?: string;
       backgroundImageAlt?: string;
+      showPhoneCTA?: boolean;
     }
   | { type: "heading"; level: 1 | 2 | 3; text: string }
   | {
