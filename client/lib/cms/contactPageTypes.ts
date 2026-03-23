@@ -10,15 +10,10 @@ export interface ContactHeroContent {
   heroImageAlt: string;
 }
 
-export interface ContactMethodItem {
-  icon: string; // Lucide icon name
-  title: string; // "Phone", "Email", "Office"
-  detail: string; // Primary detail (phone number, email, address line 1)
-  subDetail: string; // Secondary detail (availability, response time, address line 2)
-}
-
-export interface ContactMethodsContent {
-  methods: ContactMethodItem[];
+export interface ContactIntroContent {
+  sectionLabel: string;
+  heading: string;
+  description: string;
 }
 
 export interface ContactFormContent {
@@ -73,7 +68,7 @@ export interface CTAContent {
 // Complete Contact page content structure
 export interface ContactPageContent {
   hero: ContactHeroContent;
-  contactMethods: ContactMethodsContent;
+  contactIntro: ContactIntroContent;
   form: ContactFormContent;
   officeHours: OfficeHoursContent;
   process: ProcessContent;
@@ -93,8 +88,10 @@ export const defaultContactContent: ContactPageContent = {
     heroImage: "",
     heroImageAlt: "",
   },
-  contactMethods: {
-    methods: [],
+  contactIntro: {
+    sectionLabel: "",
+    heading: "",
+    description: "",
   },
   form: {
     heading: "",

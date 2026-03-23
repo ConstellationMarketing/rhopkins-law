@@ -14,12 +14,11 @@ export default function ContactEditor({ content, onChange }: ContactEditorProps)
   return (
     <div className="space-y-6">
       <HeroSection content={content} update={update} />
-      <ContactMethodsSection content={content} update={update} />
+      <ContactIntroSection content={content} update={update} />
       <FormSection content={content} update={update} />
       <OfficeHoursSection content={content} update={update} />
       <ProcessSection content={content} update={update} />
       <VisitOfficeSection content={content} update={update} />
-      <GlobalSectionInfo sectionTitle="Call to Action" managedIn="About Us" />
     </div>
   );
 }
@@ -78,39 +77,31 @@ function HeroSection({ content, update }: SectionProps) {
 }
 
 /* ------------------------------------------------------------------ */
-function ContactMethodsSection({ content, update }: SectionProps) {
+function ContactIntroSection({ content, update }: SectionProps) {
+  const intro = content.contactIntro;
+  const set = (patch: Partial<typeof intro>) => update("contactIntro", { ...intro, ...patch });
+  const ht = useHeadingTag(content, update);
+
   return (
-    <Section title="Contact Methods" defaultOpen={false}>
-      <ArrayEditor
-        items={content.contactMethods.methods}
-        onChange={(items) => update("contactMethods", { methods: items })}
-        itemLabel="Method"
-        newItem={() => ({ icon: "Phone", title: "", detail: "", subDetail: "" })}
-        renderItem={(item, _, upd) => (
-          <div className="grid gap-3">
-            <div className="grid grid-cols-4 gap-3">
-              <div>
-                <Label>Icon</Label>
-                <Input value={item.icon} onChange={(e) => upd({ ...item, icon: e.target.value })} placeholder="Lucide icon name" />
-              </div>
-              <div className="col-span-3">
-                <Label>Title</Label>
-                <Input value={item.title} onChange={(e) => upd({ ...item, title: e.target.value })} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Detail</Label>
-                <Input value={item.detail} onChange={(e) => upd({ ...item, detail: e.target.value })} />
-              </div>
-              <div>
-                <Label>Sub-Detail</Label>
-                <Input value={item.subDetail} onChange={(e) => upd({ ...item, subDetail: e.target.value })} />
-              </div>
-            </div>
-          </div>
-        )}
-      />
+    <Section title="Contact Intro Section" defaultOpen={false}>
+      <div className="grid gap-4">
+        <div>
+          <Label>Section Label</Label>
+          <Input value={intro.sectionLabel} onChange={(e) => set({ sectionLabel: e.target.value })} />
+        </div>
+        <HeadingField
+          label="Heading"
+          value={intro.heading}
+          onChange={(v) => set({ heading: v })}
+          tag={ht.get("contactIntro.heading")}
+          onTagChange={(t) => ht.set("contactIntro.heading", t)}
+        />
+        <RichTextField
+          label="Description"
+          value={intro.description}
+          onChange={(v) => set({ description: v })}
+        />
+      </div>
     </Section>
   );
 }

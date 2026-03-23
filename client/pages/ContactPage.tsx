@@ -3,53 +3,17 @@ import Layout from "@site/components/layout/Layout";
 import PageHero from "@site/components/shared/PageHero";
 import ContactForm from "@site/components/home/ContactForm";
 import CallBox from "@site/components/shared/CallBox";
-import {
-  Phone,
-  Mail,
-  MapPin,
-  Clock,
-  Calendar,
-  type LucideIcon,
-} from "lucide-react";
+import PracticeAreasSection from "@site/components/home/PracticeAreasSection";
+import { Phone, Clock } from "lucide-react";
 import { useContactContent } from "@site/hooks/useContactContent";
 import { useGlobalPhone, useSiteSettings } from "@site/contexts/SiteSettingsContext";
 import RichText from "@site/components/shared/RichText";
 import { Loader2 } from "lucide-react";
 
-// Icon mapping for contact methods
-const iconMap: Record<string, LucideIcon> = {
-  Phone,
-  Mail,
-  MapPin,
-  Clock,
-};
-
 export default function ContactPage() {
   const { content, meta, isLoading } = useContactContent();
   const { phoneNumber, phoneDisplay, phoneLabel } = useGlobalPhone();
   const { settings } = useSiteSettings();
-
-  // Map contact methods from CMS content with icon components
-  const contactMethods = content.contactMethods.methods.map((method) => {
-    let detail = method.detail;
-    let subDetail = method.subDetail;
-
-    // Fallback to Site Settings when CMS fields are empty
-    if (method.title === "Phone" && !detail) {
-      detail = phoneDisplay;
-    }
-    if (method.title === "Office") {
-      if (!detail) detail = settings.addressLine1 || "";
-      if (!subDetail) subDetail = settings.addressLine2 || "";
-    }
-
-    return {
-      icon: iconMap[method.icon] || Phone,
-      title: method.title,
-      detail,
-      subdDetail: subDetail,
-    };
-  });
 
   // Map office hours from CMS content
   const officeHours = content.officeHours.items;
@@ -91,46 +55,8 @@ export default function ContactPage() {
         heroImageAlt={content.hero.heroImageAlt}
       />
 
-      {/* Contact Methods Section */}
-      <div className="bg-white py-[40px] md:py-[60px]">
-        <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[85%]">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {contactMethods.map((method, index) => {
-              const Icon = method.icon;
-              return (
-                <div
-                  key={index}
-                  className="bg-brand-card border border-brand-border p-[30px] md:p-[40px] text-center group hover:border-brand-accent transition-all duration-300"
-                >
-                  <div className="flex justify-center mb-[20px]">
-                    <div className="bg-brand-accent p-[20px] inline-block transition-all duration-300 group-hover:bg-white group-hover:scale-110">
-                      <Icon
-                        className="w-[35px] h-[35px] md:w-[40px] md:h-[40px] text-black"
-                        strokeWidth={1.5}
-                      />
-                    </div>
-                  </div>
-                  <h3 className="font-playfair text-[24px] md:text-[28px] leading-tight text-brand-accent mb-[15px]">
-                    {method.title}
-                  </h3>
-                  <p className="font-outfit text-[18px] md:text-[20px] text-white mb-[8px]">
-                    {method.title === "Phone" ? (
-                      <a href={`tel:${method.detail.replace(/\D/g, "")}`}>
-                        {method.detail}
-                      </a>
-                    ) : (
-                      method.detail
-                    )}
-                  </p>
-                  <p className="font-outfit text-[14px] md:text-[16px] text-white/70">
-                    {method.subdDetail}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      {/* Contact Intro Section */}
+      <PracticeAreasSection content={content.contactIntro} />
 
       {/* Contact Form & Office Hours Section */}
       <div className="bg-brand-dark py-[40px] md:py-[60px]">
@@ -138,8 +64,8 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[8%]">
             {/* Left Side - Contact Form */}
             <div>
-              <div className="mb-[20px] md:mb-[30px]">
-                <h2 className="font-playfair text-[32px] md:text-[40px] leading-tight text-white pb-[10px]">
+              <div className="mb-[20px] md:mb-[30px] text-center lg:text-left">
+                <h2 className="font-playfair text-[32px] md:text-[40px] leading-tight text-white pb-[10px] text-center">
                   {content.form.heading}
                 </h2>
                 {content.form.subtext && (
@@ -159,7 +85,7 @@ export default function ContactPage() {
                 <div className="flex items-center gap-3 mb-[20px]">
                   <div className="bg-brand-accent p-[15px]">
                     <Clock
-                      className="w-[30px] h-[30px] text-black"
+                      className="w-[30px] h-[30px] text-white"
                       strokeWidth={1.5}
                     />
                   </div>
@@ -176,7 +102,7 @@ export default function ContactPage() {
                       <span className="font-outfit text-[16px] md:text-[18px] text-white/80">
                         {item.day}
                       </span>
-                      <span className="font-outfit text-[16px] md:text-[18px] text-brand-accent font-medium">
+                      <span className="font-outfit text-[16px] md:text-[18px] text-white font-medium">
                         {item.hours}
                       </span>
                     </div>
@@ -192,22 +118,14 @@ export default function ContactPage() {
                 )}
               </div>
 
-              {/* Call to Action Boxes */}
-              <div className="space-y-[20px]">
-                <CallBox
-                  icon={Phone}
-                  title={phoneLabel}
-                  subtitle={phoneDisplay}
-                  phone={phoneNumber}
-                  className="w-full max-w-none"
-                />
-                <CallBox
-                  icon={Calendar}
-                  title={content.cta.secondaryButton.label}
-                  subtitle={content.cta.secondaryButton.sublabel}
-                  className="w-full max-w-none"
-                />
-              </div>
+              {/* Phone Call Box */}
+              <CallBox
+                icon={Phone}
+                title={phoneLabel}
+                subtitle={phoneDisplay}
+                phone={phoneNumber}
+                className="w-full max-w-none"
+              />
             </div>
           </div>
         </div>

@@ -3,7 +3,6 @@ import type { ContactPageContent } from "../lib/cms/contactPageTypes";
 import { defaultContactContent } from "../lib/cms/contactPageTypes";
 import type { PageMeta } from "../lib/cms/pageMeta";
 import { emptyPageMeta } from "../lib/cms/pageMeta";
-import type { AboutPageContent } from "../lib/cms/aboutPageTypes";
 import { consumePageData } from '../lib/pageDataInjection';
 
 // Supabase configuration - use environment variables
@@ -89,39 +88,6 @@ export function useContactContent(): UseContactContentResult {
           defaultContactContent,
         );
 
-        // Fetch About page for globally-shared CTA section
-        try {
-          const aboutResp = await fetch(
-            `${SUPABASE_URL}/rest/v1/pages?url_path=eq./about/&status=eq.published&select=content`,
-            {
-              headers: {
-                apikey: SUPABASE_ANON_KEY,
-                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-              },
-            },
-          );
-          if (aboutResp.ok) {
-            const aboutData = await aboutResp.json();
-            if (Array.isArray(aboutData) && aboutData.length > 0) {
-              const aboutContent = aboutData[0].content as Partial<AboutPageContent>;
-              if (aboutContent?.cta) {
-                mergedContent = {
-                  ...mergedContent,
-                  cta: {
-                    ...mergedContent.cta,
-                    heading: aboutContent.cta.heading || mergedContent.cta.heading,
-                    description: aboutContent.cta.description || mergedContent.cta.description,
-                    primaryButton: { ...mergedContent.cta.primaryButton, ...aboutContent.cta.primaryButton },
-                    secondaryButton: { ...mergedContent.cta.secondaryButton, ...aboutContent.cta.secondaryButton },
-                  },
-                };
-              }
-            }
-          }
-        } catch (aboutErr) {
-          console.warn("[useContactContent] Failed to fetch About page for global CTA:", aboutErr);
-        }
-
         const pageMeta: PageMeta = {
           meta_title: pageData.meta_title,
           meta_description: pageData.meta_description,
@@ -176,13 +142,7 @@ function mergeWithDefaults(
 
   return {
     hero: { ...defaults.hero, ...cmsContent.hero },
-    contactMethods: {
-      ...defaults.contactMethods,
-      ...cmsContent.contactMethods,
-      methods: cmsContent.contactMethods?.methods?.length
-        ? cmsContent.contactMethods.methods
-        : defaults.contactMethods.methods,
-    },
+    contactIntro: { ...defaults.contactIntro, ...cmsContent.contactIntro },
     form: { ...defaults.form, ...cmsContent.form },
     officeHours: {
       ...defaults.officeHours,
