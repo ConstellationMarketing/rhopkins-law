@@ -14,8 +14,8 @@ export default function PracticeAreasSection({ content }: PracticeAreasSectionPr
   const data = content;
 
   return (
-    <div className="py-[20px] md:py-[30px]" style={{ backgroundColor: "#EFF0EB" }}>
-      <div className="max-w-[2560px] mx-auto w-[95%] md:w-[85%] lg:w-[80%] py-[10px] md:py-[13px] text-center">
+    <div className="pt-[20px] pb-[10px] md:pt-[30px] md:pb-[15px]" style={{ backgroundColor: "#EFF0EB" }}>
+      <div className="max-w-[2560px] mx-auto w-[95%] md:w-[85%] lg:w-[80%] pt-[10px] pb-[5px] md:pt-[13px] md:pb-[7px] text-center">
         {data.sectionLabel && (
           <p className="font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px] text-brand-accent mb-[10px]">
             {data.sectionLabel}
