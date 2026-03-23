@@ -68,10 +68,10 @@ const Col3Icon = getLucideIcon(col3IconName);
   return (
     <footer className="bg-brand-dark relative mt-16">
       {/* Footer Links Section */}
-      <div className="border-b border-[#838383] max-w-[2560px] mx-auto w-[95%] py-[20px] md:py-[27px] flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-[3%]">
+      <div className="border-b border-[#838383] max-w-[2560px] mx-auto w-[95%] py-[20px] md:py-[27px] flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-[3%] text-center lg:text-left items-center lg:items-start">
         {/* Logo + Phone Column */}
         <div className="lg:w-[20%] lg:mr-[3%]">
-          <Link to="/" className="block mb-6">
+          <Link to="/" className="block mb-6 inline-block">
             {logoUrl ? (
               <img
                 src={logoUrl}
@@ -90,7 +90,7 @@ const Col3Icon = getLucideIcon(col3IconName);
           {/* Phone / Call Box */}
           {phoneNumber && (
             <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block cursor-pointer">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 justify-center lg:justify-start">
                 <span
                   className="flex items-center justify-center w-[48px] h-[48px] rounded-full flex-shrink-0"
                   style={{ backgroundColor: "#A1134C" }}
@@ -116,7 +116,7 @@ const Col3Icon = getLucideIcon(col3IconName);
         <div className="lg:w-[20%] lg:mr-[3%]">
           <div className="font-outfit text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] text-white">
             {col2Label && (
-              <h3 className="font-playfair text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px] font-bold flex items-center gap-2">
+              <h3 className="font-playfair text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px] font-bold flex items-center gap-2 justify-center lg:justify-start">
                 {Col2Icon && <Col2Icon className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] flex-shrink-0" strokeWidth={1.5} />}
                 {col2Label}
               </h3>
@@ -142,7 +142,7 @@ const Col3Icon = getLucideIcon(col3IconName);
         <div className="lg:w-[20%] lg:mr-[3%]">
           <div className="font-outfit text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] text-white">
             {col3Label && (
-              <h3 className="font-playfair text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px] font-bold flex items-center gap-2">
+              <h3 className="font-playfair text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px] font-bold flex items-center gap-2 justify-center lg:justify-start">
                 {Col3Icon && <Col3Icon className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] flex-shrink-0" strokeWidth={1.5} />}
                 {col3Label}
               </h3>
