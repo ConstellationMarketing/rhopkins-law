@@ -52,11 +52,11 @@ export default function PracticeAreas() {
       <PracticeAreasSection content={content.intro} />
 
       {/* Practice Areas Grid Section */}
-      <div className="pt-0">
+      <div className="pt-0" style={{ backgroundColor: "#EFF0EB" }}>
         {/* Gray top zone to blend with intro section above */}
         <div style={{ backgroundColor: "#EFF0EB" }}>
           <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[85%]">
-            <div className="text-center pb-[30px] md:pb-[50px]">
+            <div className="text-center pb-[15px] md:pb-[25px]">
               <h2 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black">
                 {content.grid.heading}
               </h2>
