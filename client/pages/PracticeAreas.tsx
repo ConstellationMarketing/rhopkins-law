@@ -48,33 +48,32 @@ export default function PracticeAreas() {
         heroImageAlt={content.hero.heroImageAlt}
       />
 
-      {/* Practice Areas Intro */}
-      <PracticeAreasSection content={content.intro} />
+      {/* Seamless gray wrapper for intro + grid heading to prevent blue bleed-through */}
+      <div style={{ backgroundColor: "#EFF0EB" }}>
+        {/* Practice Areas Intro */}
+        <PracticeAreasSection content={content.intro} />
 
-      {/* Practice Areas Grid Section */}
-      <div className="pt-0" style={{ backgroundColor: "#EFF0EB" }}>
-        {/* Gray top zone to blend with intro section above */}
-        <div style={{ backgroundColor: "#EFF0EB" }}>
-          <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[85%]">
-            <div className="text-center pb-[15px] md:pb-[25px]">
-              <h2 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black">
-                {content.grid.heading}
-              </h2>
-              <RichText
-                html={content.grid.description}
-                className="font-outfit text-[16px] md:text-[18px] leading-[24px] md:leading-[28px] text-black/80 mt-[15px] max-w-[800px] mx-auto"
-              />
-            </div>
+        {/* Grid heading */}
+        <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[85%]">
+          <div className="text-center pb-[15px] md:pb-[25px]">
+            <h2 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black">
+              {content.grid.heading}
+            </h2>
+            <RichText
+              html={content.grid.description}
+              className="font-outfit text-[16px] md:text-[18px] leading-[24px] md:leading-[28px] text-black/80 mt-[15px] max-w-[800px] mx-auto"
+            />
           </div>
         </div>
-        {/* White zone for the cards grid */}
-        <div className="pb-[40px] md:pb-[60px] bg-white">
-          <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[85%]">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-              {content.grid.areas.map((area, index) => (
-                <PracticeAreaGroupCard key={index} area={area} />
-              ))}
-            </div>
+      </div>
+
+      {/* Practice Areas Grid - white cards zone */}
+      <div className="pb-[40px] md:pb-[60px] bg-white">
+        <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[85%]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {content.grid.areas.map((area, index) => (
+              <PracticeAreaGroupCard key={index} area={area} />
+            ))}
           </div>
         </div>
       </div>
