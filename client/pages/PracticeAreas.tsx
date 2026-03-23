@@ -23,6 +23,7 @@ import {
 import { usePracticeAreasContent } from "@site/hooks/usePracticeAreasContent";
 import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
 import RichText from "@site/components/shared/RichText";
+import PracticeAreasSection from "@site/components/home/PracticeAreasSection";
 import { Loader2 } from "lucide-react";
 
 // Icon mapping for practice areas
@@ -54,9 +55,6 @@ export default function PracticeAreas() {
     imageAlt: area.imageAlt,
     link: area.link,
   }));
-
-  // Map why choose items from CMS content
-  const whyChooseOurPractice = content.whyChoose.items;
 
   if (isLoading) {
     return (
@@ -92,6 +90,9 @@ export default function PracticeAreas() {
         heroImageAlt={content.hero.heroImageAlt}
       />
 
+      {/* Practice Areas Intro */}
+      <PracticeAreasSection content={content.intro} />
+
       {/* Practice Areas Grid Section */}
       <div className="bg-white py-[40px] md:py-[60px]">
         <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[85%]">
@@ -109,67 +110,6 @@ export default function PracticeAreas() {
             {practiceAreas.map((area, index) => (
               <PracticeAreaCard key={index} {...area} />
             ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Why Choose Our Practice Section */}
-      <div className="bg-brand-dark py-[40px] md:py-[60px]">
-        <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[80%]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[8%]">
-            {/* Left Side - Heading + Image */}
-            <div>
-              <div className="mb-[10px]">
-                <p className="font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px] text-brand-accent">
-                  {content.whyChoose.sectionLabel}
-                </p>
-              </div>
-              <h2 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-white pb-[20px]">
-                {content.whyChoose.heading}
-              </h2>
-              {content.whyChoose.subtitle && (
-                <p className="font-outfit text-[16px] md:text-[18px] leading-[24px] md:leading-[28px] text-white/80 pb-[15px]">
-                  {content.whyChoose.subtitle}
-                </p>
-              )}
-              <RichText
-                html={content.whyChoose.description}
-                className="font-outfit text-[16px] md:text-[18px] leading-[24px] md:leading-[28px] text-white/90 mb-[30px]"
-              />
-              {/* Section image (shared from About page) */}
-              {content.whyChoose.image && (
-                <div className="hidden lg:block">
-                  <img
-                    src={content.whyChoose.image}
-                    alt={content.whyChoose.imageAlt || "Why Choose Us"}
-                    className="w-full max-w-[400px] h-auto object-cover"
-                    width={400}
-                    height={300}
-                    loading="lazy"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Right Side - Features List */}
-            <div className="space-y-[20px] md:space-y-[30px]">
-              {whyChooseOurPractice.map((feature, index) => (
-                <div key={index}>
-                  <div className="mb-[15px] md:mb-[20px]">
-                    <h3 className="font-outfit text-[22px] md:text-[28px] leading-tight md:leading-[28px] text-white pb-[10px]">
-                      {feature.number}. {feature.title}
-                    </h3>
-                    <RichText
-                      html={feature.description}
-                      className="font-outfit text-[16px] md:text-[18px] leading-[24px] md:leading-[28px] text-white/80"
-                    />
-                  </div>
-                  {index < whyChooseOurPractice.length - 1 && (
-                    <div className="h-[1px] bg-brand-border/50"></div>
-                  )}
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

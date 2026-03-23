@@ -27,20 +27,9 @@ export interface PracticeAreasGridContent {
   areas: PracticeAreaGridItem[];
 }
 
-export interface WhyChooseItem {
-  number: string;
-  title: string;
-  description: string;
-}
-
-export interface WhyChooseContent {
-  sectionLabel: string; // "– Why Choose Us"
-  heading: string; // "Experience Across All Practice Areas"
-  subtitle: string; // Subtitle text
-  description: string; // Description paragraph
-  image: string; // Section image (shared from About page)
-  imageAlt: string; // Image alt text
-  items: WhyChooseItem[];
+export interface PracticeAreasIntroContent {
+  sectionLabel: string;
+  heading: string;
 }
 
 export interface CTAContent {
@@ -60,8 +49,8 @@ export interface CTAContent {
 // Complete Practice Areas page content structure
 export interface PracticeAreasPageContent {
   hero: PracticeAreasHeroContent;
+  intro: PracticeAreasIntroContent;
   grid: PracticeAreasGridContent;
-  whyChoose: WhyChooseContent;
   cta: CTAContent;
   /** Maps heading keys (e.g. "grid.heading") to HTML tag names (e.g. "h2") */
   headingTags?: Record<string, string>;
@@ -79,19 +68,14 @@ export const defaultPracticeAreasContent: PracticeAreasPageContent = {
     heroImage: "",
     heroImageAlt: "",
   },
+  intro: {
+    sectionLabel: "",
+    heading: "",
+  },
   grid: {
     heading: "",
     description: "",
     areas: [],
-  },
-  whyChoose: {
-    sectionLabel: "",
-    heading: "",
-    subtitle: "",
-    image: "",
-    imageAlt: "",
-    description: "",
-    items: [],
   },
   cta: {
     heading: "",

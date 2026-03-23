@@ -3,7 +3,6 @@ import type { PracticeAreasPageContent } from "../lib/cms/practiceAreasPageTypes
 import { defaultPracticeAreasContent } from "../lib/cms/practiceAreasPageTypes";
 import type { PageMeta } from "../lib/cms/pageMeta";
 import { emptyPageMeta } from "../lib/cms/pageMeta";
-import type { AboutPageContent } from "../lib/cms/aboutPageTypes";
 import { consumePageData } from '../lib/pageDataInjection';
 
 // Supabase configuration - use environment variables
@@ -89,39 +88,6 @@ export function usePracticeAreasContent(): UsePracticeAreasContentResult {
           defaultPracticeAreasContent,
         );
 
-        // Fetch About page for globally-shared sections (cta)
-        try {
-          const aboutResp = await fetch(
-            `${SUPABASE_URL}/rest/v1/pages?url_path=eq./about/&status=eq.published&select=content`,
-            {
-              headers: {
-                apikey: SUPABASE_ANON_KEY,
-                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-              },
-            },
-          );
-          if (aboutResp.ok) {
-            const aboutData = await aboutResp.json();
-            if (Array.isArray(aboutData) && aboutData.length > 0) {
-              const aboutContent = aboutData[0].content as Partial<AboutPageContent>;
-              if (aboutContent?.cta) {
-                mergedContent = {
-                  ...mergedContent,
-                  cta: {
-                    ...mergedContent.cta,
-                    heading: aboutContent.cta.heading || mergedContent.cta.heading,
-                    description: aboutContent.cta.description || mergedContent.cta.description,
-                    primaryButton: { ...mergedContent.cta.primaryButton, ...aboutContent.cta.primaryButton },
-                    secondaryButton: { ...mergedContent.cta.secondaryButton, ...aboutContent.cta.secondaryButton },
-                  },
-                };
-              }
-            }
-          }
-        } catch (aboutErr) {
-          console.warn("[usePracticeAreasContent] Failed to fetch About page for global sections:", aboutErr);
-        }
-
         const pageMeta: PageMeta = {
           meta_title: pageData.meta_title,
           meta_description: pageData.meta_description,
@@ -176,19 +142,13 @@ function mergeWithDefaults(
 
   return {
     hero: { ...defaults.hero, ...cmsContent.hero },
+    intro: { ...defaults.intro, ...cmsContent.intro },
     grid: {
       ...defaults.grid,
       ...cmsContent.grid,
       areas: cmsContent.grid?.areas?.length
         ? cmsContent.grid.areas
         : defaults.grid.areas,
-    },
-    whyChoose: {
-      ...defaults.whyChoose,
-      ...cmsContent.whyChoose,
-      items: cmsContent.whyChoose?.items?.length
-        ? cmsContent.whyChoose.items
-        : defaults.whyChoose.items,
     },
     cta: {
       ...defaults.cta,

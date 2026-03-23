@@ -14,8 +14,8 @@ export default function PracticeAreasEditor({ content, onChange }: PracticeAreas
   return (
     <div className="space-y-6">
       <HeroSection content={content} update={update} />
+      <IntroSection content={content} update={update} />
       <GridSection content={content} update={update} />
-      <GlobalSectionInfo sectionTitle="Why Choose Us" managedIn="About Us" />
       <GlobalSectionInfo sectionTitle="Call to Action" managedIn="About Us" />
     </div>
   );
@@ -69,6 +69,31 @@ function HeroSection({ content, update }: SectionProps) {
           <Input value={hero.heroImageAlt || ""} onChange={(e) => set({ heroImageAlt: e.target.value })} />
         </div>
         <p className="text-xs text-gray-500 italic">Phone number is managed in Site Settings &gt; Contact Info</p>
+      </div>
+    </Section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+function IntroSection({ content, update }: SectionProps) {
+  const intro = content.intro;
+  const set = (patch: Partial<typeof intro>) => update("intro", { ...intro, ...patch });
+  const ht = useHeadingTag(content, update);
+
+  return (
+    <Section title="Intro Section" defaultOpen={false}>
+      <div className="grid gap-4">
+        <div>
+          <Label>Section Label</Label>
+          <Input value={intro.sectionLabel} onChange={(e) => set({ sectionLabel: e.target.value })} />
+        </div>
+        <HeadingField
+          label="Heading"
+          value={intro.heading}
+          onChange={(v) => set({ heading: v })}
+          tag={ht.get("intro.heading")}
+          onTagChange={(t) => ht.set("intro.heading", t)}
+        />
       </div>
     </Section>
   );
