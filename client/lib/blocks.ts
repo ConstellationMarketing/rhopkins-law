@@ -18,6 +18,7 @@ export type ContentBlock =
       imageAlt?: string;
       imagePosition: "left" | "right";
       showCTAs?: boolean;
+      showPhoneCTA?: boolean;
     }
   | {
       type: "cta";

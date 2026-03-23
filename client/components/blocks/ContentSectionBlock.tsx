@@ -46,12 +46,14 @@ export default function ContentSectionBlock({ block, index }: ContentSectionBloc
 
               {showCTAs && (
                 <div className="flex flex-col gap-6">
-                  <CallBox
-                    icon={Phone}
-                    title={phoneLabel}
-                    subtitle={phoneDisplay}
-                    phone={phoneNumber}
-                  />
+                  {block.showPhoneCTA !== false && (
+                    <CallBox
+                      icon={Phone}
+                      title={phoneLabel}
+                      subtitle={phoneDisplay}
+                      phone={phoneNumber}
+                    />
+                  )}
                   <CallBox
                     icon={Calendar}
                     title="Schedule Now"

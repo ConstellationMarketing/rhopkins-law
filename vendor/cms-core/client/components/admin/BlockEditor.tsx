@@ -329,6 +329,12 @@ function ContentSectionFields({ block, onUpdate }: { block: Extract<ContentBlock
         <Switch checked={block.showCTAs !== false} onCheckedChange={(checked) => onUpdate({ showCTAs: checked })} />
         <Label>Show CTA Buttons (phone & schedule)</Label>
       </div>
+      {block.showCTAs !== false && (
+        <div className="flex items-center gap-2 ml-6">
+          <Switch checked={block.showPhoneCTA !== false} onCheckedChange={(checked) => onUpdate({ showPhoneCTA: checked })} />
+          <Label>Show Phone CTA</Label>
+        </div>
+      )}
     </div>
   );
 }
