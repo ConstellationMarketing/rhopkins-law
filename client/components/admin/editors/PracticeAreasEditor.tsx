@@ -1,4 +1,4 @@
-import type { PracticeAreasPageContent } from "@/lib/cms/practiceAreasPageTypes";
+import type { PracticeAreasPageContent, PracticeAreaGroupItem, SubPracticeItem } from "@/lib/cms/practiceAreasPageTypes";
 import { Section, ArrayEditor, ImageField, GlobalSectionInfo, RichTextField, HeadingField, Input, Label, Textarea } from "./EditorShared";
 
 interface PracticeAreasEditorProps {
@@ -94,6 +94,11 @@ function IntroSection({ content, update }: SectionProps) {
           tag={ht.get("intro.heading")}
           onTagChange={(t) => ht.set("intro.heading", t)}
         />
+        <RichTextField
+          label="Description"
+          value={intro.description}
+          onChange={(v) => set({ description: v })}
+        />
       </div>
     </Section>
   );
@@ -104,6 +109,22 @@ function GridSection({ content, update }: SectionProps) {
   const grid = content.grid;
   const set = (patch: Partial<typeof grid>) => update("grid", { ...grid, ...patch });
   const ht = useHeadingTag(content, update);
+
+  const newArea = (): PracticeAreaGroupItem => ({
+    title: "",
+    description: "",
+    image: "",
+    imageAlt: "",
+    link: "/practice-areas/",
+    subPractices: [],
+  });
+
+  const newSubPractice = (): SubPracticeItem => ({
+    icon: "FileText",
+    title: "",
+    description: "",
+    link: "/practice-areas/",
+  });
 
   return (
     <Section title="Practice Areas Grid" defaultOpen={false}>
@@ -120,18 +141,12 @@ function GridSection({ content, update }: SectionProps) {
           items={grid.areas}
           onChange={(items) => set({ areas: items })}
           itemLabel="Practice Area"
-          newItem={() => ({ icon: "FileText", title: "", description: "", image: "", imageAlt: "", link: "/practice-areas" })}
+          newItem={newArea}
           renderItem={(item, _, upd) => (
             <div className="grid gap-3">
-              <div className="grid grid-cols-4 gap-3">
-                <div>
-                  <Label>Icon</Label>
-                  <Input value={item.icon} onChange={(e) => upd({ ...item, icon: e.target.value })} placeholder="Lucide icon name" />
-                </div>
-                <div className="col-span-3">
-                  <Label>Title</Label>
-                  <Input value={item.title} onChange={(e) => upd({ ...item, title: e.target.value })} />
-                </div>
+              <div>
+                <Label>Title</Label>
+                <Input value={item.title} onChange={(e) => upd({ ...item, title: e.target.value })} />
               </div>
               <RichTextField label="Description" value={item.description} onChange={(v) => upd({ ...item, description: v })} />
               <ImageField label="Background Image" value={item.image} onChange={(url) => upd({ ...item, image: url })} folder="practice-areas" />
@@ -142,6 +157,37 @@ function GridSection({ content, update }: SectionProps) {
               <div>
                 <Label>Link</Label>
                 <Input value={item.link} onChange={(e) => upd({ ...item, link: e.target.value })} />
+              </div>
+
+              {/* Nested Sub-Practices */}
+              <div className="mt-2 border-t pt-3">
+                <Label>Sub-Practices</Label>
+                <p className="text-xs text-gray-500 mb-2">Add sub-practice areas that fall under this main practice area</p>
+                <ArrayEditor
+                  items={item.subPractices || []}
+                  onChange={(subs) => upd({ ...item, subPractices: subs })}
+                  itemLabel="Sub-Practice"
+                  newItem={newSubPractice}
+                  renderItem={(sub, __, updSub) => (
+                    <div className="grid gap-2">
+                      <div className="grid grid-cols-4 gap-2">
+                        <div>
+                          <Label>Icon</Label>
+                          <Input value={sub.icon} onChange={(e) => updSub({ ...sub, icon: e.target.value })} placeholder="Lucide icon" />
+                        </div>
+                        <div className="col-span-3">
+                          <Label>Title</Label>
+                          <Input value={sub.title} onChange={(e) => updSub({ ...sub, title: e.target.value })} />
+                        </div>
+                      </div>
+                      <RichTextField label="Description" value={sub.description} onChange={(v) => updSub({ ...sub, description: v })} />
+                      <div>
+                        <Label>Link</Label>
+                        <Input value={sub.link} onChange={(e) => updSub({ ...sub, link: e.target.value })} />
+                      </div>
+                    </div>
+                  )}
+                />
               </div>
             </div>
           )}

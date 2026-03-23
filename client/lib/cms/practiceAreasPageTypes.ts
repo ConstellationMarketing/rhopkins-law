@@ -12,24 +12,32 @@ export interface PracticeAreasHeroContent {
   heroImageAlt: string;
 }
 
-export interface PracticeAreaGridItem {
-  icon: string; // Lucide icon name
-  title: string; // "Personal Injury"
-  description: string; // Description text
-  image: string; // Background image URL
-  imageAlt: string; // Image alt text
-  link: string; // Link to detail page
+export interface SubPracticeItem {
+  icon: string; // Lucide icon name (e.g. "FileText")
+  title: string; // "Uncontested Divorce"
+  description: string; // Brief description
+  link: string; // "/practice-areas/uncontested-divorce/"
+}
+
+export interface PracticeAreaGroupItem {
+  title: string;
+  description: string;
+  image: string;
+  imageAlt: string;
+  link: string;
+  subPractices: SubPracticeItem[];
 }
 
 export interface PracticeAreasGridContent {
   heading: string; // "Our Areas of Practice"
   description: string; // Intro paragraph
-  areas: PracticeAreaGridItem[];
+  areas: PracticeAreaGroupItem[];
 }
 
 export interface PracticeAreasIntroContent {
   sectionLabel: string;
   heading: string;
+  description: string;
 }
 
 export interface CTAContent {
@@ -71,6 +79,7 @@ export const defaultPracticeAreasContent: PracticeAreasPageContent = {
   intro: {
     sectionLabel: "",
     heading: "",
+    description: "",
   },
   grid: {
     heading: "",

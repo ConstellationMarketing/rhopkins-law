@@ -1,60 +1,18 @@
 import Seo from "@site/components/Seo";
 import Layout from "@site/components/layout/Layout";
 import PageHero from "@site/components/shared/PageHero";
-import PracticeAreaCard from "@site/components/practice/PracticeAreaCard";
+import PracticeAreaGroupCard from "@site/components/practice/PracticeAreaGroupCard";
 import CallBox from "@site/components/shared/CallBox";
-import {
-  Phone,
-  Calendar,
-  Scale,
-  Car,
-  Briefcase,
-  Users,
-  Home,
-  DollarSign,
-  FileText,
-  Heart,
-  Shield,
-  TrendingUp,
-  Stethoscope,
-  Building,
-  type LucideIcon,
-} from "lucide-react";
+import { Phone, Calendar } from "lucide-react";
 import { usePracticeAreasContent } from "@site/hooks/usePracticeAreasContent";
 import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
 import RichText from "@site/components/shared/RichText";
 import PracticeAreasSection from "@site/components/home/PracticeAreasSection";
 import { Loader2 } from "lucide-react";
 
-// Icon mapping for practice areas
-const iconMap: Record<string, LucideIcon> = {
-  Car,
-  Stethoscope,
-  Briefcase,
-  Heart,
-  Building,
-  Shield,
-  Scale,
-  FileText,
-  Users,
-  Home,
-  DollarSign,
-  TrendingUp,
-};
-
 export default function PracticeAreas() {
   const { content, meta, isLoading } = usePracticeAreasContent();
   const { phoneNumber, phoneDisplay, phoneLabel } = useGlobalPhone();
-
-  // Map practice areas from CMS content with icon components
-  const practiceAreas = content.grid.areas.map((area) => ({
-    icon: iconMap[area.icon] || Scale,
-    title: area.title,
-    description: area.description,
-    image: area.image,
-    imageAlt: area.imageAlt,
-    link: area.link,
-  }));
 
   if (isLoading) {
     return (
@@ -107,8 +65,8 @@ export default function PracticeAreas() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            {practiceAreas.map((area, index) => (
-              <PracticeAreaCard key={index} {...area} />
+            {content.grid.areas.map((area, index) => (
+              <PracticeAreaGroupCard key={index} area={area} />
             ))}
           </div>
         </div>

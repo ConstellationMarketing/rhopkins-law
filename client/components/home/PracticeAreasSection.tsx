@@ -1,7 +1,8 @@
 import type { PracticeAreasIntroContent } from "@site/lib/cms/homePageTypes";
+import RichText from "@site/components/shared/RichText";
 
 interface PracticeAreasSectionProps {
-  content?: PracticeAreasIntroContent;
+  content?: PracticeAreasIntroContent & { description?: string };
 }
 
 export default function PracticeAreasSection({ content }: PracticeAreasSectionProps) {
@@ -24,6 +25,12 @@ export default function PracticeAreasSection({ content }: PracticeAreasSectionPr
           <h2 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black">
             {data.heading}
           </h2>
+        )}
+        {data.description && (
+          <RichText
+            html={data.description}
+            className="font-outfit text-[16px] md:text-[18px] leading-[24px] md:leading-[28px] text-black/80 mt-[15px] max-w-[800px] mx-auto"
+          />
         )}
       </div>
     </div>
