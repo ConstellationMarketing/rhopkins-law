@@ -175,15 +175,15 @@ export default function PracticeAreas() {
       </div>
 
       {/* Call to Action Section */}
-      <div className="bg-brand-accent py-[40px] md:py-[60px]">
+      <div className="py-[40px] md:py-[60px]" style={{ backgroundColor: "#365D96" }}>
         <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[80%]">
           <div className="text-center mb-[30px] md:mb-[40px]">
-            <h2 className="font-playfair text-[36px] md:text-[48px] lg:text-[60px] leading-tight text-black pb-[15px]">
+            <h2 className="font-playfair text-[36px] md:text-[48px] lg:text-[60px] leading-tight text-white pb-[15px]">
               {content.cta.heading}
             </h2>
             <RichText
               html={content.cta.description}
-              className="font-outfit text-[18px] md:text-[22px] leading-[26px] md:leading-[32px] text-black/80"
+              className="font-outfit text-[18px] md:text-[22px] leading-[26px] md:leading-[32px] text-white/80"
             />
           </div>
 
@@ -193,7 +193,7 @@ export default function PracticeAreas() {
               title={phoneLabel}
               subtitle={phoneDisplay}
               phone={phoneNumber}
-              className="bg-brand-accent-dark hover:bg-black"
+              className="bg-transparent"
               variant="dark"
             />
             <CallBox
@@ -201,8 +201,9 @@ export default function PracticeAreas() {
               title={content.cta.secondaryButton.label}
               subtitle={content.cta.secondaryButton.sublabel}
               link={content.cta.secondaryButton.link}
-              className="bg-brand-accent-dark hover:bg-black"
+              className="bg-brand-accent hover:bg-brand-accent-dark"
               variant="dark"
+              accentIcon
             />
           </div>
         </div>
