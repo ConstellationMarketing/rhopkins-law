@@ -33,7 +33,7 @@ export default function PracticeAreaGroupCard({ area }: PracticeAreaGroupCardPro
         {area.description && (
           <RichText
             html={area.description}
-            className="font-outfit text-[14px] md:text-[16px] leading-[22px] md:leading-[26px] text-black/80 mb-4"
+            className="font-outfit text-[16px] md:text-[18px] leading-[24px] md:leading-[28px] text-black/80 mb-4"
           />
         )}
 

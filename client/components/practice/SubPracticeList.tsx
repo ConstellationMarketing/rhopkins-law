@@ -43,14 +43,14 @@ export default function SubPracticeList({ items }: SubPracticeListProps) {
                 className="group/sub inline-flex items-center gap-2 text-brand-dark hover:text-brand-accent transition-colors duration-200"
               >
                 <Icon className="w-4 h-4 shrink-0 text-brand-accent" />
-                <span className="font-outfit text-[14px] md:text-[15px] font-semibold group-hover/sub:underline">
+                <span className="font-outfit text-[16px] md:text-[17px] font-semibold group-hover/sub:underline">
                   {sub.title}
                 </span>
               </Link>
               {sub.description && (
                 <RichText
                   html={sub.description}
-                  className="font-outfit text-[13px] md:text-[14px] leading-[20px] text-black/60 mt-1 pl-6"
+                  className="font-outfit text-[15px] md:text-[16px] leading-[22px] md:leading-[24px] text-black/60 mt-1 pl-6"
                 />
               )}
             </li>
