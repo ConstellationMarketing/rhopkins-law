@@ -208,6 +208,9 @@ export default function PracticeAreas() {
           </div>
         </div>
       </div>
+
+      {/* Divider between CTA and footer */}
+      <div className="w-full h-[3px]" style={{ backgroundColor: "#A1134C" }} />
     </Layout>
   );
 }
