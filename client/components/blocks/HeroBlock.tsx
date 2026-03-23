@@ -28,7 +28,13 @@ export default function HeroBlock({ block }: HeroBlockProps) {
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-[5%]">
           {/* Left Side - Heading */}
           <div className="lg:w-[65%]">
-            <h1 className="font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px] text-brand-accent mb-[10px]">
+            <h1
+              className={`font-outfit text-[18px] md:text-[24px] leading-tight md:leading-[36px] mb-[10px] ${
+                block.labelStyle === "underline"
+                  ? "text-white border-b-[3px] border-brand-accent inline-block pb-[4px]"
+                  : "text-brand-accent"
+              }`}
+            >
               {block.sectionLabel}
             </h1>
 

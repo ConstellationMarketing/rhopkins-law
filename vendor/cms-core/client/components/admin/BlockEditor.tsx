@@ -268,6 +268,16 @@ function HeroFields({ block, onUpdate }: { block: Extract<ContentBlock, { type: 
         <Switch checked={block.showPhoneCTA !== false} onCheckedChange={(checked) => onUpdate({ showPhoneCTA: checked })} />
         <Label>Show Phone CTA Box</Label>
       </div>
+      <div>
+        <Label>Label Style</Label>
+        <Select value={block.labelStyle || 'accent'} onValueChange={(v) => onUpdate({ labelStyle: v as 'accent' | 'underline' })}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="accent">Crimson Text</SelectItem>
+            <SelectItem value="underline">White Text with Crimson Underline</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }

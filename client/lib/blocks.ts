@@ -9,6 +9,7 @@ export type ContentBlock =
       backgroundImage?: string;
       backgroundImageAlt?: string;
       showPhoneCTA?: boolean;
+      labelStyle?: "accent" | "underline";
     }
   | { type: "heading"; level: 1 | 2 | 3; text: string }
   | {
