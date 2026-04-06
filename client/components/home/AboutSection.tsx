@@ -1,7 +1,7 @@
 import { Phone, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { AboutContent } from "@site/lib/cms/homePageTypes";
-import { useGlobalPhone } from "@/hooks/useSiteSettings";
+import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
 import RichText from "@site/components/shared/RichText";
 
 interface AboutSectionProps {
@@ -9,13 +9,14 @@ interface AboutSectionProps {
 }
 
 export default function AboutSection({ content }: AboutSectionProps) {
+  const { phoneNumber, phoneLabel, phoneDisplay } = useGlobalPhone();
+
   if (!content || (!content.heading && !content.description)) {
     return null;
   }
 
   const data = content;
   const stats = data.stats || [];
-  const { phoneNumber, phoneAvailability: phoneLabel, phoneDisplay } = useGlobalPhone();
 
   return (
     <div className="pt-[15px] md:pt-[27px] pb-[40px] md:pb-[60px]" style={{ backgroundColor: "#EFF0EB" }}>

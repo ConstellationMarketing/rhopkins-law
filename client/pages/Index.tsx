@@ -135,7 +135,6 @@ export default function Index() {
                     height={800}
                     sizes="(min-width: 1024px) 31vw, 90vw"
                     loading="eager"
-                    fetchPriority="high"
                     decoding="async"
                   />
                 </div>
