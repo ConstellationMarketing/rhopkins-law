@@ -30,9 +30,9 @@ export default function Hero() {
                 <Phone className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
               </span>
               <div className="flex-1">
-                <h4 className="font-outfit text-[18px] leading-tight text-white pb-[4px] font-normal">
+                <p className="font-outfit text-[18px] leading-tight text-white pb-[4px] font-normal">
                   {phoneLabel}
-                </h4>
+                </p>
                 <p className="font-outfit text-[clamp(1.5rem,4vw,40px)] text-white leading-tight">
                   {phoneDisplay}
                 </p>

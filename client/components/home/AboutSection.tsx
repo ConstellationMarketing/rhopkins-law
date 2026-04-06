@@ -95,9 +95,9 @@ export default function AboutSection({ content }: AboutSectionProps) {
                       <Phone className="w-[26px] h-[26px] text-white" strokeWidth={1.5} />
                     </span>
                     <div className="flex-1">
-                      <h4 className="font-outfit text-[14px] md:text-[16px] leading-tight text-black pb-[2px]">
+                      <p className="font-outfit text-[14px] md:text-[16px] leading-tight text-black pb-[2px]">
                         {phoneLabel}
-                      </h4>
+                      </p>
                       <p className="font-outfit text-[22px] md:text-[32px] text-black leading-none">
                         {phoneDisplay}
                       </p>

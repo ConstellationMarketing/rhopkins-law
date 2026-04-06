@@ -97,9 +97,9 @@ export default function Footer() {
                 </span>
                 <div className="flex-1">
                   {phoneLabel && (
-                    <h4 className="font-outfit text-[14px] md:text-[16px] leading-tight text-white pb-[2px]">
+                    <p className="font-outfit text-[14px] md:text-[16px] leading-tight text-white pb-[2px]">
                       {phoneLabel}
-                    </h4>
+                    </p>
                   )}
                   <p className="font-outfit text-[20px] md:text-[26px] leading-tight text-white whitespace-nowrap">
                     {phoneDisplay}

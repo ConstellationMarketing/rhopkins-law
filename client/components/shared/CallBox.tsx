@@ -45,9 +45,9 @@ export default function CallBox({
             <Icon className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
           </span>
           <div className="flex-1">
-            <h4 className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px]">
+            <p className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px]">
               {title}
-            </h4>
+            </p>
             <p className="font-outfit text-[18px] md:text-[24px] text-white leading-none whitespace-nowrap">
               {subtitle}
             </p>
