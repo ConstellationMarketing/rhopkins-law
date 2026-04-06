@@ -3,6 +3,7 @@ import { defaultPracticeAreaPageContent } from '../../../client/lib/cms/practice
 import {
   escapeHtml,
   normalizeSeoPath,
+  normalizeSiteUrl,
   renderSeoHeadTags,
   resolveSeo,
   stripManagedSeoHeadTags,
@@ -202,7 +203,7 @@ async function generateSSG() {
   });
 
   // Resolve site URL: env var override > DB site setting
-  const siteUrl = (process.env.SITE_URL || siteSettings.site_url || '').replace(/\/+$/, '');
+  const siteUrl = normalizeSiteUrl(process.env.SITE_URL || siteSettings.site_url) || '';
 
   if (!siteUrl) {
     console.warn('[SSG] WARNING: No site URL configured. Set the Site URL in CMS Site Settings (or SITE_URL env var). Skipping canonical URLs, sitemap, and robots.txt.');

@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: /sitemap.xml
+# Production builds generate an absolute sitemap URL based on SITE_URL or CMS Site URL.

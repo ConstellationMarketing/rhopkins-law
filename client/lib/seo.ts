@@ -55,7 +55,7 @@ function cleanValue(value?: string | null): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
-function normalizeSiteUrl(value?: string | null): string | undefined {
+export function normalizeSiteUrl(value?: string | null): string | undefined {
   const cleaned = cleanValue(value)?.replace(/\/+$/, '');
 
   if (!cleaned) {

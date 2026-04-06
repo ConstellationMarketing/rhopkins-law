@@ -19,6 +19,8 @@ export default function PracticeAreaCard({
   imageAlt,
   link = "/contact/",
 }: PracticeAreaCardProps) {
+  const ctaLabel = `Learn More About ${title}`;
+
   return (
     <div className="flex flex-col overflow-hidden">
       {/* Top Zone: Image with dark blue gradient overlay + heading */}
@@ -53,7 +55,7 @@ export default function PracticeAreaCard({
           className="inline-flex items-center gap-2 text-brand-accent hover:text-brand-accent-dark transition-colors duration-300 mt-auto"
         >
           <span className="font-outfit text-[14px] md:text-[16px] font-semibold uppercase tracking-wide">
-            Learn More
+            {ctaLabel}
           </span>
           <ArrowRight className="w-4 h-4" />
         </Link>
