@@ -1,11 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <rect width="256" height="256" rx="32" fill="#365d96" />
-  <image
-    href="/images/logos/firm-logo.png"
-    x="18"
-    y="107"
-    width="220"
-    height="36"
-    preserveAspectRatio="xMidYMid meet"
-  />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Scales of justice favicon">
+  <rect width="256" height="256" rx="40" fill="#365d96" />
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 46v134" stroke="#ffffff" stroke-width="14" />
+    <path d="M88 74h80" stroke="#ffffff" stroke-width="12" />
+    <path d="M128 74l-50 24" stroke="#ffffff" stroke-width="8" />
+    <path d="M128 74l50 24" stroke="#ffffff" stroke-width="8" />
+    <path d="M78 98v14" stroke="#ffffff" stroke-width="7" />
+    <path d="M178 98v14" stroke="#ffffff" stroke-width="7" />
+    <path d="M56 112l22 36 22-36" stroke="#ffffff" stroke-width="8" />
+    <path d="M156 112l22 36 22-36" stroke="#ffffff" stroke-width="8" />
+    <path d="M52 149c7 12 16 18 26 18s19-6 26-18" stroke="#a1134c" stroke-width="9" />
+    <path d="M152 149c7 12 16 18 26 18s19-6 26-18" stroke="#a1134c" stroke-width="9" />
+    <path d="M96 198h64" stroke="#ffffff" stroke-width="14" />
+    <path d="M112 212h32" stroke="#a1134c" stroke-width="10" />
+  </g>
 </svg>
