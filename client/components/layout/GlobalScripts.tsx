@@ -8,6 +8,7 @@ import {
   setKnownOriginalPhoneNumber,
   startUniversalPhoneSync,
 } from "@site/lib/syncDniPhone";
+import { stripManagedSeoHeadTags } from "@site/lib/seo";
 
 declare global {
   interface Window {
@@ -300,8 +301,10 @@ export default function GlobalScripts() {
       );
     });
 
+    const sanitizedHeadScripts = stripManagedSeoHeadTags(settings.headScripts);
+
     injectHtmlSnippet(
-      settings.headScripts,
+      sanitizedHeadScripts,
       document.head,
       "head-scripts",
       triggerWhatConvertsRefresh,

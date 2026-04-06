@@ -1,11 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 import { defaultPracticeAreaPageContent } from '../../../client/lib/cms/practiceAreaPageTypes';
+import {
+  escapeHtml,
+  normalizeSeoPath,
+  renderSeoHeadTags,
+  resolveSeo,
+  stripManagedSeoHeadTags,
+} from '../../../client/lib/seo';
 import fs from 'fs';
 import path from 'path';
 import type { Database } from '../client/lib/database.types';
-// NOTE: JSON-LD schemas are NOT injected by SSG to avoid duplication with
-// client-side Seo.tsx / React Helmet. Netlify prerendering executes JS,
-// so the Helmet-generated tags are what crawlers see.
+// NOTE: JSON-LD schemas remain client-side only to avoid duplicate structured
+// data when React Helmet updates the page after hydration.
 
 // Load environment variables
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -356,18 +362,27 @@ function generatePageHTML(
   siteUrl: string,
   blogPost?: Post | null,
 ): string {
-  const title = page.meta_title || page.title;
-  const trailingSlashPath = page.url_path === '/' ? '/' : page.url_path.replace(/\/?$/, '/');
+  const trailingSlashPath = normalizeSeoPath(page.url_path);
+  const seo = resolveSeo({
+    title: page.meta_title || page.title,
+    description: page.meta_description,
+    canonical: page.canonical_url,
+    image: page.og_image,
+    noindex: page.noindex,
+    ogTitle: page.og_title,
+    ogDescription: page.og_description,
+    ogImage: page.og_image,
+    pathname: trailingSlashPath,
+    fallbackTitle: page.title,
+    siteSettings: {
+      siteName: siteSettings.site_name,
+      siteUrl,
+      siteNoindex: siteSettings.site_noindex,
+    },
+  });
 
-  // SEO meta tags (title, description, canonical, OG, Twitter, robots) are
-  // NOT injected here — they are managed exclusively by React Helmet (Seo.tsx)
-  // to avoid duplicate tags. Netlify prerendering executes JS, so the
-  // Helmet-generated tags are what crawlers see.
-
-  // Generate analytics scripts
   let analyticsScripts = '';
 
-  // GA4 Script
   if (siteSettings.ga4_measurement_id) {
     analyticsScripts += `
     <!-- Google Analytics 4 -->
@@ -380,9 +395,7 @@ function generatePageHTML(
     </script>`;
   }
 
-  // Google Ads Script
   if (siteSettings.google_ads_id) {
-    // Only add gtag.js if not already added by GA4
     if (!siteSettings.ga4_measurement_id) {
       analyticsScripts += `
     <!-- Google Ads -->
@@ -399,29 +412,11 @@ function generatePageHTML(
     </script>`;
   }
 
-  // Custom head scripts
-  const customHeadScripts = siteSettings.head_scripts || '';
-
-  // Custom footer scripts
+  const customHeadScripts = stripManagedSeoHeadTags(siteSettings.head_scripts || '');
   const customFooterScripts = siteSettings.footer_scripts || '';
 
-  // JSON-LD schemas are handled exclusively by client-side Seo.tsx to avoid
-  // duplication. Netlify prerendering captures the Helmet output.
+  let html = stripManagedSeoHeadTags(template);
 
-  // Replace the existing <title> tag (Vite default) — React Helmet will set the real one
-  let html = template.replace(/<title>.*?<\/title>/, '');
-
-  // Inject only analytics and custom head scripts before </head>
-  // (SEO meta tags and JSON-LD are handled by React Helmet / Seo.tsx)
-  const headInjection = `${analyticsScripts}\n${customHeadScripts}\n`;
-  html = html.replace('</head>', `${headInjection}</head>`);
-
-  // Inject custom footer scripts before </body>
-  if (customFooterScripts) {
-    html = html.replace('</body>', `${customFooterScripts}\n</body>`);
-  }
-
-  // Inject window.__PAGE_DATA__ for synchronous React consumption
   const pageDataPayload: Record<string, unknown> = {
     urlPath: trailingSlashPath,
     title: page.title,
@@ -462,18 +457,17 @@ function generatePageHTML(
   }
 
   const dataScript = `<script>window.__PAGE_DATA__=${JSON.stringify(pageDataPayload)}</script>`;
-  html = html.replace('</head>', `${dataScript}\n</head>`);
+  const headInjection = [renderSeoHeadTags(seo), analyticsScripts, customHeadScripts, dataScript]
+    .filter(Boolean)
+    .join('\n');
+
+  html = html.replace('</head>', `${headInjection}\n</head>`);
+
+  if (customFooterScripts) {
+    html = html.replace('</body>', `${customFooterScripts}\n</body>`);
+  }
 
   return html;
-}
-
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
 }
 
 generateSSG().catch(err => {
