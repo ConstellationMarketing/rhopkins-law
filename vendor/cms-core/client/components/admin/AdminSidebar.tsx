@@ -15,6 +15,7 @@ import {
   BarChart3,
   Upload,
   FileInput,
+  ImageUp,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useNavigate } from "react-router-dom";
@@ -40,6 +41,7 @@ const navItems: NavItem[] = [
   { label: "Search & Replace", href: "/admin/search-replace", icon: Replace, adminOnly: true },
   { label: "QA Scans", href: "/admin/qa", icon: BarChart3, adminOnly: true },
   { label: "Bulk Import", href: "/admin/bulk-import", icon: Upload, adminOnly: true },
+  { label: "Image Cache", href: "/admin/image-cache", icon: ImageUp, adminOnly: true },
   { label: "Templates", href: "/admin/templates", icon: FileCode, adminOnly: true },
   { label: "Users", href: "/admin/users", icon: Users, adminOnly: true },
 ];

@@ -64,6 +64,9 @@ const AdminQA = lazy(
 const AdminBulkImport = lazy(
   () => import("./AdminBulkImport"),
 );
+const AdminImageCacheMigration = lazy(
+  () => import("./admin/AdminImageCacheMigration"),
+);
 const AdminForms = lazy(
   () => import("./admin/AdminForms"),
 );
@@ -240,6 +243,10 @@ export default function AdminRoutes() {
 
           {/* Bulk Import */}
           <Route path="bulk-import" element={<AdminBulkImport />} />
+          <Route
+            path="image-cache"
+            element={<AdminImageCacheMigration />}
+          />
 
           {/* Catch-all inside /admin */}
           <Route path="*" element={<Navigate to="dashboard" replace />} />

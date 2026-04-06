@@ -22,6 +22,7 @@ let qaListRunsHandler: any;
 let qaReportHandler: any;
 let bulkImportHandler: any;
 let bulkImportFetchHandler: any;
+let imageCacheMigrationHandler: any;
 
 // Flag prevents retry loop on every request when a handler fails to load
 let handlersLoaded = false;
@@ -51,7 +52,7 @@ const loadHandlers = async () => {
     }
   };
 
-  const [searchReplace, inviteUser, deleteUser, triggerQa, qaGetLatestRun, qaRunStatus, qaListRuns, qaReport, bulkImport, bulkImportFetch] =
+  const [searchReplace, inviteUser, deleteUser, triggerQa, qaGetLatestRun, qaRunStatus, qaListRuns, qaReport, bulkImport, bulkImportFetch, imageCacheMigration] =
     await Promise.all([
       tryLoad("search-replace"),
       tryLoad("invite-user"),
@@ -63,6 +64,7 @@ const loadHandlers = async () => {
       tryLoad("qa-report"),
       tryLoad("bulk-import"),
       tryLoad("bulk-import-fetch"),
+      tryLoad("image-cache-migration"),
     ]);
 
   searchReplaceHandler = searchReplace?.handler ?? null;
@@ -75,6 +77,7 @@ const loadHandlers = async () => {
   qaReportHandler = qaReport?.handler ?? null;
   bulkImportHandler = bulkImport?.handler ?? null;
   bulkImportFetchHandler = bulkImportFetch?.handler ?? null;
+  imageCacheMigrationHandler = imageCacheMigration?.handler ?? null;
 };
 
 export function createServer() {
@@ -487,6 +490,44 @@ export function createServer() {
       }
     } catch (err) {
       console.error("Bulk-import-fetch dev proxy error:", err);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Dev adapter for image-cache-migration Netlify function
+  app.post("/.netlify/functions/image-cache-migration", async (req, res) => {
+    if (!imageCacheMigrationHandler) {
+      return res.status(503).json({ error: "Netlify functions not available" });
+    }
+    try {
+      const result = await imageCacheMigrationHandler(
+        {
+          httpMethod: "POST",
+          headers: req.headers as Record<string, string>,
+          body: JSON.stringify(req.body),
+          rawUrl: req.url,
+          rawQuery: "",
+          path: req.path,
+          queryStringParameters: null,
+          multiValueQueryStringParameters: null,
+          multiValueHeaders: {},
+          isBase64Encoded: false,
+        } as any,
+        {} as any,
+      );
+      if (result) {
+        res.status(result.statusCode || 200);
+        if (result.headers) {
+          for (const [key, value] of Object.entries(result.headers)) {
+            if (value) res.setHeader(key, String(value));
+          }
+        }
+        res.send(result.body);
+      } else {
+        res.status(500).json({ error: "No response from handler" });
+      }
+    } catch (err) {
+      console.error("Image-cache-migration dev proxy error:", err);
       res.status(500).json({ error: "Internal server error" });
     }
   });
