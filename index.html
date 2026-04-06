@@ -22,7 +22,8 @@
 
   <body>
     <!-- Hidden Netlify form definitions for SPA bot detection -->
-    <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+    <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="contact" />
       <input type="text" name="firstName" />
       <input type="text" name="lastName" />
       <input type="email" name="email" />
@@ -31,7 +32,8 @@
       <input type="text" name="bot-field" />
     </form>
 
-    <form name="contact-block" netlify netlify-honeypot="bot-field" hidden>
+    <form name="contact-block" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="contact-block" />
       <input type="text" name="name" />
       <input type="email" name="email" />
       <input type="tel" name="phone" />
