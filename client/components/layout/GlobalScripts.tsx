@@ -1,16 +1,46 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
 import {
   refreshWhatConvertsDni,
   scheduleRefreshSeries,
 } from "@site/lib/whatconvertsRefresh";
-import { startUniversalPhoneSync } from "@site/lib/syncDniPhone";
+import {
+  setKnownOriginalPhoneNumber,
+  startUniversalPhoneSync,
+} from "@site/lib/syncDniPhone";
 
 declare global {
   interface Window {
     dataLayer: unknown[];
     gtag: (...args: unknown[]) => void;
   }
+}
+
+const MANAGED_KEY_ATTR = "data-global-script-key";
+const MANAGED_SCOPE_ATTR = "data-global-script-scope";
+
+function hashString(value: string) {
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(index);
+    hash |= 0;
+  }
+
+  return Math.abs(hash).toString(36);
+}
+
+function getManagedNode(key: string) {
+  return (
+    Array.from(document.querySelectorAll<HTMLElement>(`[${MANAGED_KEY_ATTR}]`)).find(
+      (node) => node.getAttribute(MANAGED_KEY_ATTR) === key,
+    ) ?? null
+  );
+}
+
+function markManaged(node: HTMLElement, scope: string, key: string) {
+  node.setAttribute(MANAGED_KEY_ATTR, key);
+  node.setAttribute(MANAGED_SCOPE_ATTR, scope);
 }
 
 function isWhatConvertsScript(script: HTMLScriptElement) {
@@ -25,39 +55,69 @@ function isWhatConvertsScript(script: HTMLScriptElement) {
   );
 }
 
-/**
- * Parses an HTML string and injects the resulting elements into the DOM.
- * - <script> elements are recreated (innerHTML assignment won't execute scripts)
- * - External scripts (with src) get async = true to prevent render blocking
- * - Non-script elements (meta, link, noscript, style) are cloned directly
- *
- * Returns the list of injected nodes so they can be removed on cleanup.
- */
+function buildNodeKey(scope: string, node: Node, index: number) {
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    const element = node as Element;
+    const serialized =
+      element.tagName === "SCRIPT"
+        ? `${element.tagName}|${(element as HTMLScriptElement).src}|${element.textContent || ""}`
+        : element.outerHTML;
+
+    return `${scope}-${index}-${hashString(serialized)}`;
+  }
+
+  return `${scope}-${index}-${hashString(node.textContent || "")}`;
+}
+
+function syncManagedScope(scope: string, activeKeys: string[]) {
+  const activeKeySet = new Set(activeKeys);
+
+  document
+    .querySelectorAll<HTMLElement>(`[${MANAGED_SCOPE_ATTR}="${scope}"]`)
+    .forEach((node) => {
+      const key = node.getAttribute(MANAGED_KEY_ATTR) || "";
+      if (!activeKeySet.has(key)) {
+        node.remove();
+      }
+    });
+}
+
 function injectHtmlSnippet(
   html: string,
   target: HTMLElement,
+  scope: string,
   onWhatConvertsReady?: () => void,
-): Node[] {
-  if (!html.trim()) return [];
+): string[] {
+  if (!html.trim()) {
+    syncManagedScope(scope, []);
+    return [];
+  }
 
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
-  const injected: Node[] = [];
-
   const sources = [
     ...Array.from(doc.head.childNodes),
     ...Array.from(doc.body.childNodes),
   ];
+  const activeKeys: string[] = [];
 
-  for (const node of sources) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      if (!node.textContent?.trim()) continue;
+  sources.forEach((node, index) => {
+    if (node.nodeType === Node.TEXT_NODE && !node.textContent?.trim()) {
+      return;
     }
 
-    if (
-      node.nodeType === Node.ELEMENT_NODE &&
-      (node as Element).tagName === "SCRIPT"
-    ) {
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return;
+    }
+
+    const key = buildNodeKey(scope, node, index);
+    activeKeys.push(key);
+
+    if (getManagedNode(key)) {
+      return;
+    }
+
+    if ((node as Element).tagName === "SCRIPT") {
       const original = node as HTMLScriptElement;
       const script = document.createElement("script");
 
@@ -81,64 +141,84 @@ function injectHtmlSnippet(
         script.textContent = original.textContent;
       }
 
+      markManaged(script, scope, key);
       target.appendChild(script);
-      injected.push(script);
 
       if (isWhatConverts && !script.src && onWhatConvertsReady) {
         window.setTimeout(onWhatConvertsReady, 0);
       }
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      const clone = node.cloneNode(true);
-      target.appendChild(clone);
-      injected.push(clone);
+
+      return;
     }
+
+    const clone = node.cloneNode(true) as HTMLElement;
+    markManaged(clone, scope, key);
+    target.appendChild(clone);
+  });
+
+  syncManagedScope(scope, activeKeys);
+  return activeKeys;
+}
+
+function ensureScriptTag(key: string, scope: string, src: string) {
+  if (!src) {
+    syncManagedScope(scope, []);
+    return;
   }
 
-  return injected;
+  if (!getManagedNode(key)) {
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    markManaged(script, scope, key);
+    document.head.appendChild(script);
+  }
+
+  syncManagedScope(scope, [key]);
 }
 
-function injectGA4(measurementId: string): Node[] {
-  if (!measurementId) return [];
-  if (typeof window.gtag === "function") return [];
+function injectGA4(measurementId: string) {
+  if (!measurementId) {
+    syncManagedScope("ga4", []);
+    return;
+  }
 
-  const injected: Node[] = [];
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function gtag(...args: unknown[]) {
-    window.dataLayer.push(args);
-  };
-  window.gtag("js", new Date());
-  window.gtag("config", measurementId);
-
-  const script = document.createElement("script");
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  script.async = true;
-  document.head.appendChild(script);
-  injected.push(script);
-
-  return injected;
-}
-
-function injectGoogleAds(
-  adsId: string,
-  conversionLabel: string,
-): Node[] {
-  if (!adsId) return [];
-
-  const injected: Node[] = [];
-
   if (typeof window.gtag !== "function") {
-    window.dataLayer = window.dataLayer || [];
     window.gtag = function gtag(...args: unknown[]) {
       window.dataLayer.push(args);
     };
     window.gtag("js", new Date());
-
-    const script = document.createElement("script");
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${adsId}`;
-    script.async = true;
-    document.head.appendChild(script);
-    injected.push(script);
   }
+
+  ensureScriptTag(
+    `ga4-${measurementId}`,
+    "ga4",
+    `https://www.googletagmanager.com/gtag/js?id=${measurementId}`,
+  );
+
+  window.gtag("config", measurementId);
+}
+
+function injectGoogleAds(adsId: string, conversionLabel: string) {
+  if (!adsId) {
+    syncManagedScope("google-ads", []);
+    return;
+  }
+
+  window.dataLayer = window.dataLayer || [];
+  if (typeof window.gtag !== "function") {
+    window.gtag = function gtag(...args: unknown[]) {
+      window.dataLayer.push(args);
+    };
+    window.gtag("js", new Date());
+  }
+
+  ensureScriptTag(
+    `google-ads-${adsId}`,
+    "google-ads",
+    `https://www.googletagmanager.com/gtag/js?id=${adsId}`,
+  );
 
   window.gtag("config", adsId);
 
@@ -147,69 +227,47 @@ function injectGoogleAds(
       send_to: `${adsId}/${conversionLabel}`,
     });
   }
-
-  return injected;
 }
 
 export default function GlobalScripts() {
   const { settings, isLoading } = useSiteSettings();
-  const injectedRef = useRef<Node[]>([]);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) {
+      return;
+    }
 
-    const allInjected: Node[] = [];
+    setKnownOriginalPhoneNumber(settings.phoneNumber || settings.phoneDisplay);
+
     const triggerWhatConvertsRefresh = () => {
       scheduleRefreshSeries("whatconverts-ready", startUniversalPhoneSync);
       refreshWhatConvertsDni("whatconverts-ready", { force: true });
     };
 
-    if (settings.ga4MeasurementId) {
-      allInjected.push(...injectGA4(settings.ga4MeasurementId));
-    }
-
-    if (settings.googleAdsId) {
-      allInjected.push(
-        ...injectGoogleAds(
-          settings.googleAdsId,
-          settings.googleAdsConversionLabel,
-        ),
-      );
-    }
-
-    if (settings.headScripts) {
-      allInjected.push(
-        ...injectHtmlSnippet(
-          settings.headScripts,
-          document.head,
-          triggerWhatConvertsRefresh,
-        ),
-      );
-    }
-
-    if (settings.footerScripts) {
-      allInjected.push(
-        ...injectHtmlSnippet(
-          settings.footerScripts,
-          document.body,
-          triggerWhatConvertsRefresh,
-        ),
-      );
-    }
+    injectGA4(settings.ga4MeasurementId);
+    injectGoogleAds(
+      settings.googleAdsId,
+      settings.googleAdsConversionLabel,
+    );
+    injectHtmlSnippet(
+      settings.headScripts,
+      document.head,
+      "head-scripts",
+      triggerWhatConvertsRefresh,
+    );
+    injectHtmlSnippet(
+      settings.footerScripts,
+      document.body,
+      "footer-scripts",
+      triggerWhatConvertsRefresh,
+    );
 
     refreshWhatConvertsDni("scripts-injected", { force: true });
     scheduleRefreshSeries("scripts-injected", startUniversalPhoneSync);
-
-    injectedRef.current = allInjected;
-
-    return () => {
-      for (const node of injectedRef.current) {
-        node.parentNode?.removeChild(node);
-      }
-      injectedRef.current = [];
-    };
   }, [
     isLoading,
+    settings.phoneNumber,
+    settings.phoneDisplay,
     settings.ga4MeasurementId,
     settings.googleAdsId,
     settings.googleAdsConversionLabel,

@@ -4,15 +4,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useCmsForm } from "@site/hooks/useCmsForm";
+import { notifyWhatConvertsLead } from "@site/lib/whatconvertsRefresh";
 import { Loader2 } from "lucide-react";
 import type { CmsForm, FormFieldDef } from "@site/lib/cms/formTypes";
 
 interface CmsFormRendererProps {
-  /** Pass a pre-loaded form object directly */
   form?: CmsForm;
-  /** Or pass an ID/name to fetch it */
   formId?: string;
-  /** Optional extra className on the wrapper */
   className?: string;
 }
 
@@ -48,27 +46,39 @@ function getAttributionValues() {
     }
 
     const currentValue = params.get(fieldName)?.trim() || "";
-    const storedValue = sessionStorage.getItem(`${ATTRIBUTION_STORAGE_PREFIX}${fieldName}`) || "";
+    const storedValue =
+      sessionStorage.getItem(`${ATTRIBUTION_STORAGE_PREFIX}${fieldName}`) || "";
     const resolvedValue = currentValue || storedValue;
 
     if (currentValue) {
-      sessionStorage.setItem(`${ATTRIBUTION_STORAGE_PREFIX}${fieldName}`, currentValue);
+      sessionStorage.setItem(
+        `${ATTRIBUTION_STORAGE_PREFIX}${fieldName}`,
+        currentValue,
+      );
     }
 
     values[fieldName] = resolvedValue;
   }
 
   const currentLandingPage = `${window.location.pathname}${window.location.search}`;
-  const storedLandingPage = sessionStorage.getItem(`${ATTRIBUTION_STORAGE_PREFIX}landing_page`) || "";
+  const storedLandingPage =
+    sessionStorage.getItem(`${ATTRIBUTION_STORAGE_PREFIX}landing_page`) || "";
   const resolvedLandingPage = storedLandingPage || currentLandingPage;
-  sessionStorage.setItem(`${ATTRIBUTION_STORAGE_PREFIX}landing_page`, resolvedLandingPage);
+  sessionStorage.setItem(
+    `${ATTRIBUTION_STORAGE_PREFIX}landing_page`,
+    resolvedLandingPage,
+  );
   values.landing_page = resolvedLandingPage;
 
   const currentReferrer = document.referrer.trim();
-  const storedReferrer = sessionStorage.getItem(`${ATTRIBUTION_STORAGE_PREFIX}referrer`) || "";
+  const storedReferrer =
+    sessionStorage.getItem(`${ATTRIBUTION_STORAGE_PREFIX}referrer`) || "";
   const resolvedReferrer = storedReferrer || currentReferrer;
   if (currentReferrer && !storedReferrer) {
-    sessionStorage.setItem(`${ATTRIBUTION_STORAGE_PREFIX}referrer`, currentReferrer);
+    sessionStorage.setItem(
+      `${ATTRIBUTION_STORAGE_PREFIX}referrer`,
+      currentReferrer,
+    );
   }
   values.referrer = resolvedReferrer;
 
@@ -117,7 +127,8 @@ function FormInner({
     setIsSubmitting(true);
 
     try {
-      const formData = new FormData(e.currentTarget);
+      const formElement = e.currentTarget;
+      const formData = new FormData(formElement);
       const body = new URLSearchParams();
       const latestAttributionValues = getAttributionValues();
       body.set("form-name", form.name);
@@ -134,14 +145,20 @@ function FormInner({
         }
       });
 
-      await fetch("/", {
+      const response = await fetch("/", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body.toString(),
       });
 
+      if (!response.ok) {
+        throw new Error(`Form submission failed with status ${response.status}`);
+      }
+
+      setAttributionValues(latestAttributionValues);
+      notifyWhatConvertsLead(form.name);
       toast.success(form.success_message);
-      (e.target as HTMLFormElement).reset();
+      formElement.reset();
     } catch (err) {
       console.error("[CmsFormRenderer] Submit error:", err);
       toast.error("Something went wrong. Please try again.");
@@ -154,6 +171,7 @@ function FormInner({
     <form
       name={form.name}
       method="POST"
+      action="/"
       data-netlify="true"
       data-netlify-honeypot="bot-field"
       onSubmit={handleSubmit}
@@ -174,7 +192,6 @@ function FormInner({
         <FormField key={field.id} field={field} />
       ))}
 
-      {/* Submit */}
       <div>
         <Button
           type="submit"
@@ -185,7 +202,6 @@ function FormInner({
         </Button>
       </div>
 
-      {/* Netlify Honeypot */}
       <div className="absolute invisible" aria-hidden="true">
         <label>
           If you are a human, leave this empty.

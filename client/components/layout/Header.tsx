@@ -5,6 +5,7 @@ import { Menu, ArrowRight, ChevronDown, Phone } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
 import NavDropdown from "./NavDropdown";
+import { normalizePhoneDigits } from "@site/lib/syncDniPhone";
 
 export default function Header({ overlay = false }: { overlay?: boolean }) {
   const { settings } = useSiteSettings();
@@ -27,6 +28,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
   const headerServiceText = settings.headerServiceText?.trim() || "";
   const phoneDisplay = settings.phoneDisplay?.trim() || "";
   const phoneNumber = settings.phoneNumber?.trim() || "";
+  const phoneHref = normalizePhoneDigits(phoneNumber || phoneDisplay) || phoneNumber || phoneDisplay;
 
   const navItems = [...(settings.navigationItems ?? [])].sort(
     (a, b) => (a.order ?? 0) - (b.order ?? 0),
@@ -78,7 +80,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
                     <Phone className="w-[16px] h-[16px] text-white" />
                   </span>
                   <a
-                    href={`tel:${phoneNumber || phoneDisplay}`}
+                    href={`tel:${phoneHref}`}
                     className="font-outfit font-semibold text-white text-[28px] leading-none hover:opacity-80 transition-opacity"
                   >
                     {phoneDisplay}
@@ -153,7 +155,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
                   )}
                   {phoneDisplay && (
                     <a
-                      href={`tel:${phoneNumber || phoneDisplay}`}
+                      href={`tel:${phoneHref}`}
                       className="flex items-center gap-2 font-outfit font-semibold text-white text-[18px] hover:opacity-80 transition-opacity"
                     >
                       <span className="flex items-center justify-center w-[22px] h-[22px] rounded-full bg-red-500 flex-shrink-0">
