@@ -1,6 +1,6 @@
 import { lazy, Suspense, Component, type ReactNode, type ErrorInfo } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Loader2, AlertTriangle } from "lucide-react";
+import { Loader2, AlertTriangle, RefreshCw } from "lucide-react";
 
 // Lazy load admin components from cms-core submodule
 // This prevents the route scanner from following these imports at build time
@@ -71,6 +71,31 @@ const AdminFormEdit = lazy(
   () => import("./admin/AdminFormEdit"),
 );
 
+const ADMIN_CHUNK_RELOAD_KEY = "admin-chunk-reload-attempted";
+
+function isLikelyChunkLoadError(error: Error | null) {
+  const message = error?.message ?? "";
+  return (
+    message.includes("Failed to fetch dynamically imported module") ||
+    message.includes("ChunkLoadError") ||
+    message.includes("Loading chunk")
+  );
+}
+
+function tryRecoverFromChunkError() {
+  if (typeof window === "undefined") return false;
+
+  const hasRetried = sessionStorage.getItem(ADMIN_CHUNK_RELOAD_KEY) === "true";
+  if (hasRetried) {
+    sessionStorage.removeItem(ADMIN_CHUNK_RELOAD_KEY);
+    return false;
+  }
+
+  sessionStorage.setItem(ADMIN_CHUNK_RELOAD_KEY, "true");
+  window.location.reload();
+  return true;
+}
+
 // Loading fallback for admin pages
 function AdminLoading() {
   return (
@@ -104,6 +129,10 @@ class AdminErrorBoundary extends Component<
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error("[AdminErrorBoundary] Caught error:", error, info);
+
+    if (isLikelyChunkLoadError(error)) {
+      tryRecoverFromChunkError();
+    }
   }
 
   render() {
@@ -114,17 +143,32 @@ class AdminErrorBoundary extends Component<
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0" />
               <h2 className="text-lg font-semibold text-red-800">
-                Something went wrong
+                {isLikelyChunkLoadError(this.state.error)
+                  ? "Admin update detected"
+                  : "Something went wrong"}
               </h2>
             </div>
             <pre className="text-sm text-red-700 bg-red-100 p-3 rounded overflow-auto max-h-48 mb-4">
               {this.state.error?.message || "Unknown error"}
             </pre>
+            {isLikelyChunkLoadError(this.state.error) && (
+              <p className="text-sm text-red-700 mb-4">
+                The CMS was updated while this tab was open. Refresh to load the latest admin files.
+              </p>
+            )}
             <button
-              onClick={() => this.setState({ hasError: false, error: null })}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+              onClick={() => {
+                if (isLikelyChunkLoadError(this.state.error)) {
+                  sessionStorage.removeItem(ADMIN_CHUNK_RELOAD_KEY);
+                  window.location.reload();
+                  return;
+                }
+                this.setState({ hasError: false, error: null });
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm inline-flex items-center gap-2"
             >
-              Try Again
+              {isLikelyChunkLoadError(this.state.error) && <RefreshCw className="h-4 w-4" />}
+              {isLikelyChunkLoadError(this.state.error) ? "Refresh Admin" : "Try Again"}
             </button>
           </div>
         </div>
