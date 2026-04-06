@@ -381,34 +381,29 @@ function generatePageHTML(
     },
   });
 
+  const googleTagIds = [siteSettings.ga4_measurement_id, siteSettings.google_ads_id].filter(
+    (tagId, index, allTagIds): tagId is string => !!tagId && allTagIds.indexOf(tagId) === index,
+  );
+  const googleTagLoaderId = googleTagIds[0] || null;
+
   let analyticsScripts = '';
 
-  if (siteSettings.ga4_measurement_id) {
-    analyticsScripts += `
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=${escapeHtml(siteSettings.ga4_measurement_id)}"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '${escapeHtml(siteSettings.ga4_measurement_id)}');
-    </script>`;
-  }
+  if (googleTagLoaderId) {
+    const googleTagConfigCalls = googleTagIds
+      .map(
+        (tagId) => `      gtag('config', '${escapeHtml(tagId)}');\n      window.__googleTagConfiguredIds['${escapeHtml(tagId)}'] = true;`,
+      )
+      .join('\n');
 
-  if (siteSettings.google_ads_id) {
-    if (!siteSettings.ga4_measurement_id) {
-      analyticsScripts += `
-    <!-- Google Ads -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=${escapeHtml(siteSettings.google_ads_id)}"></script>
-    <script>
+    analyticsScripts += `
+    <!-- Google tag (gtag.js) -->
+    <script async data-google-tag-loader="true" src="https://www.googletagmanager.com/gtag/js?id=${escapeHtml(googleTagLoaderId)}"></script>
+    <script data-google-tag-config="true">
       window.dataLayer = window.dataLayer || [];
+      window.__googleTagConfiguredIds = window.__googleTagConfiguredIds || {};
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    </script>`;
-    }
-    analyticsScripts += `
-    <script>
-      gtag('config', '${escapeHtml(siteSettings.google_ads_id)}');
+${googleTagConfigCalls}
     </script>`;
   }
 

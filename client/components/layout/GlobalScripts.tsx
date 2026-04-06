@@ -14,6 +14,7 @@ declare global {
   interface Window {
     dataLayer: unknown[];
     gtag: (...args: unknown[]) => void;
+    __googleTagConfiguredIds?: Record<string, boolean>;
     _wcq?: Array<Record<string, unknown>>;
     _wci?: { run?: () => void };
     WhatConverts?: { track?: () => void };
@@ -22,6 +23,8 @@ declare global {
 
 const MANAGED_KEY_ATTR = "data-global-script-key";
 const MANAGED_SCOPE_ATTR = "data-global-script-scope";
+const GOOGLE_TAG_HOST = "www.googletagmanager.com";
+const GOOGLE_TAG_LOADER_PATH = "/gtag/js";
 
 function hashString(value: string) {
   let hash = 0;
@@ -182,69 +185,118 @@ function injectHtmlSnippet(
   return activeKeys;
 }
 
-function ensureScriptTag(key: string, scope: string, src: string) {
-  if (!src) {
-    syncManagedScope(scope, []);
+function normalizeScriptUrl(url: string) {
+  try {
+    const normalizedUrl = new URL(url, window.location.origin);
+    normalizedUrl.hash = "";
+    return normalizedUrl.toString();
+  } catch {
+    return url;
+  }
+}
+
+function isGoogleTagLoaderUrl(url: string) {
+  try {
+    const normalizedUrl = new URL(url, window.location.origin);
+    return (
+      normalizedUrl.hostname === GOOGLE_TAG_HOST &&
+      normalizedUrl.pathname === GOOGLE_TAG_LOADER_PATH
+    );
+  } catch {
+    return false;
+  }
+}
+
+function getExistingScriptBySrc(src: string) {
+  const normalizedSrc = normalizeScriptUrl(src);
+
+  return (
+    Array.from(document.querySelectorAll<HTMLScriptElement>("script[src]")).find(
+      (script) => normalizeScriptUrl(script.src) === normalizedSrc,
+    ) ?? null
+  );
+}
+
+function getExistingGoogleTagLoader() {
+  return (
+    Array.from(document.querySelectorAll<HTMLScriptElement>("script[src]")).find(
+      (script) => isGoogleTagLoaderUrl(script.src),
+    ) ?? null
+  );
+}
+
+function getGoogleTagConfiguredIds() {
+  window.__googleTagConfiguredIds = window.__googleTagConfiguredIds || {};
+  return window.__googleTagConfiguredIds;
+}
+
+function ensureGoogleTagRuntime() {
+  window.dataLayer = window.dataLayer || [];
+  if (typeof window.gtag !== "function") {
+    window.gtag = function gtag(...args: unknown[]) {
+      window.dataLayer.push(args);
+    };
+    window.gtag("js", new Date());
+  }
+}
+
+function ensureGoogleTagLoader(loaderId: string) {
+  if (!loaderId) {
+    syncManagedScope("google-tag-loader", []);
     return;
   }
+
+  const loaderSrc = `https://${GOOGLE_TAG_HOST}${GOOGLE_TAG_LOADER_PATH}?id=${loaderId}`;
+  const existingLoader = getExistingGoogleTagLoader() || getExistingScriptBySrc(loaderSrc);
+
+  if (existingLoader) {
+    syncManagedScope("google-tag-loader", []);
+    return;
+  }
+
+  const key = `google-tag-loader-${loaderId}`;
 
   if (!getManagedNode(key)) {
     const script = document.createElement("script");
-    script.src = src;
+    script.src = loaderSrc;
     script.async = true;
-    markManaged(script, scope, key);
+    script.setAttribute("data-google-tag-loader", "true");
+    markManaged(script, "google-tag-loader", key);
     document.head.appendChild(script);
   }
 
-  syncManagedScope(scope, [key]);
+  syncManagedScope("google-tag-loader", [key]);
 }
 
-function injectGA4(measurementId: string) {
-  if (!measurementId) {
-    syncManagedScope("ga4", []);
+function ensureGoogleTagConfig(tagId: string) {
+  if (!tagId) {
     return;
   }
 
-  window.dataLayer = window.dataLayer || [];
-  if (typeof window.gtag !== "function") {
-    window.gtag = function gtag(...args: unknown[]) {
-      window.dataLayer.push(args);
-    };
-    window.gtag("js", new Date());
-  }
-
-  ensureScriptTag(
-    `ga4-${measurementId}`,
-    "ga4",
-    `https://www.googletagmanager.com/gtag/js?id=${measurementId}`,
-  );
-
-  window.gtag("config", measurementId);
-}
-
-function injectGoogleAds(adsId: string, conversionLabel: string) {
-  if (!adsId) {
-    syncManagedScope("google-ads", []);
+  const configuredIds = getGoogleTagConfiguredIds();
+  if (configuredIds[tagId]) {
     return;
   }
 
-  window.dataLayer = window.dataLayer || [];
-  if (typeof window.gtag !== "function") {
-    window.gtag = function gtag(...args: unknown[]) {
-      window.dataLayer.push(args);
-    };
-    window.gtag("js", new Date());
+  window.gtag("config", tagId);
+  configuredIds[tagId] = true;
+}
+
+function injectGoogleTags(measurementId: string, adsId: string, conversionLabel: string) {
+  const loaderId = measurementId || adsId;
+
+  if (!loaderId) {
+    syncManagedScope("google-tag-loader", []);
+    return;
   }
 
-  ensureScriptTag(
-    `google-ads-${adsId}`,
-    "google-ads",
-    `https://www.googletagmanager.com/gtag/js?id=${adsId}`,
-  );
+  ensureGoogleTagRuntime();
+  ensureGoogleTagLoader(loaderId);
 
-  window.gtag("config", adsId);
+  ensureGoogleTagConfig(measurementId);
+  ensureGoogleTagConfig(adsId);
 
-  if (conversionLabel) {
+  if (adsId && conversionLabel) {
     window.gtag("event", "conversion", {
       send_to: `${adsId}/${conversionLabel}`,
     });
@@ -294,8 +346,8 @@ export default function GlobalScripts() {
     let readinessInterval: ReturnType<typeof setInterval> | null = null;
 
     const cancelNonCriticalInjection = scheduleNonCriticalWork(() => {
-      injectGA4(settings.ga4MeasurementId);
-      injectGoogleAds(
+      injectGoogleTags(
+        settings.ga4MeasurementId,
         settings.googleAdsId,
         settings.googleAdsConversionLabel,
       );
