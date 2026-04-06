@@ -223,9 +223,13 @@ export function startUniversalPhoneSync(): void {
       pollingTimer = null;
     }
 
-    const MAX_ITERATIONS = 60;
+    const INTERVAL_MS = 500;
+    const MAX_ITERATIONS = 40;
+    const MIN_ITERATIONS = 12;
     let iterations = 0;
     let consecutiveNoChange = 0;
+
+    syncPhoneNumbersNow();
 
     pollingTimer = setInterval(() => {
       iterations += 1;
@@ -236,13 +240,16 @@ export function startUniversalPhoneSync(): void {
         consecutiveNoChange += 1;
       }
 
-      if (iterations >= MAX_ITERATIONS || consecutiveNoChange >= 3) {
+      if (
+        iterations >= MAX_ITERATIONS ||
+        (iterations >= MIN_ITERATIONS && consecutiveNoChange >= 6)
+      ) {
         if (pollingTimer !== null) {
           clearInterval(pollingTimer);
           pollingTimer = null;
         }
       }
-    }, 250);
+    }, INTERVAL_MS);
   } catch {
     // Silent
   }

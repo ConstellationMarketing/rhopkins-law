@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import ScrollToTop from "./components/ScrollToTop";
 import TrailingSlashEnforcer from "./components/TrailingSlashEnforcer";
 import WcDniManager from "./components/layout/WcDniManager";
+import GlobalScripts from "./components/layout/GlobalScripts";
 
 // Lazy-loaded routes (everything except the home page)
 const AboutUs = lazy(() => import("./pages/AboutUs"));
@@ -56,6 +57,7 @@ const App = () => {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <SiteSettingsProvider>
+          <GlobalScripts />
           <TooltipProvider>
             <Toaster />
             <Sonner />

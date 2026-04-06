@@ -13,6 +13,9 @@ declare global {
   interface Window {
     dataLayer: unknown[];
     gtag: (...args: unknown[]) => void;
+    _wcq?: Array<Record<string, unknown>>;
+    _wci?: { run?: () => void };
+    WhatConverts?: { track?: () => void };
   }
 }
 
@@ -82,6 +85,18 @@ function syncManagedScope(scope: string, activeKeys: string[]) {
     });
 }
 
+function hasWhatConvertsSnippet(html: string) {
+  return /whatconverts|_wcq|_wci/i.test(html);
+}
+
+function hasWhatConvertsRuntime() {
+  return (
+    Array.isArray(window._wcq) ||
+    typeof window._wci?.run === "function" ||
+    typeof window.WhatConverts?.track === "function"
+  );
+}
+
 function injectHtmlSnippet(
   html: string,
   target: HTMLElement,
@@ -131,7 +146,13 @@ function injectHtmlSnippet(
       }
 
       if (script.src) {
-        script.async = true;
+        script.async = original.hasAttribute("async");
+        script.defer = original.hasAttribute("defer");
+
+        if (!script.async && !script.defer) {
+          script.async = false;
+        }
+
         if (isWhatConverts && onWhatConvertsReady) {
           script.addEventListener("load", onWhatConvertsReady, { once: true });
         }
@@ -242,7 +263,14 @@ export default function GlobalScripts() {
     const triggerWhatConvertsRefresh = () => {
       scheduleRefreshSeries("whatconverts-ready", startUniversalPhoneSync);
       refreshWhatConvertsDni("whatconverts-ready", { force: true });
+      startUniversalPhoneSync();
     };
+
+    const headHasWhatConverts = hasWhatConvertsSnippet(settings.headScripts);
+    const footerHasWhatConverts = hasWhatConvertsSnippet(settings.footerScripts);
+    const shouldWatchWhatConverts = headHasWhatConverts || footerHasWhatConverts;
+    const readinessTimers: ReturnType<typeof setTimeout>[] = [];
+    let readinessInterval: ReturnType<typeof setInterval> | null = null;
 
     injectGA4(settings.ga4MeasurementId);
     injectGoogleAds(
@@ -262,8 +290,42 @@ export default function GlobalScripts() {
       triggerWhatConvertsRefresh,
     );
 
-    refreshWhatConvertsDni("scripts-injected", { force: true });
-    scheduleRefreshSeries("scripts-injected", startUniversalPhoneSync);
+    const kickoffDelays = [0, 250, 1000];
+    kickoffDelays.forEach((delay) => {
+      const timer = window.setTimeout(() => {
+        refreshWhatConvertsDni(`scripts-injected-${delay}`, { force: true });
+        startUniversalPhoneSync();
+      }, delay);
+      readinessTimers.push(timer);
+    });
+
+    if (shouldWatchWhatConverts) {
+      let attempts = 0;
+      readinessInterval = window.setInterval(() => {
+        attempts += 1;
+
+        if (hasWhatConvertsRuntime()) {
+          triggerWhatConvertsRefresh();
+        } else {
+          refreshWhatConvertsDni(`whatconverts-wait-${attempts}`, { force: true });
+          startUniversalPhoneSync();
+        }
+
+        if (hasWhatConvertsRuntime() || attempts >= 30) {
+          if (readinessInterval !== null) {
+            clearInterval(readinessInterval);
+            readinessInterval = null;
+          }
+        }
+      }, 500);
+    }
+
+    return () => {
+      readinessTimers.forEach((timer) => clearTimeout(timer));
+      if (readinessInterval !== null) {
+        clearInterval(readinessInterval);
+      }
+    };
   }, [
     isLoading,
     settings.phoneNumber,

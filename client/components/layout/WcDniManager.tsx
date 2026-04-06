@@ -49,24 +49,38 @@ export default function WcDniManager() {
   const isFirstMount = useRef(true);
   const mutationDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const runRefreshCycle = (reason: string) => {
+    refreshWhatConvertsDni(reason, { force: true });
+    scheduleRefreshSeries(reason, startUniversalPhoneSync);
+    startUniversalPhoneSync();
+    syncPhoneNumbersNow();
+  };
+
   /* ------ Trigger 1: Initial mount + window.load ------ */
   useEffect(() => {
-    scheduleRefreshSeries("initial", startUniversalPhoneSync);
+    runRefreshCycle("initial");
 
-    const onLoad = () => {
-      refreshWhatConvertsDni("window-load", { force: true });
-      startUniversalPhoneSync();
+    const onLoad = () => runRefreshCycle("window-load");
+    const onPageShow = () => runRefreshCycle("pageshow");
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        runRefreshCycle("visibility-visible");
+      }
     };
 
     if (document.readyState === "complete") {
-      // Already loaded — fire immediately
       onLoad();
     } else {
       window.addEventListener("load", onLoad);
     }
 
+    window.addEventListener("pageshow", onPageShow);
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
       window.removeEventListener("load", onLoad);
+      window.removeEventListener("pageshow", onPageShow);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
@@ -79,8 +93,16 @@ export default function WcDniManager() {
     }
 
     cancelScheduledRefreshes();
-    scheduleRefreshSeries("route", startUniversalPhoneSync);
-  }, [location.pathname]);
+    runRefreshCycle(`route-${location.pathname}`);
+
+    const afterPaint = window.setTimeout(() => {
+      runRefreshCycle(`route-postpaint-${location.pathname}`);
+    }, 250);
+
+    return () => {
+      clearTimeout(afterPaint);
+    };
+  }, [location.pathname, location.search, location.key]);
 
   /* ------ Trigger 3: DOM mutation — new tel links ------ */
   useEffect(() => {
@@ -94,8 +116,7 @@ export default function WcDniManager() {
         // Only act if there are tel links on the page
         const telLinks = document.querySelectorAll('a[href^="tel:"]');
         if (telLinks.length > 0) {
-          refreshWhatConvertsDni("dom-mutation", { force: true });
-          syncPhoneNumbersNow();
+          runRefreshCycle("dom-mutation");
         }
       }, 300);
     });
@@ -103,6 +124,9 @@ export default function WcDniManager() {
     observer.observe(document.body, {
       childList: true,
       subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ["href"],
     });
 
     // Observer stays alive for the full session — intentionally no disconnect

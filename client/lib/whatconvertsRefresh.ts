@@ -160,7 +160,7 @@ export function scheduleRefreshSeries(
 ): void {
   cancelScheduledRefreshes();
 
-  const delays = [100, 500, 1500, 3000];
+  const delays = [0, 250, 1000, 2500, 5000, 8000, 12000];
 
   for (const delay of delays) {
     const id = setTimeout(() => {
