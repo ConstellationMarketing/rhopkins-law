@@ -30,6 +30,9 @@ const ATTRIBUTION_FIELD_NAMES = [
 ] as const;
 
 const ATTRIBUTION_STORAGE_PREFIX = "netlify_attribution_";
+const FORM_SUCCESS_REDIRECTS: Record<string, string> = {
+  contact: "/thank-you/",
+};
 
 function getAttributionValues() {
   const values: Record<string, string> = {};
@@ -117,6 +120,7 @@ function FormInner({
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [attributionValues, setAttributionValues] = useState<Record<string, string>>({});
+  const successRedirectUrl = FORM_SUCCESS_REDIRECTS[form.name] || "";
 
   useEffect(() => {
     setAttributionValues(getAttributionValues());
@@ -157,6 +161,12 @@ function FormInner({
 
       setAttributionValues(latestAttributionValues);
       notifyWhatConvertsLead(form.name);
+
+      if (successRedirectUrl) {
+        window.location.assign(successRedirectUrl);
+        return;
+      }
+
       toast.success(form.success_message);
       formElement.reset();
     } catch (err) {
@@ -171,7 +181,7 @@ function FormInner({
     <form
       name={form.name}
       method="POST"
-      action="/"
+      action={successRedirectUrl || "/"}
       data-netlify="true"
       data-netlify-honeypot="bot-field"
       onSubmit={handleSubmit}
