@@ -67,7 +67,7 @@ export default function ImageUploader({
         const { error: uploadError } = await supabase.storage
           .from(bucket)
           .upload(fileName, blob, {
-            cacheControl: "3600",
+            cacheControl: "31536000",
             upsert: false,
             contentType: ext === "webp" ? "image/webp" : file.type,
           });
