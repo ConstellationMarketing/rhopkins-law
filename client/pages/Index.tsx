@@ -13,28 +13,24 @@ import FaqSection from "@site/components/home/FaqSection";
 import ContactUsSection from "@site/components/home/ContactUsSection";
 import { useHomeContent } from "@site/hooks/useHomeContent";
 import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
-import { Loader2, Phone, ArrowRight } from "lucide-react";
+import { Phone, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
+import { Helmet } from "react-helmet-async";
+
+const deferredSectionStyle = {
+  contentVisibility: "auto" as const,
+  containIntrinsicSize: "900px",
+};
 
 export default function Index() {
-  const { content, meta, isLoading } = useHomeContent();
+  const { content, meta } = useHomeContent();
   const { phoneNumber, phoneDisplay, phoneLabel } = useGlobalPhone();
   const { settings } = useSiteSettings();
 
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-brand-accent" />
-        </div>
-      </Layout>
-    );
-  }
-
-  // Use CMS content for hero and partner logos
   const heroContent = content.hero;
   const partnerLogos = content.partnerLogos;
+  const heroImage = heroContent.heroImage?.trim() || "";
 
   return (
     <Layout headerOverlay>
@@ -51,18 +47,19 @@ export default function Index() {
         pageContent={content}
       />
 
-      {/* Hero Section — left-to-right gradient, image bottom-anchored */}
+      {heroImage && (
+        <Helmet>
+          <link rel="preload" as="image" href={heroImage} />
+        </Helmet>
+      )}
+
       <section
         className="w-full overflow-hidden"
         style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 28%, #060d1a 100%)" }}
       >
         <div className="max-w-[2560px] mx-auto w-[95%] pt-[120px] lg:pt-[105px]">
           <div className="flex flex-col lg:flex-row lg:items-end gap-4 lg:gap-[3%]">
-
-            {/* Left column */}
             <div className="lg:w-[65.667%] pb-[20px] md:pb-[60px]">
-
-              {/* 1. Tagline — all caps */}
               <div className="mb-[30px] md:mb-[40px]">
                 <p className="font-playfair text-[clamp(2.1rem,5.5vw,60px)] leading-[1.2] text-white text-left uppercase">
                   {heroContent.highlightedText && heroContent.headline.includes(heroContent.highlightedText)
@@ -85,14 +82,11 @@ export default function Index() {
                         <br />
                         {heroContent.headline}
                       </>
-                    )
-                  }
+                    )}
                 </p>
               </div>
 
-              {/* 2. CTA Boxes — phone + book consultation side by side */}
               <div className="flex flex-col sm:flex-row gap-8 items-stretch mb-[30px] md:mb-[40px]">
-                {/* Phone CTA */}
                 <a href={`tel:${phoneNumber.replace(/\D/g, "")}`} className="block py-[8px] cursor-pointer">
                   <div className="flex items-center gap-4">
                     <span
@@ -112,7 +106,6 @@ export default function Index() {
                   </div>
                 </a>
 
-                {/* Book a Consultation CTA — matches header button style */}
                 <Link
                   to={settings.headerCtaUrl?.trim() || "/contact"}
                   className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[24px] py-[20px] sm:py-0 hover:opacity-90 transition-opacity self-stretch"
@@ -123,37 +116,35 @@ export default function Index() {
                 </Link>
               </div>
 
-              {/* 3. H1 — title case with decorative accent bar */}
               {heroContent.h1Title && (
                 <h1 className="font-outfit text-[18px] md:text-[20px] font-medium tracking-wider capitalize text-white flex items-center gap-3">
-                  <img
-                    src="https://cdn.builder.io/api/v1/image/assets%2F50bd0f2438824f8ea1271cf7dd2c508e%2Fffa54af5f7044e0f807e6ead48cedd46?format=webp&width=800&height=1200"
-                    alt=""
-                    aria-hidden="true"
-                    className="flex-shrink-0 w-auto"
-                    style={{ height: "5px" }}
-                  />
+                  <span aria-hidden="true" className="h-[5px] w-[72px] flex-shrink-0 bg-brand-accent" />
                   {heroContent.h1Title}
                 </h1>
               )}
             </div>
 
-            {/* Right column — original width, image bottom-anchored */}
             <div className="lg:w-[31.3333%] self-end">
-              {heroContent.heroImage && (
-                <img
-                  src={heroContent.heroImage}
-                  alt={heroContent.heroImageAlt || ""}
-                  className="max-h-[640px] w-auto block object-bottom ml-auto"
-                />
+              {heroImage && (
+                <div className="relative ml-auto w-full max-w-[520px] aspect-[4/5]">
+                  <img
+                    src={heroImage}
+                    alt={heroContent.heroImageAlt || ""}
+                    className="absolute inset-0 h-full w-full block object-contain object-bottom"
+                    width={640}
+                    height={800}
+                    sizes="(min-width: 1024px) 31vw, 90vw"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                </div>
               )}
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* Partner Badges Section - Bottom of Hero */}
       {partnerLogos.length > 0 && (
         <div className="bg-brand-dark py-[20px] md:py-[30px]">
           <div className="max-w-[2560px] mx-auto w-[95%]">
@@ -171,6 +162,7 @@ export default function Index() {
                       width={190}
                       height={123}
                       loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 </div>
@@ -180,7 +172,6 @@ export default function Index() {
         </div>
       )}
 
-      {/* Divider — right-anchored 60%, centered on dark/white boundary (50% in each section) */}
       <div className="relative h-0 w-full z-10">
         <div className="absolute right-0 w-[60%]" style={{ transform: "translateY(-50%)" }}>
           <img
@@ -188,17 +179,15 @@ export default function Index() {
             alt=""
             aria-hidden="true"
             className="w-full block"
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </div>
 
-      {/* About Us Section */}
       <AboutSection content={content.about} />
-
-      {/* Attorney Spotlight Section */}
       <AttorneySpotlightSection content={content.attorneySpotlight} />
 
-      {/* Divider — left-anchored 60%, centered on boundary, mirrored */}
       <div className="relative h-0 w-full z-10">
         <div className="absolute left-0 w-[60%]" style={{ transform: "translateY(-50%) scaleX(-1)" }}>
           <img
@@ -206,36 +195,39 @@ export default function Index() {
             alt=""
             aria-hidden="true"
             className="w-full block"
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </div>
 
-      {/* CTA Section */}
       <HomeCTASection content={content.homeCta} />
-
-      {/* Practice Areas Section */}
       <PracticeAreasSection content={content.practiceAreasIntro} />
-
-      {/* Practice Areas Grid */}
       <PracticeAreasGrid areas={content.practiceAreas} />
 
-      {/* Awards & Membership Section */}
-      <AwardsSection content={content.awards} headingTag={content.headingTags?.["awards.sectionLabel"]} />
+      <div style={deferredSectionStyle}>
+        <AwardsSection content={content.awards} headingTag={content.headingTags?.["awards.sectionLabel"]} />
+      </div>
 
-      {/* Testimonials Section */}
-      <TestimonialsSection content={content.testimonials} headingTag={content.headingTags?.["testimonials.sectionLabel"]} />
+      <div style={deferredSectionStyle}>
+        <TestimonialsSection content={content.testimonials} headingTag={content.headingTags?.["testimonials.sectionLabel"]} />
+      </div>
 
-      {/* Process Section */}
-      <ProcessSection content={content.process} headingTags={content.headingTags} />
+      <div style={deferredSectionStyle}>
+        <ProcessSection content={content.process} headingTags={content.headingTags} />
+      </div>
 
-      {/* Google Reviews Section */}
-      <GoogleReviewsSection content={content.googleReviews} headingTag={content.headingTags?.["googleReviews.sectionLabel"]} />
+      <div style={deferredSectionStyle}>
+        <GoogleReviewsSection content={content.googleReviews} headingTag={content.headingTags?.["googleReviews.sectionLabel"]} />
+      </div>
 
-      {/* FAQ Section */}
-      <FaqSection content={content.faq} />
+      <div style={deferredSectionStyle}>
+        <FaqSection content={content.faq} />
+      </div>
 
-      {/* Contact Us Section */}
-      <ContactUsSection content={content.contact} headingTag={content.headingTags?.["contact.sectionLabel"]} />
+      <div style={deferredSectionStyle}>
+        <ContactUsSection content={content.contact} headingTag={content.headingTags?.["contact.sectionLabel"]} />
+      </div>
     </Layout>
   );
 }

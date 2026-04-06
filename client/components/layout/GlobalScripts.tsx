@@ -250,6 +250,26 @@ function injectGoogleAds(adsId: string, conversionLabel: string) {
   }
 }
 
+function scheduleNonCriticalWork(callback: () => void) {
+  let idleHandle: number | null = null;
+  let timerHandle: ReturnType<typeof setTimeout> | null = null;
+
+  if (typeof window.requestIdleCallback === "function") {
+    idleHandle = window.requestIdleCallback(() => callback(), { timeout: 2000 });
+  } else {
+    timerHandle = setTimeout(callback, 1200);
+  }
+
+  return () => {
+    if (idleHandle !== null && typeof window.cancelIdleCallback === "function") {
+      window.cancelIdleCallback(idleHandle);
+    }
+    if (timerHandle !== null) {
+      clearTimeout(timerHandle);
+    }
+  };
+}
+
 export default function GlobalScripts() {
   const { settings, isLoading } = useSiteSettings();
 
@@ -272,11 +292,14 @@ export default function GlobalScripts() {
     const readinessTimers: ReturnType<typeof setTimeout>[] = [];
     let readinessInterval: ReturnType<typeof setInterval> | null = null;
 
-    injectGA4(settings.ga4MeasurementId);
-    injectGoogleAds(
-      settings.googleAdsId,
-      settings.googleAdsConversionLabel,
-    );
+    const cancelNonCriticalInjection = scheduleNonCriticalWork(() => {
+      injectGA4(settings.ga4MeasurementId);
+      injectGoogleAds(
+        settings.googleAdsId,
+        settings.googleAdsConversionLabel,
+      );
+    });
+
     injectHtmlSnippet(
       settings.headScripts,
       document.head,
@@ -292,7 +315,7 @@ export default function GlobalScripts() {
 
     const kickoffDelays = [0, 250, 1000];
     kickoffDelays.forEach((delay) => {
-      const timer = window.setTimeout(() => {
+      const timer = setTimeout(() => {
         refreshWhatConvertsDni(`scripts-injected-${delay}`, { force: true });
         startUniversalPhoneSync();
       }, delay);
@@ -301,7 +324,7 @@ export default function GlobalScripts() {
 
     if (shouldWatchWhatConverts) {
       let attempts = 0;
-      readinessInterval = window.setInterval(() => {
+      readinessInterval = setInterval(() => {
         attempts += 1;
 
         if (hasWhatConvertsRuntime()) {
@@ -321,6 +344,7 @@ export default function GlobalScripts() {
     }
 
     return () => {
+      cancelNonCriticalInjection();
       readinessTimers.forEach((timer) => clearTimeout(timer));
       if (readinessInterval !== null) {
         clearInterval(readinessInterval);
