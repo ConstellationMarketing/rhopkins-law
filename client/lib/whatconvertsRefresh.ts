@@ -73,22 +73,29 @@ export function refreshWhatConvertsDni(
     // Silently continue to next strategy
   }
 
-  // Strategy 3 — Clone the original <script> tag to force a re-execution
+  // Strategy 3 — Re-run the original WhatConverts script
   try {
     const original = document.querySelector<HTMLScriptElement>(
-      'script[src*="whatconverts"]',
+      'script[data-whatconverts-script="true"], script[src*="whatconverts"]',
     );
     if (!original) return;
 
-    // Remove any previously cloned copies
     document
       .querySelectorAll("script[data-wc-dni-copy]")
       .forEach((el) => el.parentNode?.removeChild(el));
 
     const clone = document.createElement("script");
-    clone.src = original.src;
     clone.async = true;
     clone.setAttribute("data-wc-dni-copy", "true");
+
+    if (original.src) {
+      clone.src = original.src;
+    } else if (original.textContent) {
+      clone.textContent = original.textContent;
+    } else {
+      return;
+    }
+
     document.head.appendChild(clone);
   } catch {
     // Silent — never break the app for analytics
