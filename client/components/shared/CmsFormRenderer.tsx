@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,65 @@ interface CmsFormRendererProps {
   formId?: string;
   /** Optional extra className on the wrapper */
   className?: string;
+}
+
+const ATTRIBUTION_FIELD_NAMES = [
+  "source",
+  "medium",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+  "gclid",
+  "fbclid",
+  "msclkid",
+  "landing_page",
+  "referrer",
+] as const;
+
+const ATTRIBUTION_STORAGE_PREFIX = "netlify_attribution_";
+
+function getAttributionValues() {
+  const values: Record<string, string> = {};
+
+  if (typeof window === "undefined") {
+    return values;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+
+  for (const fieldName of ATTRIBUTION_FIELD_NAMES) {
+    if (fieldName === "landing_page" || fieldName === "referrer") {
+      continue;
+    }
+
+    const currentValue = params.get(fieldName)?.trim() || "";
+    const storedValue = sessionStorage.getItem(`${ATTRIBUTION_STORAGE_PREFIX}${fieldName}`) || "";
+    const resolvedValue = currentValue || storedValue;
+
+    if (currentValue) {
+      sessionStorage.setItem(`${ATTRIBUTION_STORAGE_PREFIX}${fieldName}`, currentValue);
+    }
+
+    values[fieldName] = resolvedValue;
+  }
+
+  const currentLandingPage = `${window.location.pathname}${window.location.search}`;
+  const storedLandingPage = sessionStorage.getItem(`${ATTRIBUTION_STORAGE_PREFIX}landing_page`) || "";
+  const resolvedLandingPage = storedLandingPage || currentLandingPage;
+  sessionStorage.setItem(`${ATTRIBUTION_STORAGE_PREFIX}landing_page`, resolvedLandingPage);
+  values.landing_page = resolvedLandingPage;
+
+  const currentReferrer = document.referrer.trim();
+  const storedReferrer = sessionStorage.getItem(`${ATTRIBUTION_STORAGE_PREFIX}referrer`) || "";
+  const resolvedReferrer = storedReferrer || currentReferrer;
+  if (currentReferrer && !storedReferrer) {
+    sessionStorage.setItem(`${ATTRIBUTION_STORAGE_PREFIX}referrer`, currentReferrer);
+  }
+  values.referrer = resolvedReferrer;
+
+  return values;
 }
 
 export default function CmsFormRenderer({
@@ -47,6 +106,11 @@ function FormInner({
   className?: string;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [attributionValues, setAttributionValues] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setAttributionValues(getAttributionValues());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,11 +119,18 @@ function FormInner({
     try {
       const formData = new FormData(e.currentTarget);
       const body = new URLSearchParams();
+      const latestAttributionValues = getAttributionValues();
       body.set("form-name", form.name);
 
       formData.forEach((value, key) => {
         if (key !== "form-name" && key !== "bot-field") {
           body.set(key, value as string);
+        }
+      });
+
+      Object.entries(latestAttributionValues).forEach(([key, value]) => {
+        if (value) {
+          body.set(key, value);
         }
       });
 
@@ -89,6 +160,15 @@ function FormInner({
       className={className ?? "space-y-[25px]"}
     >
       <input type="hidden" name="form-name" value={form.name} />
+      {ATTRIBUTION_FIELD_NAMES.map((fieldName) => (
+        <input
+          key={fieldName}
+          type="hidden"
+          name={fieldName}
+          value={attributionValues[fieldName] || ""}
+          readOnly
+        />
+      ))}
 
       {form.fields.map((field) => (
         <FormField key={field.id} field={field} />
@@ -181,69 +261,15 @@ function FormField({ field }: { field: FormFieldDef }) {
           <legend className="font-outfit text-[16px] text-[#6b6b6b] mb-2">
             {field.label}
           </legend>
-          {(field.options ?? []).map((opt) => (
-            <label
-              key={opt}
-              className="flex items-center gap-2 font-outfit text-[15px] text-[#6b6b6b] mb-1 cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                name={field.name}
-                value={opt}
-                className="h-4 w-4"
-              />
-              {opt}
-            </label>
-          ))}
+          <div className="space-y-2">
+            {(field.options ?? []).map((opt) => (
+              <label key={opt} className="flex items-center gap-2">
+                <input type="checkbox" name={field.name} value={opt} />
+                <span className="font-outfit text-[16px] text-[#6b6b6b]">{opt}</span>
+              </label>
+            ))}
+          </div>
         </fieldset>
-      );
-
-    case "radio":
-      return (
-        <fieldset>
-          <legend className="font-outfit text-[16px] text-[#6b6b6b] mb-2">
-            {field.label}
-          </legend>
-          {(field.options ?? []).map((opt) => (
-            <label
-              key={opt}
-              className="flex items-center gap-2 font-outfit text-[15px] text-[#6b6b6b] mb-1 cursor-pointer"
-            >
-              <input
-                type="radio"
-                name={field.name}
-                value={opt}
-                required={field.required}
-                className="h-4 w-4"
-              />
-              {opt}
-            </label>
-          ))}
-        </fieldset>
-      );
-
-    case "file":
-      return (
-        <div>
-          <label className="block font-outfit text-[16px] text-[#6b6b6b] mb-1">
-            {field.label}
-          </label>
-          <input
-            type="file"
-            name={field.name}
-            required={field.required}
-            accept={field.accept}
-            className="w-full text-[#6b6b6b] text-[16px] file:mr-4 file:py-2 file:px-4 file:border file:border-[#c4c4c4] file:bg-[#f7f7f7] file:text-[#6b6b6b] file:text-sm file:font-outfit file:rounded-none"
-          />
-        </div>
-      );
-
-    case "html":
-      return (
-        <div
-          className="font-outfit text-[15px] text-[#6b6b6b] [&_a]:text-blue-600 [&_a]:underline"
-          dangerouslySetInnerHTML={{ __html: field.htmlContent ?? "" }}
-        />
       );
 
     default:
