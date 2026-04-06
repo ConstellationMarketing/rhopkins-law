@@ -2,7 +2,10 @@
  * Universal WhatConverts phone-number synchronisation utility.
  */
 
+const SWAPPED_PHONE_STORAGE_KEY = "whatconverts_swapped_phone_digits";
+
 let knownOriginalPhoneDigits = "";
+let knownSwappedPhoneDigits = "";
 
 export function normalizePhoneDigits(value: string): string {
   const digits = value.replace(/\D/g, "");
@@ -14,8 +17,47 @@ export function normalizePhoneDigits(value: string): string {
   return digits;
 }
 
+function readStoredSwappedPhoneDigits() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return normalizePhoneDigits(
+    sessionStorage.getItem(SWAPPED_PHONE_STORAGE_KEY) || "",
+  );
+}
+
+function persistSwappedPhoneDigits(value: string) {
+  const digits = normalizePhoneDigits(value);
+  knownSwappedPhoneDigits = digits;
+
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (digits) {
+    sessionStorage.setItem(SWAPPED_PHONE_STORAGE_KEY, digits);
+  } else {
+    sessionStorage.removeItem(SWAPPED_PHONE_STORAGE_KEY);
+  }
+}
+
+function getKnownSwappedPhoneDigits() {
+  if (knownSwappedPhoneDigits) {
+    return knownSwappedPhoneDigits;
+  }
+
+  knownSwappedPhoneDigits = readStoredSwappedPhoneDigits();
+  return knownSwappedPhoneDigits;
+}
+
 export function setKnownOriginalPhoneNumber(value?: string): void {
   knownOriginalPhoneDigits = normalizePhoneDigits(value || "");
+
+  const storedSwappedDigits = getKnownSwappedPhoneDigits();
+  if (storedSwappedDigits && storedSwappedDigits === knownOriginalPhoneDigits) {
+    persistSwappedPhoneDigits("");
+  }
 }
 
 function formatPhoneVariants(digits: string): string[] {
@@ -129,6 +171,85 @@ function getSwappedDigits(counts: Map<string, number>, baselineDigits: string) {
   return swappedDigits;
 }
 
+function resolveActiveSwappedDigits(
+  counts: Map<string, number>,
+  originalDigits: string,
+) {
+  const detectedSwappedDigits = getSwappedDigits(counts, originalDigits);
+
+  if (detectedSwappedDigits && detectedSwappedDigits !== originalDigits) {
+    persistSwappedPhoneDigits(detectedSwappedDigits);
+    return detectedSwappedDigits;
+  }
+
+  const rememberedSwappedDigits = getKnownSwappedPhoneDigits();
+  if (rememberedSwappedDigits && rememberedSwappedDigits !== originalDigits) {
+    return rememberedSwappedDigits;
+  }
+
+  return "";
+}
+
+function applySwappedPhoneDigits(
+  telLinks: NodeListOf<HTMLAnchorElement>,
+  originalDigits: string,
+  swappedDigits: string,
+) {
+  const originalVariants = Array.from(
+    new Set([
+      ...formatPhoneVariants(originalDigits),
+      primaryFormat(originalDigits),
+    ]),
+  );
+  const swappedFormatted = primaryFormat(swappedDigits);
+  let changed = false;
+
+  for (const link of telLinks) {
+    const linkDigits = normalizePhoneDigits(link.href);
+    if (linkDigits === originalDigits) {
+      link.href = `tel:${swappedDigits}`;
+      replacePhoneTextInElement(link, originalVariants, swappedFormatted);
+      changed = true;
+    }
+  }
+
+  const processedAnchors = new Set<Node>(telLinks);
+  const bodyWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let textNode: Text | null;
+
+  while ((textNode = bodyWalker.nextNode() as Text | null)) {
+    if (!textNode.textContent) {
+      continue;
+    }
+
+    let insideTelAnchor = false;
+    let parent: Node | null = textNode.parentNode;
+    while (parent && parent !== document.body) {
+      if (processedAnchors.has(parent)) {
+        insideTelAnchor = true;
+        break;
+      }
+      parent = parent.parentNode;
+    }
+
+    if (insideTelAnchor) {
+      continue;
+    }
+
+    for (const variant of originalVariants) {
+      if (textNode.textContent.includes(variant)) {
+        textNode.textContent = textNode.textContent.replace(
+          variant,
+          swappedFormatted,
+        );
+        changed = true;
+      }
+    }
+  }
+
+  return changed;
+}
+
 export function syncPhoneNumbersNow(): boolean {
   try {
     const telLinks = document.querySelectorAll<HTMLAnchorElement>('a[href^="tel:"]');
@@ -150,65 +271,13 @@ export function syncPhoneNumbersNow(): boolean {
     }
 
     const originalDigits = getBaselineDigits(counts);
-    const swappedDigits = getSwappedDigits(counts, originalDigits);
+    const swappedDigits = resolveActiveSwappedDigits(counts, originalDigits);
 
     if (!originalDigits || !swappedDigits || originalDigits === swappedDigits) {
       return false;
     }
 
-    const originalVariants = Array.from(
-      new Set([
-        ...formatPhoneVariants(originalDigits),
-        primaryFormat(originalDigits),
-      ]),
-    );
-    const swappedFormatted = primaryFormat(swappedDigits);
-    let changed = false;
-
-    for (const link of telLinks) {
-      const linkDigits = normalizePhoneDigits(link.href);
-      if (linkDigits === originalDigits) {
-        link.href = `tel:${swappedDigits}`;
-        replacePhoneTextInElement(link, originalVariants, swappedFormatted);
-        changed = true;
-      }
-    }
-
-    const processedAnchors = new Set<Node>(telLinks);
-    const bodyWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    let textNode: Text | null;
-
-    while ((textNode = bodyWalker.nextNode() as Text | null)) {
-      if (!textNode.textContent) {
-        continue;
-      }
-
-      let insideTelAnchor = false;
-      let parent: Node | null = textNode.parentNode;
-      while (parent && parent !== document.body) {
-        if (processedAnchors.has(parent)) {
-          insideTelAnchor = true;
-          break;
-        }
-        parent = parent.parentNode;
-      }
-
-      if (insideTelAnchor) {
-        continue;
-      }
-
-      for (const variant of originalVariants) {
-        if (textNode.textContent.includes(variant)) {
-          textNode.textContent = textNode.textContent.replace(
-            variant,
-            swappedFormatted,
-          );
-          changed = true;
-        }
-      }
-    }
-
-    return changed;
+    return applySwappedPhoneDigits(telLinks, originalDigits, swappedDigits);
   } catch {
     return false;
   }
