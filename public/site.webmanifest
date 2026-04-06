@@ -1,0 +1,19 @@
+{
+  "name": "The Law Offices of Robert R. Hopkins, LLC",
+  "short_name": "R. Hopkins Law",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#365d96",
+  "background_color": "#365d96",
+  "display": "standalone"
+}

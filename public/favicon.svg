@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="32" fill="#365d96" />
+  <image
+    href="/images/logos/firm-logo.png"
+    x="18"
+    y="107"
+    width="220"
+    height="36"
+    preserveAspectRatio="xMidYMid meet"
+  />
+</svg>
