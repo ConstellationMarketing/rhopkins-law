@@ -98,7 +98,7 @@ export default function AdminForms() {
 
         // Check for contact-section blocks with matching form name
         const hasContactBlock =
-          form.name === "contact-block" &&
+          form.name === "contact" &&
           contentStr.includes('"type":"contact-section"');
 
         // Check if page content contains the form name reference

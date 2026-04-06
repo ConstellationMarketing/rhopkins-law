@@ -48,7 +48,7 @@ export default function ContactSectionBlock({ block }: ContactSectionBlockProps)
 
                   {/* Form */}
                   <div className="contact-form-white pb-0">
-                    <CmsFormRenderer formId="contact-block" className="space-y-[16px] md:space-y-[20px]" />
+                    <CmsFormRenderer formId="contact" className="space-y-[16px] md:space-y-[20px]" />
                   </div>
                 </div>
               </div>
