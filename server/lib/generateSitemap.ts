@@ -1,14 +1,8 @@
-/**
- * Sitemap generation utilities for the dev Express server.
- *
- * Mirrors the Netlify functions in vendor/cms-core/netlify/functions/:
- *   sitemap.ts        → generateSitemapIndex()
- *   sitemap-pages.ts  → generatePagesSitemap()
- *   sitemap-posts.ts  → generatePostsSitemap()
- *
- * CMS database is the single source of truth — no hardcoded routes.
- * Only published, non-noindex content is included.
- */
+import {
+  buildBlogPostPath,
+  getIndexablePageRoutes,
+  getIndexablePostRoutes,
+} from "../../client/lib/cms/publicRoutes";
 
 interface PageRow {
   url_path: string;
@@ -27,11 +21,10 @@ function escapeXml(str: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&apos;");
 }
 
-/** Sitemap index that points to /sitemap-pages.xml and /sitemap-posts.xml */
 export function generateSitemapIndex(siteUrl: string): string {
   const origin = siteUrl.replace(/\/+$/, "");
   const today = new Date().toISOString().split("T")[0];
@@ -49,7 +42,6 @@ export function generateSitemapIndex(siteUrl: string): string {
 </sitemapindex>`;
 }
 
-/** Sitemap of all published, indexable CMS pages */
 export async function generatePagesSitemap(siteUrl: string): Promise<string> {
   const origin = siteUrl.replace(/\/+$/, "");
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -78,16 +70,13 @@ export async function generatePagesSitemap(siteUrl: string): Promise<string> {
     }
   }
 
-  const urlEntries = pages
-    .filter((p) => !p.noindex && !p.url_path.startsWith("/admin"))
-    .map((p) => {
-      const pagePath = p.url_path === '/' ? '/' : p.url_path.replace(/\/?$/, '/');
-      const loc = escapeXml(`${origin}${pagePath}`);
-      const lastmod = p.updated_at
-        ? `\n    <lastmod>${new Date(p.updated_at).toISOString().split("T")[0]}</lastmod>`
-        : "";
-      return `  <url>\n    <loc>${loc}</loc>${lastmod}\n  </url>`;
-    });
+  const urlEntries = getIndexablePageRoutes(pages).map((page) => {
+    const loc = escapeXml(`${origin}${page.url_path}`);
+    const lastmod = page.updated_at
+      ? `\n    <lastmod>${new Date(page.updated_at).toISOString().split("T")[0]}</lastmod>`
+      : "";
+    return `  <url>\n    <loc>${loc}</loc>${lastmod}\n  </url>`;
+  });
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -95,7 +84,6 @@ ${urlEntries.join("\n")}
 </urlset>`;
 }
 
-/** Sitemap of all published, indexable blog posts */
 export async function generatePostsSitemap(siteUrl: string): Promise<string> {
   const origin = siteUrl.replace(/\/+$/, "");
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -124,16 +112,13 @@ export async function generatePostsSitemap(siteUrl: string): Promise<string> {
     }
   }
 
-  const urlEntries = posts
-    .filter((p) => !p.noindex)
-    .map((p) => {
-      const slug = p.slug.replace(/^\/+|\/+$/g, "");
-      const loc = escapeXml(`${origin}/blog/${slug}/`);
-      const lastmod = p.updated_at
-        ? `\n    <lastmod>${new Date(p.updated_at).toISOString().split("T")[0]}</lastmod>`
-        : "";
-      return `  <url>\n    <loc>${loc}</loc>${lastmod}\n  </url>`;
-    });
+  const urlEntries = getIndexablePostRoutes(posts).map((post) => {
+    const loc = escapeXml(`${origin}${buildBlogPostPath(post.normalized_slug)}`);
+    const lastmod = post.updated_at
+      ? `\n    <lastmod>${new Date(post.updated_at).toISOString().split("T")[0]}</lastmod>`
+      : "";
+    return `  <url>\n    <loc>${loc}</loc>${lastmod}\n  </url>`;
+  });
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -141,10 +126,6 @@ ${urlEntries.join("\n")}
 </urlset>`;
 }
 
-/**
- * @deprecated Use generateSitemapIndex / generatePagesSitemap / generatePostsSitemap directly.
- * Kept for backwards compatibility with any callers.
- */
 export async function generateSitemap(siteUrl: string): Promise<string> {
   return generateSitemapIndex(siteUrl);
 }

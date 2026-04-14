@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { PracticeAreasPageContent } from "../lib/cms/practiceAreasPageTypes";
 import { defaultPracticeAreasContent } from "../lib/cms/practiceAreasPageTypes";
 import type { PageMeta } from "../lib/cms/pageMeta";
 import { emptyPageMeta } from "../lib/cms/pageMeta";
-import type { AboutPageContent } from "../lib/cms/aboutPageTypes";
-import { consumePageData } from '../lib/pageDataInjection';
+import { getCmsPreloadedRouteData } from "../lib/cms/preloadedState";
+import { getPublicEnv } from "../lib/runtimeEnv";
+import { resolvePracticeAreasPageData } from "../lib/cms/sharedPageData";
 
-// Supabase configuration - use environment variables
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = getPublicEnv("VITE_SUPABASE_URL");
+const SUPABASE_ANON_KEY = getPublicEnv("VITE_SUPABASE_ANON_KEY");
 
 interface UsePracticeAreasContentResult {
   content: PracticeAreasPageContent;
@@ -17,26 +17,23 @@ interface UsePracticeAreasContentResult {
   error: Error | null;
 }
 
-// Cache for practice areas content
 let cachedContent: PracticeAreasPageContent | null = null;
 let cachedMeta: PageMeta | null = null;
 
 export function usePracticeAreasContent(): UsePracticeAreasContentResult {
-  // Consume SSG-injected data synchronously before first render
-  const injected = consumePageData('/practice-areas/');
-  const initialContent = injected
-    ? mergeWithDefaults(injected.content as Partial<PracticeAreasPageContent>, defaultPracticeAreasContent)
-    : (cachedContent ?? defaultPracticeAreasContent);
-  const initialMeta = injected?.meta ?? (cachedMeta ?? emptyPageMeta);
+  const preloaded = getCmsPreloadedRouteData("/practice-areas/")?.practiceAreas ?? null;
+  const initialContent =
+    preloaded?.content || cachedContent || defaultPracticeAreasContent;
+  const initialMeta = preloaded?.meta || cachedMeta || emptyPageMeta;
 
-  if (injected && !cachedContent) {
-    cachedContent = initialContent;
-    cachedMeta = initialMeta;
+  if (preloaded && !cachedContent) {
+    cachedContent = preloaded.content;
+    cachedMeta = preloaded.meta;
   }
 
   const [content, setContent] = useState<PracticeAreasPageContent>(initialContent);
   const [meta, setMeta] = useState<PageMeta>(initialMeta);
-  const [isLoading, setIsLoading] = useState(!injected && !cachedContent);
+  const [isLoading, setIsLoading] = useState(!preloaded && !cachedContent);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
@@ -44,7 +41,6 @@ export function usePracticeAreasContent(): UsePracticeAreasContentResult {
 
     async function fetchContent() {
       try {
-        // Return cached content if available
         if (cachedContent) {
           if (isMounted) {
             setContent(cachedContent);
@@ -54,8 +50,7 @@ export function usePracticeAreasContent(): UsePracticeAreasContentResult {
           return;
         }
 
-        // Fetch practice areas page from pages table
-        const response = await fetch(
+        const pageResponse = await fetch(
           `${SUPABASE_URL}/rest/v1/pages?url_path=eq./practice-areas/&status=eq.published&select=content,meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,schema_type,schema_data`,
           {
             headers: {
@@ -65,14 +60,13 @@ export function usePracticeAreasContent(): UsePracticeAreasContentResult {
           },
         );
 
-        if (!response.ok) {
-          throw new Error(`HTTP error: ${response.status}`);
+        if (!pageResponse.ok) {
+          throw new Error(`HTTP error: ${pageResponse.status}`);
         }
 
-        const data = await response.json();
+        const pageData = await pageResponse.json();
 
-        if (!Array.isArray(data) || data.length === 0) {
-          // No CMS content, use defaults
+        if (!Array.isArray(pageData) || pageData.length === 0) {
           if (isMounted) {
             setContent(defaultPracticeAreasContent);
             setIsLoading(false);
@@ -80,18 +74,9 @@ export function usePracticeAreasContent(): UsePracticeAreasContentResult {
           return;
         }
 
-        const pageData = data[0];
-        const cmsContent = pageData.content as PracticeAreasPageContent;
-
-        // Merge CMS content with defaults (CMS content takes precedence)
-        let mergedContent = mergeWithDefaults(
-          cmsContent,
-          defaultPracticeAreasContent,
-        );
-
-        // Fetch About page for globally-shared CTA section
+        let aboutPage = null;
         try {
-          const aboutResp = await fetch(
+          const aboutResponse = await fetch(
             `${SUPABASE_URL}/rest/v1/pages?url_path=eq./about/&status=eq.published&select=content`,
             {
               headers: {
@@ -100,54 +85,33 @@ export function usePracticeAreasContent(): UsePracticeAreasContentResult {
               },
             },
           );
-          if (aboutResp.ok) {
-            const aboutData = await aboutResp.json();
+
+          if (aboutResponse.ok) {
+            const aboutData = await aboutResponse.json();
             if (Array.isArray(aboutData) && aboutData.length > 0) {
-              const aboutContent = aboutData[0].content as Partial<AboutPageContent>;
-              if (aboutContent?.cta) {
-                mergedContent = {
-                  ...mergedContent,
-                  cta: {
-                    ...mergedContent.cta,
-                    heading: aboutContent.cta.heading || mergedContent.cta.heading,
-                    description: aboutContent.cta.description || mergedContent.cta.description,
-                    primaryButton: { ...mergedContent.cta.primaryButton, ...aboutContent.cta.primaryButton },
-                    secondaryButton: { ...mergedContent.cta.secondaryButton, ...aboutContent.cta.secondaryButton },
-                  },
-                };
-              }
+              aboutPage = aboutData[0];
             }
           }
         } catch (aboutErr) {
-          console.warn("[usePracticeAreasContent] Failed to fetch About page for global CTA:", aboutErr);
+          console.warn(
+            "[usePracticeAreasContent] Failed to fetch About page for global CTA:",
+            aboutErr,
+          );
         }
 
-        const pageMeta: PageMeta = {
-          meta_title: pageData.meta_title,
-          meta_description: pageData.meta_description,
-          canonical_url: pageData.canonical_url,
-          og_title: pageData.og_title,
-          og_description: pageData.og_description,
-          og_image: pageData.og_image,
-          noindex: pageData.noindex,
-          schema_type: pageData.schema_type,
-          schema_data: pageData.schema_data,
-        };
-
-        // Cache the result
-        cachedContent = mergedContent;
-        cachedMeta = pageMeta;
+        const resolved = resolvePracticeAreasPageData(pageData[0], aboutPage);
+        cachedContent = resolved.content;
+        cachedMeta = resolved.meta;
 
         if (isMounted) {
-          setContent(mergedContent);
-          setMeta(pageMeta);
+          setContent(resolved.content);
+          setMeta(resolved.meta);
           setError(null);
         }
       } catch (err) {
         console.error("[usePracticeAreasContent] Error:", err);
         if (isMounted) {
           setError(err instanceof Error ? err : new Error("Unknown error"));
-          // Fall back to defaults on error
           setContent(defaultPracticeAreasContent);
         }
       } finally {
@@ -167,39 +131,6 @@ export function usePracticeAreasContent(): UsePracticeAreasContentResult {
   return { content, meta, isLoading, error };
 }
 
-// Deep merge CMS content with defaults
-function mergeWithDefaults(
-  cmsContent: Partial<PracticeAreasPageContent> | null | undefined,
-  defaults: PracticeAreasPageContent,
-): PracticeAreasPageContent {
-  if (!cmsContent) return defaults;
-
-  return {
-    hero: { ...defaults.hero, ...cmsContent.hero },
-    intro: { ...defaults.intro, ...cmsContent.intro },
-    grid: {
-      ...defaults.grid,
-      ...cmsContent.grid,
-      areas: cmsContent.grid?.areas?.length
-        ? cmsContent.grid.areas
-        : defaults.grid.areas,
-    },
-    cta: {
-      ...defaults.cta,
-      ...cmsContent.cta,
-      primaryButton: {
-        ...defaults.cta.primaryButton,
-        ...cmsContent.cta?.primaryButton,
-      },
-      secondaryButton: {
-        ...defaults.cta.secondaryButton,
-        ...cmsContent.cta?.secondaryButton,
-      },
-    },
-  };
-}
-
-// Helper to clear cache (useful after admin edits)
 export function clearPracticeAreasContentCache() {
   cachedContent = null;
   cachedMeta = null;

@@ -1,6 +1,6 @@
 import { Phone, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@site/lib/helmet";
 import { useGlobalPhone, useSiteSettings } from "@site/contexts/SiteSettingsContext";
 
 interface PageHeroProps {

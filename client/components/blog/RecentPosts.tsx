@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Post } from "@/lib/database.types";
 import BlogPostCard from "./BlogPostCard";
+import { getPublicEnv } from "@site/lib/runtimeEnv";
 
 interface PostWithCategory extends Post {
   post_categories: { name: string; slug: string } | null;
@@ -20,8 +21,8 @@ export default function RecentPosts({ excludeId }: RecentPostsProps) {
   }, [excludeId]);
 
   const fetchRecentPosts = async () => {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseUrl = getPublicEnv("VITE_SUPABASE_URL");
+    const supabaseKey = getPublicEnv("VITE_SUPABASE_ANON_KEY");
 
     if (!supabaseUrl || !supabaseKey) {
       setLoading(false);

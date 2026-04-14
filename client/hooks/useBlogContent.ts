@@ -1,23 +1,18 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { PageMeta } from "../lib/cms/pageMeta";
 import { emptyPageMeta } from "../lib/cms/pageMeta";
-import type { ContentBlock } from "../lib/blocks";
-import { consumePageData } from '../lib/pageDataInjection';
+import { getCmsPreloadedRouteData } from "../lib/cms/preloadedState";
+import { getPublicEnv } from "../lib/runtimeEnv";
+import {
+  type BlogHeroData,
+  type RecentPostsData,
+  resolveBlogPageData,
+} from "../lib/cms/sharedPageData";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+export type { BlogHeroData, RecentPostsData } from "../lib/cms/sharedPageData";
 
-export interface BlogHeroData {
-  title: string;
-  subtitle: string;
-  backgroundImage?: string;
-}
-
-export interface RecentPostsData {
-  sectionLabel: string;
-  heading: string;
-  postCount: number;
-}
+const SUPABASE_URL = getPublicEnv("VITE_SUPABASE_URL");
+const SUPABASE_ANON_KEY = getPublicEnv("VITE_SUPABASE_ANON_KEY");
 
 interface UseBlogContentResult {
   hero: BlogHeroData;
@@ -26,7 +21,6 @@ interface UseBlogContentResult {
   isLoading: boolean;
 }
 
-// Module-level cache
 let cachedHero: BlogHeroData | null = null;
 let cachedRecentPosts: RecentPostsData | null = null;
 let cachedMeta: PageMeta | null = null;
@@ -43,44 +37,18 @@ const defaultRecentPosts: RecentPostsData = {
 };
 
 export function useBlogContent(): UseBlogContentResult {
-  // Consume SSG-injected data synchronously before first render
-  const injected = consumePageData('/blog/');
+  const preloaded = getCmsPreloadedRouteData("/blog/")?.blog ?? null;
 
-  if (injected && !cachedHero) {
-    const blocks = injected.content as ContentBlock[] | null;
-    let heroData: BlogHeroData = defaultHero;
-    let recentPostsData: RecentPostsData = defaultRecentPosts;
-
-    if (Array.isArray(blocks)) {
-      const heroBlock = blocks.find((b) => b.type === 'hero') as
-        | Extract<ContentBlock, { type: 'hero' }>
-        | undefined;
-      if (heroBlock) {
-        heroData = {
-          title: heroBlock.sectionLabel || defaultHero.title,
-          subtitle: heroBlock.tagline || defaultHero.subtitle,
-          backgroundImage: heroBlock.backgroundImage,
-        };
-      }
-      const recentPostsBlock = blocks.find((b) => b.type === 'recent-posts') as
-        | Extract<ContentBlock, { type: 'recent-posts' }>
-        | undefined;
-      if (recentPostsBlock) {
-        recentPostsData = {
-          sectionLabel: recentPostsBlock.sectionLabel || defaultRecentPosts.sectionLabel,
-          heading: recentPostsBlock.heading || defaultRecentPosts.heading,
-          postCount: recentPostsBlock.postCount || defaultRecentPosts.postCount,
-        };
-      }
-    }
-
-    cachedHero = heroData;
-    cachedRecentPosts = recentPostsData;
-    cachedMeta = injected.meta ?? emptyPageMeta;
+  if (preloaded && !cachedHero) {
+    cachedHero = preloaded.hero;
+    cachedRecentPosts = preloaded.recentPosts;
+    cachedMeta = preloaded.meta;
   }
 
   const [hero, setHero] = useState<BlogHeroData>(cachedHero || defaultHero);
-  const [recentPosts, setRecentPosts] = useState<RecentPostsData>(cachedRecentPosts || defaultRecentPosts);
+  const [recentPosts, setRecentPosts] = useState<RecentPostsData>(
+    cachedRecentPosts || defaultRecentPosts,
+  );
   const [meta, setMeta] = useState<PageMeta>(cachedMeta || emptyPageMeta);
   const [isLoading, setIsLoading] = useState(!cachedHero);
 
@@ -106,7 +74,7 @@ export function useBlogContent(): UseBlogContentResult {
               apikey: SUPABASE_ANON_KEY,
               Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
             },
-          }
+          },
         );
 
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
@@ -118,60 +86,15 @@ export function useBlogContent(): UseBlogContentResult {
           return;
         }
 
-        const pageData = data[0];
-        const blocks = pageData.content as ContentBlock[] | null;
-
-        // Extract hero block
-        let heroData: BlogHeroData = defaultHero;
-        // Extract recent-posts block
-        let recentPostsData: RecentPostsData = defaultRecentPosts;
-
-        if (Array.isArray(blocks)) {
-          const heroBlock = blocks.find((b) => b.type === "hero") as
-            | Extract<ContentBlock, { type: "hero" }>
-            | undefined;
-
-          if (heroBlock) {
-            heroData = {
-              title: heroBlock.sectionLabel || defaultHero.title,
-              subtitle: heroBlock.tagline || defaultHero.subtitle,
-              backgroundImage: heroBlock.backgroundImage,
-            };
-          }
-
-          const recentPostsBlock = blocks.find((b) => b.type === "recent-posts") as
-            | Extract<ContentBlock, { type: "recent-posts" }>
-            | undefined;
-
-          if (recentPostsBlock) {
-            recentPostsData = {
-              sectionLabel: recentPostsBlock.sectionLabel || defaultRecentPosts.sectionLabel,
-              heading: recentPostsBlock.heading || defaultRecentPosts.heading,
-              postCount: recentPostsBlock.postCount || defaultRecentPosts.postCount,
-            };
-          }
-        }
-
-        const pageMeta: PageMeta = {
-          meta_title: pageData.meta_title,
-          meta_description: pageData.meta_description,
-          canonical_url: pageData.canonical_url,
-          og_title: pageData.og_title,
-          og_description: pageData.og_description,
-          og_image: pageData.og_image,
-          noindex: pageData.noindex,
-          schema_type: pageData.schema_type,
-          schema_data: pageData.schema_data,
-        };
-
-        cachedHero = heroData;
-        cachedRecentPosts = recentPostsData;
-        cachedMeta = pageMeta;
+        const resolved = resolveBlogPageData(data[0]);
+        cachedHero = resolved.hero;
+        cachedRecentPosts = resolved.recentPosts;
+        cachedMeta = resolved.meta;
 
         if (isMounted) {
-          setHero(heroData);
-          setRecentPosts(recentPostsData);
-          setMeta(pageMeta);
+          setHero(resolved.hero);
+          setRecentPosts(resolved.recentPosts);
+          setMeta(resolved.meta);
         }
       } catch (err) {
         console.error("[useBlogContent] Error:", err);
@@ -181,7 +104,9 @@ export function useBlogContent(): UseBlogContentResult {
     }
 
     fetchBlogPage();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return { hero, recentPosts, meta, isLoading };

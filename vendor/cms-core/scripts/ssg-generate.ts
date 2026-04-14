@@ -1,68 +1,63 @@
-import { createClient } from '@supabase/supabase-js';
-import { defaultPracticeAreaPageContent } from '../../../client/lib/cms/practiceAreaPageTypes';
+import { createClient } from "@supabase/supabase-js";
+import fs from "fs";
+import path from "path";
+import type { Database } from "../client/lib/database.types";
+import { defaultPracticeAreaPageContent } from "../../../client/lib/cms/practiceAreaPageTypes";
+import {
+  buildBlogPostPath,
+  getPublicPageRoutes,
+  normalizeCmsPath,
+  normalizeBlogSlug,
+} from "../../../client/lib/cms/publicRoutes";
+import {
+  serializeCmsPreloadedState,
+  type CmsPreloadedState,
+} from "../../../client/lib/cms/preloadedState";
+import {
+  mapSiteSettingsRow,
+  type SiteSettings,
+} from "../../../client/lib/cms/siteSettings";
+import {
+  resolveAboutPageData,
+  resolveBlogPageData,
+  resolveBlogPostData,
+  resolveContactPageData,
+  resolveDynamicPageData,
+  resolveHomePageData,
+  resolvePracticeAreaPageData,
+  resolvePracticeAreasPageData,
+  type BlogPostWithCategory,
+  type CmsPageRow,
+} from "../../../client/lib/cms/sharedPageData";
 import {
   escapeHtml,
-  normalizeSeoPath,
   normalizeSiteUrl,
-  renderSeoHeadTags,
-  resolveSeo,
   stripManagedSeoHeadTags,
-} from '../../../client/lib/seo';
-import fs from 'fs';
-import path from 'path';
-import type { Database } from '../client/lib/database.types';
-// NOTE: JSON-LD schemas remain client-side only to avoid duplicate structured
-// data when React Helmet updates the page after hydration.
+} from "../../../client/lib/seo";
+import { renderCmsPage } from "../../../client/server-entry";
 
-// Load environment variables
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!supabaseUrl || !supabaseServiceRoleKey) {
-  console.log('Supabase credentials not configured. Skipping SSG generation.');
-  console.log('To enable SSG, set VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.');
+  console.log("Supabase credentials not configured. Skipping SSG generation.");
+  console.log(
+    "To enable SSG, set VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.",
+  );
   process.exit(0);
 }
 
 const supabase = createClient<Database>(supabaseUrl, supabaseServiceRoleKey);
 
-interface Page {
+interface PageRow extends CmsPageRow {
   id: string;
   title: string;
   url_path: string;
-  meta_title: string | null;
-  meta_description: string | null;
-  canonical_url: string | null;
-  og_title: string | null;
-  og_description: string | null;
-  og_image: string | null;
-  noindex: boolean;
   updated_at: string;
   content: unknown;
-  schema_type: string | null;
-  schema_data: Record<string, unknown> | null;
 }
 
-interface Post {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  featured_image: string | null;
-  category_id: string | null;
-  meta_title: string | null;
-  meta_description: string | null;
-  canonical_url: string | null;
-  og_title: string | null;
-  og_description: string | null;
-  og_image: string | null;
-  noindex: boolean;
+interface PostRow extends BlogPostWithCategory {
   updated_at: string;
-  body: string | null;
-  schema_type: string | null;
-  schema_data: Record<string, unknown> | null;
-  published_at: string | null;
-  created_at: string;
-  post_categories: { name: string; slug: string } | null;
 }
 
 interface Redirect {
@@ -71,332 +66,307 @@ interface Redirect {
   status_code: number;
 }
 
-interface NavigationItem {
-  label: string;
-  href: string;
-  order?: number;
-  children?: { label: string; href: string }[];
-}
-
-interface FooterLink {
-  label: string;
-  href?: string;
-}
-
-interface SocialLink {
-  platform: string;
-  url: string;
-  enabled: boolean;
-}
-
-interface SiteSettings {
-  site_url: string | null;
-  site_noindex: boolean;
-  site_name: string | null;
-  ga4_measurement_id: string | null;
-  google_ads_id: string | null;
-  google_ads_conversion_label: string | null;
-  head_scripts: string | null;
-  footer_scripts: string | null;
-  navigation_items: NavigationItem[] | null;
-  footer_about_links: FooterLink[] | null;
-  footer_practice_links: FooterLink[] | null;
-  global_schema: string | null;
-  phone_number: string | null;
-  phone_display: string | null;
-  address_line1: string | null;
-  address_line2: string | null;
-  logo_url: string | null;
-  social_links: SocialLink[] | null;
-}
-
-/**
- * One-time restore: re-creates the /practice-areas/practice-area/ template page
- * if it was accidentally deleted from the database. Idempotent — skips silently
- * when the page already exists.
- */
 async function ensurePracticeAreaPage() {
   if (!supabaseServiceRoleKey) {
-    console.log('[ensurePracticeAreaPage] No service role key — skipping.');
+    console.log("[ensurePracticeAreaPage] No service role key — skipping.");
     return;
   }
 
-  const PA_URL = '/practice-areas/practice-area/';
+  const practiceAreaUrl = "/practice-areas/practice-area/";
 
   const { data: existing, error: checkError } = await supabase
-    .from('pages')
-    .select('id')
-    .eq('url_path', PA_URL)
+    .from("pages")
+    .select("id")
+    .eq("url_path", practiceAreaUrl)
     .maybeSingle();
 
   if (checkError) {
-    console.error('[ensurePracticeAreaPage] Error checking for page:', checkError.message);
+    console.error(
+      "[ensurePracticeAreaPage] Error checking for page:",
+      checkError.message,
+    );
     return;
   }
 
   if (existing) {
-    console.log(`[ensurePracticeAreaPage] Page ${PA_URL} already exists (id=${existing.id}). Nothing to do.`);
+    console.log(
+      `[ensurePracticeAreaPage] Page ${practiceAreaUrl} already exists (id=${existing.id}). Nothing to do.`,
+    );
     return;
   }
 
-  // Page is missing — insert it with full default content
   const { data: inserted, error: insertError } = await supabase
-    .from('pages')
+    .from("pages")
     .insert({
-      title: 'Practice Area',
-      url_path: PA_URL,
-      page_type: 'practice',
-      status: 'published',
+      title: "Practice Area",
+      url_path: practiceAreaUrl,
+      page_type: "practice",
+      status: "published",
       content: defaultPracticeAreaPageContent as unknown as Record<string, unknown>,
     })
-    .select('id')
+    .select("id")
     .single();
 
   if (insertError || !inserted) {
-    console.error('[ensurePracticeAreaPage] Failed to insert page:', insertError?.message ?? 'unknown error');
+    console.error(
+      "[ensurePracticeAreaPage] Failed to insert page:",
+      insertError?.message ?? "unknown error",
+    );
     return;
   }
 
-  console.log(`[ensurePracticeAreaPage] Restored ${PA_URL} (id=${inserted.id}) with default content.`);
+  console.log(
+    `[ensurePracticeAreaPage] Restored ${practiceAreaUrl} (id=${inserted.id}) with default content.`,
+  );
 }
 
 async function generateSSG() {
-  console.log('Starting SSG generation...');
+  console.log("Starting SSG generation...");
 
-  // Restore the practice-area template page if it was accidentally deleted
   await ensurePracticeAreaPage();
 
-  // 0. Fetch site settings for analytics, scripts, and schema generation
   const { data: siteSettingsData } = await supabase
-    .from('site_settings')
-    .select('site_url, site_noindex, site_name, ga4_measurement_id, google_ads_id, google_ads_conversion_label, head_scripts, footer_scripts, navigation_items, footer_about_links, footer_practice_links, global_schema, phone_number, phone_display, address_line1, address_line2, logo_url, social_links')
-    .eq('settings_key', 'global')
+    .from("site_settings")
+    .select(
+      "site_name, logo_url, logo_alt, phone_number, phone_display, phone_availability, apply_phone_globally, header_cta_text, header_cta_url, header_service_text, navigation_items, footer_about_links, footer_practice_links, footer_about_label, footer_about_icon, footer_practice_label, footer_practice_icon, footer_column3_html, footer_tagline_html, address_line1, address_line2, map_embed_url, social_links, copyright_text, site_url, site_noindex, ga4_measurement_id, google_ads_id, google_ads_conversion_label, head_scripts, footer_scripts, global_schema",
+    )
+    .eq("settings_key", "global")
     .single();
 
-  const siteSettings: SiteSettings = siteSettingsData || {
-    site_url: null,
-    site_noindex: false,
-    site_name: null,
-    ga4_measurement_id: null,
-    google_ads_id: null,
-    google_ads_conversion_label: null,
-    head_scripts: null,
-    footer_scripts: null,
-    navigation_items: null,
-    footer_about_links: null,
-    footer_practice_links: null,
-    global_schema: null,
-    phone_number: null,
-    phone_display: null,
-    address_line1: null,
-    address_line2: null,
-    logo_url: null,
-    social_links: null,
-  };
-
-  console.log('Site settings loaded:', {
-    siteNoindex: siteSettings.site_noindex,
-    hasGA4: !!siteSettings.ga4_measurement_id,
-    hasGoogleAds: !!siteSettings.google_ads_id,
-    hasHeadScripts: !!siteSettings.head_scripts,
-    hasFooterScripts: !!siteSettings.footer_scripts,
-  });
-
-  // Resolve site URL: env var override > DB site setting
-  const siteUrl = normalizeSiteUrl(process.env.SITE_URL || siteSettings.site_url) || '';
+  const siteSettings = mapSiteSettingsRow(siteSettingsData);
+  const siteUrl = normalizeSiteUrl(process.env.SITE_URL || siteSettings.siteUrl) || "";
 
   if (!siteUrl) {
-    console.warn('[SSG] WARNING: No site URL configured. Set the Site URL in CMS Site Settings (or SITE_URL env var). Skipping canonical URLs, sitemap, and robots.txt.');
+    console.warn(
+      "[SSG] WARNING: No site URL configured. Set the Site URL in CMS Site Settings (or SITE_URL env var). Skipping canonical URLs, sitemap, and robots.txt.",
+    );
   } else {
-    console.log('Resolved site URL:', siteUrl);
+    console.log("Resolved site URL:", siteUrl);
   }
 
-  // 1. Fetch all published pages (including content + schema fields for SSG rendering)
   const { data: pages, error: pagesError } = await supabase
-    .from('pages')
-    .select('id, title, url_path, meta_title, meta_description, canonical_url, og_title, og_description, og_image, noindex, updated_at, content, schema_type, schema_data')
-    .eq('status', 'published');
+    .from("pages")
+    .select(
+      "id, title, url_path, meta_title, meta_description, canonical_url, og_title, og_description, og_image, noindex, updated_at, content, schema_type, schema_data",
+    )
+    .eq("status", "published");
 
   if (pagesError) {
-    console.error('Error fetching pages:', pagesError);
+    console.error("Error fetching pages:", pagesError);
     process.exit(1);
   }
 
-  console.log(`Found ${pages?.length || 0} published pages`);
-
-  // 2. Read the SPA index.html as template
-  const templatePath = path.join(process.cwd(), 'dist/spa/index.html');
-  if (!fs.existsSync(templatePath)) {
-    console.error('Template not found at dist/spa/index.html. Run build:client first.');
-    process.exit(1);
-  }
-
-  const template = fs.readFileSync(templatePath, 'utf-8');
-
-
-  // 3. For each page, generate static HTML with SEO meta tags
-  // First pass: collect post URLs before generating (need for crawlable body)
-  // We'll do a two-pass: fetch posts first, then generate all HTML
-
-  // 3b. Fetch blog posts (including body + schema fields for SSG rendering)
   const { data: posts, error: postsError } = await supabase
-    .from('posts')
-    .select('id, title, slug, excerpt, featured_image, category_id, meta_title, meta_description, canonical_url, og_title, og_description, og_image, noindex, updated_at, body, schema_type, schema_data, published_at, created_at, post_categories(name,slug)')
-    .eq('status', 'published');
+    .from("posts")
+    .select(
+      "id, title, slug, excerpt, featured_image, category_id, content, body, meta_title, meta_description, canonical_url, og_title, og_description, og_image, noindex, updated_at, published_at, created_at, post_categories(name,slug)",
+    )
+    .eq("status", "published");
 
   if (postsError) {
-    console.error('Error fetching posts:', postsError);
+    console.error("Error fetching posts:", postsError);
   }
 
+  const templatePath = path.join(process.cwd(), "dist/spa/index.html");
+  if (!fs.existsSync(templatePath)) {
+    console.error("Template not found at dist/spa/index.html. Run build:client first.");
+    process.exit(1);
+  }
+
+  const template = fs.readFileSync(templatePath, "utf-8");
+  const publicPages = getPublicPageRoutes((pages || []) as PageRow[]);
+  const pagesByPath = new Map(
+    publicPages.map((page) => [normalizeCmsPath(page.url_path), page]),
+  );
+  const aboutPage = pagesByPath.get("/about/") || null;
+
+  console.log(`Found ${publicPages.length} published public pages`);
   console.log(`Found ${posts?.length || 0} published posts`);
 
-  // Now generate page HTML
-  for (const page of pages || []) {
-    const html = generatePageHTML(template, page, siteSettings, siteUrl);
-
-    let outputPath: string;
-    if (page.url_path === '/') {
-      outputPath = path.join(process.cwd(), 'dist/spa/index.html');
-    } else {
-      const pagePath = page.url_path.startsWith('/') ? page.url_path.slice(1) : page.url_path;
-      outputPath = path.join(process.cwd(), 'dist/spa', pagePath, 'index.html');
-    }
+  for (const page of publicPages) {
+    const normalizedPath = normalizeCmsPath(page.url_path);
+    const preloadedState = buildPagePreloadedState(
+      normalizedPath,
+      page,
+      siteSettings,
+      aboutPage,
+    );
+    const html = buildPrerenderedHtml(template, normalizedPath, preloadedState, siteSettings);
+    const outputPath = getHtmlOutputPath(normalizedPath);
 
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, html);
-    console.log(`Generated: ${page.url_path}`);
+    console.log(`Generated: ${normalizedPath}`);
   }
 
-  // Generate blog post HTML
-  for (const post of posts || []) {
-    const normalizedSlug = post.slug.replace(/^\/+|\/+$/g, '');
+  for (const post of (posts || []) as PostRow[]) {
+    const normalizedSlug = normalizeBlogSlug(post.slug);
     if (!normalizedSlug) continue;
 
-    const postAsPage: Page = {
-      id: post.id,
-      title: post.title,
-      url_path: `/blog/${normalizedSlug}/`,
-      meta_title: post.meta_title,
-      meta_description: post.meta_description,
-      canonical_url: post.canonical_url,
-      og_title: post.og_title,
-      og_description: post.og_description,
-      og_image: post.og_image || post.featured_image,
-      noindex: post.noindex,
-      updated_at: post.updated_at,
-      content: null,
-      schema_type: post.schema_type,
-      schema_data: post.schema_data,
-    };
+    const normalizedPath = buildBlogPostPath(normalizedSlug);
+    const preloadedState = buildPostPreloadedState(normalizedPath, post, siteSettings);
+    const html = buildPrerenderedHtml(template, normalizedPath, preloadedState, siteSettings);
+    const outputPath = getHtmlOutputPath(normalizedPath);
 
-    const html = generatePageHTML(template, postAsPage, siteSettings, siteUrl, post);
-    const outputPath = path.join(process.cwd(), 'dist/spa', 'blog', normalizedSlug, 'index.html');
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, html);
-    console.log(`Generated post: /blog/${normalizedSlug}/`);
+    console.log(`Generated post: ${normalizedPath}`);
   }
 
-  // 4. Fetch and generate _redirects
-  const { data: redirects, error: redirectsError } = await supabase
-    .from('redirects')
-    .select('from_path, to_path, status_code')
-    .eq('enabled', true);
+  await writeRedirects();
+  writeRobots(siteUrl, siteSettings.siteNoindex);
 
-  // Sitemap and API function routes — must appear before the /* catch-all so
-  // Netlify routes them to the correct functions even when _redirects is present.
-  const functionRedirects = [
-    '/sitemap.xml /.netlify/functions/sitemap 200',
-    '/sitemap-pages.xml /.netlify/functions/sitemap-pages 200',
-    '/sitemap-posts.xml /.netlify/functions/sitemap-posts 200',
-    '/api/* /.netlify/functions/api/:splat 200',
-  ].join('\n');
-
-  if (redirectsError) {
-    console.error('Error fetching redirects:', redirectsError);
-  } else if (redirects && redirects.length > 0) {
-    const cmsRedirects = redirects
-      .map((r: Redirect) => `${r.from_path} ${r.to_path} ${r.status_code}`)
-      .join('\n');
-
-    // Function routes → CMS redirects → SPA catch-all
-    const fullRedirectsContent =
-      functionRedirects + '\n' + cmsRedirects + '\n/* /index.html 200';
-    fs.writeFileSync(path.join(process.cwd(), 'dist/spa/_redirects'), fullRedirectsContent);
-    console.log(`Generated _redirects with function routes + ${redirects.length} CMS redirect(s) + SPA fallback`);
-  } else {
-    // Function routes → SPA catch-all
-    const fullRedirectsContent =
-      functionRedirects + '\n/* /index.html 200';
-    fs.writeFileSync(path.join(process.cwd(), 'dist/spa/_redirects'), fullRedirectsContent);
-    console.log('Generated _redirects with function routes + SPA fallback');
-  }
-
-  // 5. Generate robots.txt (only if site URL is configured)
-  // Note: sitemap.xml, sitemap-pages.xml, and sitemap-posts.xml are served by
-  // Netlify functions (via _redirects above) — no static file generation needed.
-  if (siteUrl) {
-    // 6. Generate robots.txt (conditional based on site_noindex)
-    let robotsTxt: string;
-    if (siteSettings.site_noindex) {
-      robotsTxt = `User-agent: *
-Disallow: /`;
-      console.log('Generated robots.txt with Disallow (site is noindex)');
-    } else {
-      robotsTxt = `User-agent: *
-Allow: /
-
-Sitemap: ${siteUrl}/sitemap.xml`;
-      console.log('Generated robots.txt with Allow');
-    }
-    fs.writeFileSync(path.join(process.cwd(), 'dist/spa/robots.txt'), robotsTxt);
-  } else {
-    console.warn('[SSG] Skipping sitemap.xml and robots.txt — no site URL configured.');
-  }
-
-  console.log('SSG generation complete!');
+  console.log("SSG generation complete!");
 }
 
-function generatePageHTML(
-  template: string,
-  page: Page,
+function buildPagePreloadedState(
+  normalizedPath: string,
+  page: PageRow,
   siteSettings: SiteSettings,
-  siteUrl: string,
-  blogPost?: Post | null,
-): string {
-  const trailingSlashPath = normalizeSeoPath(page.url_path);
-  const seo = resolveSeo({
-    title: page.meta_title || page.title,
-    description: page.meta_description,
-    canonical: page.canonical_url,
-    image: page.og_image,
-    noindex: page.noindex,
-    ogTitle: page.og_title,
-    ogDescription: page.og_description,
-    ogImage: page.og_image,
-    pathname: trailingSlashPath,
-    fallbackTitle: page.title,
-    siteSettings: {
-      siteName: siteSettings.site_name,
-      siteUrl,
-      siteNoindex: siteSettings.site_noindex,
-    },
-  });
+  aboutPage: PageRow | null,
+): CmsPreloadedState {
+  switch (normalizedPath) {
+    case "/":
+      return {
+        currentPath: normalizedPath,
+        siteSettings,
+        routeData: { home: resolveHomePageData(page) },
+      };
+    case "/about/":
+      return {
+        currentPath: normalizedPath,
+        siteSettings,
+        routeData: { about: resolveAboutPageData(page) },
+      };
+    case "/contact/":
+      return {
+        currentPath: normalizedPath,
+        siteSettings,
+        routeData: { contact: resolveContactPageData(page) },
+      };
+    case "/practice-areas/":
+      return {
+        currentPath: normalizedPath,
+        siteSettings,
+        routeData: {
+          practiceAreas: resolvePracticeAreasPageData(page, aboutPage),
+        },
+      };
+    case "/blog/":
+      return {
+        currentPath: normalizedPath,
+        siteSettings,
+        routeData: { blog: resolveBlogPageData(page) },
+      };
+    default:
+      if (normalizedPath.startsWith("/practice-areas/")) {
+        return {
+          currentPath: normalizedPath,
+          siteSettings,
+          routeData: {
+            practiceAreaPage: resolvePracticeAreaPageData(page),
+          },
+        };
+      }
 
-  const googleTagIds = [siteSettings.ga4_measurement_id, siteSettings.google_ads_id].filter(
-    (tagId, index, allTagIds): tagId is string => !!tagId && allTagIds.indexOf(tagId) === index,
+      return {
+        currentPath: normalizedPath,
+        siteSettings,
+        routeData: { dynamicPage: resolveDynamicPageData(page) },
+      };
+  }
+}
+
+function buildPostPreloadedState(
+  normalizedPath: string,
+  post: PostRow,
+  siteSettings: SiteSettings,
+): CmsPreloadedState {
+  return {
+    currentPath: normalizedPath,
+    siteSettings,
+    routeData: {
+      blogPost: resolveBlogPostData(post),
+    },
+  };
+}
+
+function buildPrerenderedHtml(
+  template: string,
+  normalizedPath: string,
+  preloadedState: CmsPreloadedState,
+  siteSettings: SiteSettings,
+): string {
+  const { html: appHtml, helmetContext } = renderCmsPage(
+    normalizedPath,
+    preloadedState,
+  );
+  const serializedState = serializeCmsPreloadedState(preloadedState);
+  const analyticsScripts = buildAnalyticsScripts(siteSettings);
+  const customHeadScripts = stripManagedSeoHeadTags(siteSettings.headScripts || "");
+  const customFooterScripts = siteSettings.footerScripts || "";
+  const preloadScript = `<script>window.__CMS_PRELOADED_STATE__=${serializedState}</script>`;
+  const helmet = (helmetContext as { helmet?: Record<string, { toString(): string }> })
+    .helmet;
+  const helmetHead = [
+    helmet?.title?.toString?.() || "",
+    helmet?.meta?.toString?.() || "",
+    helmet?.link?.toString?.() || "",
+    helmet?.style?.toString?.() || "",
+    helmet?.script?.toString?.() || "",
+    helmet?.noscript?.toString?.() || "",
+    helmet?.base?.toString?.() || "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  let html = stripManagedSeoHeadTags(template);
+  html = html.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
+
+  const headInjection = [helmetHead, analyticsScripts, customHeadScripts]
+    .filter(Boolean)
+    .join("\n");
+  html = html.replace("</head>", `${headInjection}\n</head>`);
+
+  html = html.replace(
+    /<script type="module"[^>]*><\/script>/,
+    `${preloadScript}\n$&`,
+  );
+
+  if (customFooterScripts) {
+    html = html.replace("</body>", `${customFooterScripts}\n</body>`);
+  }
+
+  return html;
+}
+
+function getHtmlOutputPath(normalizedPath: string): string {
+  if (normalizedPath === "/") {
+    return path.join(process.cwd(), "dist/spa/index.html");
+  }
+
+  return path.join(process.cwd(), "dist/spa", normalizedPath.slice(1), "index.html");
+}
+
+function buildAnalyticsScripts(siteSettings: SiteSettings): string {
+  const googleTagIds = [siteSettings.ga4MeasurementId, siteSettings.googleAdsId].filter(
+    (tagId, index, allTagIds): tagId is string =>
+      !!tagId && allTagIds.indexOf(tagId) === index,
   );
   const googleTagLoaderId = googleTagIds[0] || null;
 
-  let analyticsScripts = '';
+  if (!googleTagLoaderId) {
+    return "";
+  }
 
-  if (googleTagLoaderId) {
-    const googleTagConfigCalls = googleTagIds
-      .map(
-        (tagId) => `      gtag('config', '${escapeHtml(tagId)}');\n      window.__googleTagConfiguredIds['${escapeHtml(tagId)}'] = true;`,
-      )
-      .join('\n');
+  const googleTagConfigCalls = googleTagIds
+    .map(
+      (tagId) =>
+        `      gtag('config', '${escapeHtml(tagId)}');\n      window.__googleTagConfiguredIds['${escapeHtml(tagId)}'] = true;`,
+    )
+    .join("\n");
 
-    analyticsScripts += `
+  return `
     <!-- Google tag (gtag.js) -->
     <script async data-google-tag-loader="true" src="https://www.googletagmanager.com/gtag/js?id=${escapeHtml(googleTagLoaderId)}"></script>
     <script data-google-tag-config="true">
@@ -406,67 +376,72 @@ function generatePageHTML(
       gtag('js', new Date());
 ${googleTagConfigCalls}
     </script>`;
-  }
-
-  const customHeadScripts = stripManagedSeoHeadTags(siteSettings.head_scripts || '');
-  const customFooterScripts = siteSettings.footer_scripts || '';
-
-  let html = stripManagedSeoHeadTags(template);
-
-  const pageDataPayload: Record<string, unknown> = {
-    urlPath: trailingSlashPath,
-    title: page.title,
-    content: page.content,
-    meta: {
-      meta_title: page.meta_title,
-      meta_description: page.meta_description,
-      canonical_url: page.canonical_url,
-      og_title: page.og_title,
-      og_description: page.og_description,
-      og_image: page.og_image,
-      noindex: page.noindex,
-      schema_type: page.schema_type,
-      schema_data: page.schema_data,
-    },
-  };
-
-  if (blogPost) {
-    pageDataPayload.post = {
-      id: blogPost.id,
-      title: blogPost.title,
-      slug: blogPost.slug,
-      body: blogPost.body,
-      excerpt: blogPost.excerpt ?? null,
-      featured_image: blogPost.featured_image,
-      category_id: blogPost.category_id ?? null,
-      meta_title: blogPost.meta_title,
-      meta_description: blogPost.meta_description,
-      canonical_url: blogPost.canonical_url,
-      og_title: blogPost.og_title,
-      og_description: blogPost.og_description,
-      og_image: blogPost.og_image,
-      noindex: blogPost.noindex,
-      published_at: blogPost.published_at ?? null,
-      created_at: blogPost.created_at ?? null,
-      post_categories: blogPost.post_categories ?? null,
-    };
-  }
-
-  const dataScript = `<script>window.__PAGE_DATA__=${JSON.stringify(pageDataPayload)}</script>`;
-  const headInjection = [renderSeoHeadTags(seo), analyticsScripts, customHeadScripts, dataScript]
-    .filter(Boolean)
-    .join('\n');
-
-  html = html.replace('</head>', `${headInjection}\n</head>`);
-
-  if (customFooterScripts) {
-    html = html.replace('</body>', `${customFooterScripts}\n</body>`);
-  }
-
-  return html;
 }
 
-generateSSG().catch(err => {
-  console.error('SSG generation failed:', err);
+async function writeRedirects() {
+  const { data: redirects, error: redirectsError } = await supabase
+    .from("redirects")
+    .select("from_path, to_path, status_code")
+    .eq("enabled", true);
+
+  const functionRedirects = [
+    "/sitemap.xml /.netlify/functions/sitemap 200",
+    "/sitemap-pages.xml /.netlify/functions/sitemap-pages 200",
+    "/sitemap-posts.xml /.netlify/functions/sitemap-posts 200",
+    "/api/* /.netlify/functions/api/:splat 200",
+  ].join("\n");
+
+  if (redirectsError) {
+    console.error("Error fetching redirects:", redirectsError);
+    const fallbackContent = `${functionRedirects}\n/* /index.html 200`;
+    fs.writeFileSync(path.join(process.cwd(), "dist/spa/_redirects"), fallbackContent);
+    return;
+  }
+
+  if (redirects && redirects.length > 0) {
+    const cmsRedirects = redirects
+      .map((redirect: Redirect) => `${redirect.from_path} ${redirect.to_path} ${redirect.status_code}`)
+      .join("\n");
+
+    const fullRedirectsContent = `${functionRedirects}\n${cmsRedirects}\n/* /index.html 200`;
+    fs.writeFileSync(
+      path.join(process.cwd(), "dist/spa/_redirects"),
+      fullRedirectsContent,
+    );
+    console.log(
+      `Generated _redirects with function routes + ${redirects.length} CMS redirect(s) + SPA fallback`,
+    );
+    return;
+  }
+
+  const fullRedirectsContent = `${functionRedirects}\n/* /index.html 200`;
+  fs.writeFileSync(path.join(process.cwd(), "dist/spa/_redirects"), fullRedirectsContent);
+  console.log("Generated _redirects with function routes + SPA fallback");
+}
+
+function writeRobots(siteUrl: string, siteNoindex: boolean) {
+  if (!siteUrl) {
+    console.warn("[SSG] Skipping sitemap.xml and robots.txt — no site URL configured.");
+    return;
+  }
+
+  const robotsTxt = siteNoindex
+    ? `User-agent: *
+Disallow: /`
+    : `User-agent: *
+Allow: /
+
+Sitemap: ${siteUrl}/sitemap.xml`;
+
+  fs.writeFileSync(path.join(process.cwd(), "dist/spa/robots.txt"), robotsTxt);
+  console.log(
+    siteNoindex
+      ? "Generated robots.txt with Disallow (site is noindex)"
+      : "Generated robots.txt with Allow",
+  );
+}
+
+generateSSG().catch((err) => {
+  console.error("SSG generation failed:", err);
   process.exit(1);
 });

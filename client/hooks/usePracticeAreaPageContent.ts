@@ -1,12 +1,15 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PracticeAreaPageContent } from "../lib/cms/practiceAreaPageTypes";
 import { defaultPracticeAreaPageContent } from "../lib/cms/practiceAreaPageTypes";
 import type { PageMeta } from "../lib/cms/pageMeta";
 import { emptyPageMeta } from "../lib/cms/pageMeta";
-import { consumePageData } from '../lib/pageDataInjection';
+import { getCmsPreloadedRouteData } from "../lib/cms/preloadedState";
+import { normalizeCmsPath } from "../lib/cms/publicRoutes";
+import { getPublicEnv } from "../lib/runtimeEnv";
+import { resolvePracticeAreaPageData } from "../lib/cms/sharedPageData";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = getPublicEnv("VITE_SUPABASE_URL");
+const SUPABASE_ANON_KEY = getPublicEnv("VITE_SUPABASE_ANON_KEY");
 
 interface UsePracticeAreaPageContentResult {
   content: PracticeAreaPageContent;
@@ -17,7 +20,6 @@ interface UsePracticeAreaPageContentResult {
   notFound: boolean;
 }
 
-// Cache by url_path
 const cache = new Map<
   string,
   { content: PracticeAreaPageContent; meta: PageMeta; title: string }
@@ -26,30 +28,33 @@ const cache = new Map<
 export function usePracticeAreaPageContent(
   slug: string | undefined,
 ): UsePracticeAreaPageContentResult {
-  // Consume SSG-injected data synchronously before first render
-  const urlPath = slug ? `/practice-areas/${slug}/` : '';
-  const injected = slug ? consumePageData(urlPath) : null;
-  const initialContent = injected
-    ? mergeWithDefaults(injected.content as Partial<PracticeAreaPageContent>, defaultPracticeAreaPageContent)
-    : (urlPath && cache.has(urlPath) ? cache.get(urlPath)!.content : defaultPracticeAreaPageContent);
-  const initialMeta = injected?.meta ?? (urlPath && cache.has(urlPath) ? cache.get(urlPath)!.meta : emptyPageMeta);
-  const initialTitle = injected?.title ?? (urlPath && cache.has(urlPath) ? cache.get(urlPath)!.title : '');
+  const urlPath = slug ? normalizeCmsPath(`/practice-areas/${slug}/`) : "";
+  const preloaded = urlPath
+    ? getCmsPreloadedRouteData(urlPath)?.practiceAreaPage || null
+    : null;
+  const cached = urlPath ? cache.get(urlPath) : null;
+  const initialContent =
+    preloaded?.content || cached?.content || defaultPracticeAreaPageContent;
+  const initialMeta = preloaded?.meta || cached?.meta || emptyPageMeta;
+  const initialTitle = preloaded?.title || cached?.title || "";
 
-  // Seed Map cache
-  if (injected && urlPath && !cache.has(urlPath)) {
-    cache.set(urlPath, { content: initialContent, meta: initialMeta, title: initialTitle });
+  if (preloaded && urlPath && !cache.has(urlPath)) {
+    cache.set(urlPath, {
+      content: preloaded.content,
+      meta: preloaded.meta,
+      title: preloaded.title,
+    });
   }
 
   const [content, setContent] = useState<PracticeAreaPageContent>(initialContent);
   const [meta, setMeta] = useState<PageMeta>(initialMeta);
   const [title, setTitle] = useState(initialTitle);
-  const [isLoading, setIsLoading] = useState(!injected && !(urlPath && cache.has(urlPath)));
+  const [isLoading, setIsLoading] = useState(!preloaded && !cached);
   const [error, setError] = useState<Error | null>(null);
   const [notFound, setNotFound] = useState(false);
   const prevSlug = useRef(slug);
 
   useEffect(() => {
-    // Reset when slug changes
     if (prevSlug.current !== slug) {
       prevSlug.current = slug;
       setIsLoading(true);
@@ -64,17 +69,16 @@ export function usePracticeAreaPageContent(
     }
 
     let isMounted = true;
-    const urlPath = `/practice-areas/${slug}/`;
+    const nextUrlPath = normalizeCmsPath(`/practice-areas/${slug}/`);
 
     async function fetchContent() {
       try {
-        // Check cache
-        const cached = cache.get(urlPath);
-        if (cached) {
+        const cachedEntry = cache.get(nextUrlPath);
+        if (cachedEntry) {
           if (isMounted) {
-            setContent(cached.content);
-            setMeta(cached.meta);
-            setTitle(cached.title);
+            setContent(cachedEntry.content);
+            setMeta(cachedEntry.meta);
+            setTitle(cachedEntry.title);
             setIsLoading(false);
             setNotFound(false);
           }
@@ -82,7 +86,7 @@ export function usePracticeAreaPageContent(
         }
 
         const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/pages?url_path=eq.${encodeURIComponent(urlPath)}&status=eq.published&select=title,content,meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,schema_type,schema_data`,
+          `${SUPABASE_URL}/rest/v1/pages?url_path=eq.${encodeURIComponent(nextUrlPath)}&status=eq.published&select=title,content,meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,schema_type,schema_data`,
           {
             headers: {
               apikey: SUPABASE_ANON_KEY,
@@ -105,38 +109,13 @@ export function usePracticeAreaPageContent(
           return;
         }
 
-        const pageData = data[0];
-        const cmsContent = pageData.content as Partial<PracticeAreaPageContent>;
-        const mergedContent = mergeWithDefaults(
-          cmsContent,
-          defaultPracticeAreaPageContent,
-        );
-
-        const pageMeta: PageMeta = {
-          meta_title: pageData.meta_title,
-          meta_description: pageData.meta_description,
-          canonical_url: pageData.canonical_url,
-          og_title: pageData.og_title,
-          og_description: pageData.og_description,
-          og_image: pageData.og_image,
-          noindex: pageData.noindex,
-          schema_type: pageData.schema_type,
-          schema_data: pageData.schema_data,
-        };
-
-        const pageTitle = pageData.title || "";
-
-        // Cache
-        cache.set(urlPath, {
-          content: mergedContent,
-          meta: pageMeta,
-          title: pageTitle,
-        });
+        const resolved = resolvePracticeAreaPageData(data[0]);
+        cache.set(nextUrlPath, resolved);
 
         if (isMounted) {
-          setContent(mergedContent);
-          setMeta(pageMeta);
-          setTitle(pageTitle);
+          setContent(resolved.content);
+          setMeta(resolved.meta);
+          setTitle(resolved.title);
           setNotFound(false);
           setError(null);
         }
@@ -163,49 +142,10 @@ export function usePracticeAreaPageContent(
   return { content, meta, title, isLoading, error, notFound };
 }
 
-function mergeWithDefaults(
-  cms: Partial<PracticeAreaPageContent> | null | undefined,
-  defaults: PracticeAreaPageContent,
-): PracticeAreaPageContent {
-  if (!cms) return defaults;
-
-  return {
-    hero: { ...defaults.hero, ...cms.hero },
-    socialProof: {
-      ...defaults.socialProof,
-      ...cms.socialProof,
-      testimonials:
-        cms.socialProof?.testimonials?.length
-          ? cms.socialProof.testimonials
-          : defaults.socialProof.testimonials,
-      awards: {
-        ...defaults.socialProof.awards,
-        ...cms.socialProof?.awards,
-        logos:
-          cms.socialProof?.awards?.logos?.length
-            ? cms.socialProof.awards.logos
-            : defaults.socialProof.awards.logos,
-      },
-    },
-    contentSections:
-      cms.contentSections?.length
-        ? cms.contentSections
-        : defaults.contentSections,
-    faq: {
-      ...defaults.faq,
-      ...cms.faq,
-      items: cms.faq?.items?.length ? cms.faq.items : defaults.faq.items,
-    },
-    headingTags: cms.headingTags ?? defaults.headingTags,
-  };
-}
-
-/** Clear cache for a specific practice area or all practice areas */
 export function clearPracticeAreaPageCache(slug?: string) {
   if (slug) {
-    cache.delete(`/practice-areas/${slug}/`);
+    cache.delete(normalizeCmsPath(`/practice-areas/${slug}/`));
   } else {
-    // Clear all practice area caches
     for (const key of cache.keys()) {
       cache.delete(key);
     }

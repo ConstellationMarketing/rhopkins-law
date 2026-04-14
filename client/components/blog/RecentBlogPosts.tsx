@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import BlogPostCard from "@site/components/blog/BlogPostCard";
 import type { Post } from "@/lib/database.types";
 import type { RecentPostsData } from "@site/hooks/useBlogContent";
+import { getPublicEnv } from "@site/lib/runtimeEnv";
 
 interface PostWithCategory extends Post {
   post_categories: { name: string; slug: string } | null;
@@ -11,8 +12,8 @@ interface RecentBlogPostsProps {
   data: RecentPostsData;
 }
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = getPublicEnv("VITE_SUPABASE_URL");
+const SUPABASE_ANON_KEY = getPublicEnv("VITE_SUPABASE_ANON_KEY");
 
 export default function RecentBlogPosts({ data }: RecentBlogPostsProps) {
   const [posts, setPosts] = useState<PostWithCategory[]>([]);

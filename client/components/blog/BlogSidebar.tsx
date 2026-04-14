@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Phone, Calendar } from "lucide-react";
 import CallBox from "@site/components/shared/CallBox";
 import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
+import { getPublicEnv } from "@site/lib/runtimeEnv";
 
 interface AwardImage {
   src: string;
@@ -19,8 +20,8 @@ export default function BlogSidebar() {
   }, []);
 
   const fetchSidebarSettings = async () => {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseUrl = getPublicEnv("VITE_SUPABASE_URL");
+    const supabaseKey = getPublicEnv("VITE_SUPABASE_ANON_KEY");
 
     if (!supabaseUrl || !supabaseKey) return;
 

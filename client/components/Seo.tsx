@@ -1,9 +1,10 @@
-import { Helmet } from 'react-helmet-async';
+import { Helmet } from '@site/lib/helmet';
 import { useLocation } from 'react-router-dom';
 import { useMemo } from 'react';
 import { buildAllSchemas, type SchemaInput } from '@site/lib/schemaHelpers';
 import { useSiteSettings } from '@site/contexts/SiteSettingsContext';
 import { resolveSeo } from '@site/lib/seo';
+import { getPublicEnv } from '@site/lib/runtimeEnv';
 
 interface SeoProps {
   title?: string;
@@ -48,7 +49,7 @@ export default function Seo({
     fallbackTitle: typeof document !== 'undefined' ? document.title : '',
     siteSettings: {
       siteName: settings.siteName,
-      siteUrl: settings.siteUrl || import.meta.env.VITE_SITE_URL || '',
+      siteUrl: settings.siteUrl || getPublicEnv('VITE_SITE_URL') || '',
       siteNoindex: settings.siteNoindex,
     },
   });

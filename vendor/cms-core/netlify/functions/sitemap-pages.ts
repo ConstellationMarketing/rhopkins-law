@@ -1,4 +1,5 @@
 import type { Handler, HandlerEvent } from "@netlify/functions";
+import { getIndexablePageRoutes } from "../../../../client/lib/cms/publicRoutes";
 
 interface PageRow {
   url_path: string;
@@ -11,12 +12,10 @@ function escapeXml(str: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&apos;");
 }
 
-// Serves /sitemap-pages.xml — all published, indexable CMS pages.
-// CMS database is the single source of truth; no hardcoded routes.
 export const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== "GET") {
     return { statusCode: 405, body: "Method Not Allowed" };
@@ -25,8 +24,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
   const siteUrl = (
-    process.env.URL ||
-    `https://${event.headers.host || "localhost"}`
+    process.env.URL || `https://${event.headers.host || "localhost"}`
   ).replace(/\/+$/, "");
 
   try {
@@ -49,17 +47,13 @@ export const handler: Handler = async (event: HandlerEvent) => {
     }
 
     const pages: PageRow[] = await response.json();
-
-    const urlEntries = pages
-      .filter((p) => !p.noindex && !p.url_path.startsWith("/admin"))
-      .map((p) => {
-        const pagePath = p.url_path === '/' ? '/' : p.url_path.replace(/\/?$/, '/');
-        const loc = escapeXml(`${siteUrl}${pagePath}`);
-        const lastmod = p.updated_at
-          ? `\n    <lastmod>${new Date(p.updated_at).toISOString().split("T")[0]}</lastmod>`
-          : "";
-        return `  <url>\n    <loc>${loc}</loc>${lastmod}\n  </url>`;
-      });
+    const urlEntries = getIndexablePageRoutes(pages).map((page) => {
+      const loc = escapeXml(`${siteUrl}${page.url_path}`);
+      const lastmod = page.updated_at
+        ? `\n    <lastmod>${new Date(page.updated_at).toISOString().split("T")[0]}</lastmod>`
+        : "";
+      return `  <url>\n    <loc>${loc}</loc>${lastmod}\n  </url>`;
+    });
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

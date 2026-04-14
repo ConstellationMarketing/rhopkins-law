@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import type { CmsForm } from "../lib/cms/formTypes";
+import { getPublicEnv } from "../lib/runtimeEnv";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = getPublicEnv("VITE_SUPABASE_URL");
+const SUPABASE_ANON_KEY = getPublicEnv("VITE_SUPABASE_ANON_KEY");
 
 // Module-level caches
 const formCache = new Map<string, CmsForm>();

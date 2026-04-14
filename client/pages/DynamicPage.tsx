@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Layout from "@site/components/layout/Layout";
 import Seo from "@site/components/Seo";
@@ -6,10 +6,13 @@ import BlockRenderer from "@site/components/BlockRenderer";
 import NotFound from "./NotFound";
 import type { PageMeta } from "@site/lib/cms/pageMeta";
 import { emptyPageMeta } from "@site/lib/cms/pageMeta";
-import { consumePageData } from "@site/lib/pageDataInjection";
+import { getCmsPreloadedRouteData } from "@site/lib/cms/preloadedState";
+import { normalizeCmsPath } from "@site/lib/cms/publicRoutes";
+import { resolveDynamicPageData } from "@site/lib/cms/sharedPageData";
+import { getPublicEnv } from "@site/lib/runtimeEnv";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = getPublicEnv("VITE_SUPABASE_URL");
+const SUPABASE_ANON_KEY = getPublicEnv("VITE_SUPABASE_ANON_KEY");
 
 interface CmsPage {
   title: string;
@@ -17,30 +20,19 @@ interface CmsPage {
   meta: PageMeta;
 }
 
-/** In-memory cache keyed by url_path */
 const pageCache = new Map<string, CmsPage>();
 
 export default function DynamicPage() {
   const { pathname } = useLocation();
+  const queryPath = normalizeCmsPath(pathname);
+  const preloaded = getCmsPreloadedRouteData(queryPath)?.dynamicPage ?? null;
 
-  // Consume SSG-injected data synchronously before first render
-  const injected = consumePageData(pathname);
-  const initialPage = injected ? {
-    title: injected.title || '',
-    content: injected.content,
-    meta: injected.meta ?? emptyPageMeta,
-  } as CmsPage : null;
-
-  // Seed cache so useEffect fetch skips
-  if (initialPage) {
-    const queryPath = pathname === '/' ? '/' : pathname.endsWith('/') ? pathname : pathname + '/';
-    if (!pageCache.has(queryPath)) {
-      pageCache.set(queryPath, initialPage);
-    }
+  if (preloaded && !pageCache.has(queryPath)) {
+    pageCache.set(queryPath, preloaded);
   }
 
-  const [page, setPage] = useState<CmsPage | null>(initialPage);
-  const [isLoading, setIsLoading] = useState(!initialPage);
+  const [page, setPage] = useState<CmsPage | null>(preloaded || pageCache.get(queryPath) || null);
+  const [isLoading, setIsLoading] = useState(!preloaded && !pageCache.has(queryPath));
   const [notFound, setNotFound] = useState(false);
   const prevPath = useRef(pathname);
 
@@ -55,12 +47,6 @@ export default function DynamicPage() {
     let isMounted = true;
 
     async function fetchPage() {
-      // Ensure trailing slash so DB query matches stored url_path values (e.g. /about/)
-      // The root "/" is kept as-is.
-      const queryPath =
-        pathname === '/' ? '/' : pathname.endsWith('/') ? pathname : pathname + '/';
-
-      // Check cache first (keyed on normalised path)
       const cached = pageCache.get(queryPath);
       if (cached) {
         if (isMounted) {
@@ -96,23 +82,7 @@ export default function DynamicPage() {
           return;
         }
 
-        const row = data[0];
-        const cmsPage: CmsPage = {
-          title: row.title || "",
-          content: row.content,
-          meta: {
-            meta_title: row.meta_title,
-            meta_description: row.meta_description,
-            canonical_url: row.canonical_url,
-            og_title: row.og_title,
-            og_description: row.og_description,
-            og_image: row.og_image,
-            noindex: row.noindex,
-            schema_type: row.schema_type,
-            schema_data: row.schema_data,
-          },
-        };
-
+        const cmsPage = resolveDynamicPageData(data[0]);
         pageCache.set(queryPath, cmsPage);
 
         if (isMounted) {
@@ -136,9 +106,8 @@ export default function DynamicPage() {
     return () => {
       isMounted = false;
     };
-  }, [pathname]);
+  }, [pathname, queryPath]);
 
-  // Loading state
   if (isLoading) {
     return (
       <Layout>
@@ -149,7 +118,6 @@ export default function DynamicPage() {
     );
   }
 
-  // Not found
   if (notFound || !page) {
     return <NotFound />;
   }

@@ -1,4 +1,8 @@
 import type { Handler, HandlerEvent } from "@netlify/functions";
+import {
+  buildBlogPostPath,
+  getIndexablePostRoutes,
+} from "../../../../client/lib/cms/publicRoutes";
 
 interface PostRow {
   slug: string;
@@ -11,12 +15,10 @@ function escapeXml(str: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&apos;");
 }
 
-// Serves /sitemap-posts.xml — all published, indexable blog posts.
-// CMS database is the single source of truth; posts route is /blog/{slug}.
 export const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== "GET") {
     return { statusCode: 405, body: "Method Not Allowed" };
@@ -25,8 +27,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
   const siteUrl = (
-    process.env.URL ||
-    `https://${event.headers.host || "localhost"}`
+    process.env.URL || `https://${event.headers.host || "localhost"}`
   ).replace(/\/+$/, "");
 
   try {
@@ -49,17 +50,13 @@ export const handler: Handler = async (event: HandlerEvent) => {
     }
 
     const posts: PostRow[] = await response.json();
-
-    const urlEntries = posts
-      .filter((p) => !p.noindex)
-      .map((p) => {
-        const slug = p.slug.replace(/^\/+|\/+$/g, "");
-        const loc = escapeXml(`${siteUrl}/blog/${slug}/`);
-        const lastmod = p.updated_at
-          ? `\n    <lastmod>${new Date(p.updated_at).toISOString().split("T")[0]}</lastmod>`
-          : "";
-        return `  <url>\n    <loc>${loc}</loc>${lastmod}\n  </url>`;
-      });
+    const urlEntries = getIndexablePostRoutes(posts).map((post) => {
+      const loc = escapeXml(`${siteUrl}${buildBlogPostPath(post.normalized_slug)}`);
+      const lastmod = post.updated_at
+        ? `\n    <lastmod>${new Date(post.updated_at).toISOString().split("T")[0]}</lastmod>`
+        : "";
+      return `  <url>\n    <loc>${loc}</loc>${lastmod}\n  </url>`;
+    });
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

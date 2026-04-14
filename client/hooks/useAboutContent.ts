@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { AboutPageContent } from "../lib/cms/aboutPageTypes";
 import { defaultAboutContent } from "../lib/cms/aboutPageTypes";
 import type { PageMeta } from "../lib/cms/pageMeta";
 import { emptyPageMeta } from "../lib/cms/pageMeta";
-import { consumePageData } from '../lib/pageDataInjection';
+import { getCmsPreloadedRouteData } from "../lib/cms/preloadedState";
+import { getPublicEnv } from "../lib/runtimeEnv";
+import { resolveAboutPageData } from "../lib/cms/sharedPageData";
 
-// Supabase configuration - use environment variables
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = getPublicEnv("VITE_SUPABASE_URL");
+const SUPABASE_ANON_KEY = getPublicEnv("VITE_SUPABASE_ANON_KEY");
 
 interface UseAboutContentResult {
   content: AboutPageContent;
@@ -16,26 +17,22 @@ interface UseAboutContentResult {
   error: Error | null;
 }
 
-// Cache for about content
 let cachedContent: AboutPageContent | null = null;
 let cachedMeta: PageMeta | null = null;
 
 export function useAboutContent(): UseAboutContentResult {
-  // Consume SSG-injected data synchronously before first render
-  const injected = consumePageData('/about/');
-  const initialContent = injected
-    ? mergeWithDefaults(injected.content as Partial<AboutPageContent>, defaultAboutContent)
-    : (cachedContent ?? defaultAboutContent);
-  const initialMeta = injected?.meta ?? (cachedMeta ?? emptyPageMeta);
+  const preloaded = getCmsPreloadedRouteData("/about/")?.about ?? null;
+  const initialContent = preloaded?.content || cachedContent || defaultAboutContent;
+  const initialMeta = preloaded?.meta || cachedMeta || emptyPageMeta;
 
-  if (injected && !cachedContent) {
-    cachedContent = initialContent;
-    cachedMeta = initialMeta;
+  if (preloaded && !cachedContent) {
+    cachedContent = preloaded.content;
+    cachedMeta = preloaded.meta;
   }
 
   const [content, setContent] = useState<AboutPageContent>(initialContent);
   const [meta, setMeta] = useState<PageMeta>(initialMeta);
-  const [isLoading, setIsLoading] = useState(!injected && !cachedContent);
+  const [isLoading, setIsLoading] = useState(!preloaded && !cachedContent);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
@@ -43,7 +40,6 @@ export function useAboutContent(): UseAboutContentResult {
 
     async function fetchAboutContent() {
       try {
-        // Return cached content if available
         if (cachedContent) {
           if (isMounted) {
             setContent(cachedContent);
@@ -53,7 +49,6 @@ export function useAboutContent(): UseAboutContentResult {
           return;
         }
 
-        // Fetch about page from pages table
         const response = await fetch(
           `${SUPABASE_URL}/rest/v1/pages?url_path=eq./about/&status=eq.published&select=content,meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,schema_type,schema_data`,
           {
@@ -71,7 +66,6 @@ export function useAboutContent(): UseAboutContentResult {
         const data = await response.json();
 
         if (!Array.isArray(data) || data.length === 0) {
-          // No CMS content, use defaults
           if (isMounted) {
             setContent(defaultAboutContent);
             setIsLoading(false);
@@ -79,41 +73,19 @@ export function useAboutContent(): UseAboutContentResult {
           return;
         }
 
-        const pageData = data[0];
-        const cmsContent = pageData.content as AboutPageContent;
-
-        // Merge CMS content with defaults (CMS content takes precedence)
-        const mergedContent = mergeWithDefaults(
-          cmsContent,
-          defaultAboutContent,
-        );
-
-        const pageMeta: PageMeta = {
-          meta_title: pageData.meta_title,
-          meta_description: pageData.meta_description,
-          canonical_url: pageData.canonical_url,
-          og_title: pageData.og_title,
-          og_description: pageData.og_description,
-          og_image: pageData.og_image,
-          noindex: pageData.noindex,
-          schema_type: pageData.schema_type,
-          schema_data: pageData.schema_data,
-        };
-
-        // Cache the result
-        cachedContent = mergedContent;
-        cachedMeta = pageMeta;
+        const resolved = resolveAboutPageData(data[0]);
+        cachedContent = resolved.content;
+        cachedMeta = resolved.meta;
 
         if (isMounted) {
-          setContent(mergedContent);
-          setMeta(pageMeta);
+          setContent(resolved.content);
+          setMeta(resolved.meta);
           setError(null);
         }
       } catch (err) {
         console.error("[useAboutContent] Error:", err);
         if (isMounted) {
           setError(err instanceof Error ? err : new Error("Unknown error"));
-          // Fall back to defaults on error
           setContent(defaultAboutContent);
         }
       } finally {
@@ -133,70 +105,6 @@ export function useAboutContent(): UseAboutContentResult {
   return { content, meta, isLoading, error };
 }
 
-// Deep merge CMS content with defaults
-function mergeWithDefaults(
-  cmsContent: Partial<AboutPageContent> | null | undefined,
-  defaults: AboutPageContent,
-): AboutPageContent {
-  if (!cmsContent) return defaults;
-
-  return {
-    hero: { ...defaults.hero, ...cmsContent.hero },
-    about: {
-      ...defaults.about,
-      ...cmsContent.about,
-      features: cmsContent.about?.features?.length
-        ? cmsContent.about.features
-        : defaults.about.features,
-      stats: cmsContent.about?.stats?.length
-        ? cmsContent.about.stats
-        : defaults.about.stats,
-    },
-    attorneySpotlight: {
-      ...defaults.attorneySpotlight,
-      ...cmsContent.attorneySpotlight,
-    },
-    team: {
-      ...defaults.team,
-      ...cmsContent.team,
-      members: cmsContent.team?.members?.length
-        ? cmsContent.team.members
-        : defaults.team.members,
-    },
-    values: {
-      ...defaults.values,
-      ...cmsContent.values,
-      items: cmsContent.values?.items?.length
-        ? cmsContent.values.items
-        : defaults.values.items,
-    },
-    stats: {
-      ...defaults.stats,
-      ...cmsContent.stats,
-      stats: cmsContent.stats?.stats?.length
-        ? cmsContent.stats.stats
-        : defaults.stats.stats,
-    },
-    whyChooseUs: {
-      ...defaults.whyChooseUs,
-      ...cmsContent.whyChooseUs,
-    },
-    cta: {
-      ...defaults.cta,
-      ...cmsContent.cta,
-      primaryButton: {
-        ...defaults.cta.primaryButton,
-        ...cmsContent.cta?.primaryButton,
-      },
-      secondaryButton: {
-        ...defaults.cta.secondaryButton,
-        ...cmsContent.cta?.secondaryButton,
-      },
-    },
-  };
-}
-
-// Helper to clear cache (useful after admin edits)
 export function clearAboutContentCache() {
   cachedContent = null;
   cachedMeta = null;

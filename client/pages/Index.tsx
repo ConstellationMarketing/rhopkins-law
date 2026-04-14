@@ -16,7 +16,7 @@ import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
 import { Phone, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@site/lib/helmet";
 
 const deferredSectionStyle = {
   contentVisibility: "auto" as const,
