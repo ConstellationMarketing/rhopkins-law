@@ -20,6 +20,13 @@ interface NavDropdownLinkProps {
   tabIndex?: number;
 }
 
+interface NestedDropdownItemProps {
+  item: NavDropdownItem;
+  parentOpen: boolean;
+  onNavigate: () => void;
+  level?: number;
+}
+
 function NavDropdownLink({ item, className, onClick, tabIndex }: NavDropdownLinkProps) {
   return (
     <Link
@@ -39,21 +46,15 @@ function NestedDropdownItem({
   item,
   parentOpen,
   onNavigate,
-}: {
-  item: NavDropdownItem;
-  parentOpen: boolean;
-  onNavigate: () => void;
-}) {
+  level = 0,
+}: NestedDropdownItemProps) {
   const [open, setOpen] = useState(false);
   const hasChildren = Boolean(item.children?.length);
+  const indentClass = level === 0 ? "" : level === 1 ? "pl-4" : "pl-8";
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <div className="flex items-stretch">
+    <div>
+      <div className={`flex items-stretch ${indentClass}`}>
         <NavDropdownLink
           item={item}
           className="flex-1 px-5 py-2.5 font-outfit text-[16px] text-white/90 hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap"
@@ -72,25 +73,22 @@ function NestedDropdownItem({
               setOpen((current) => !current);
             }}
           >
-            <ChevronRight className={`w-4 h-4 transition-transform ${open ? "scale-110" : ""}`} />
+            <ChevronRight
+              className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-90" : ""}`}
+            />
           </button>
         )}
       </div>
 
-      {hasChildren && (
-        <div
-          className={`absolute left-full top-0 ml-1 min-w-[220px] bg-brand-card border border-brand-border rounded-md shadow-xl z-[60] py-2 transition-all duration-200 ${
-            open
-              ? "visible opacity-100 pointer-events-auto"
-              : "invisible opacity-0 pointer-events-none"
-          }`}
-        >
+      {hasChildren && open && (
+        <div className="pb-1">
           {item.children!.map((child, index) => (
             <NestedDropdownItem
               key={`${child.href}-${index}`}
               item={child}
-              parentOpen={open}
+              parentOpen={parentOpen}
               onNavigate={onNavigate}
+              level={level + 1}
             />
           ))}
         </div>
@@ -154,7 +152,7 @@ export default function NavDropdown({ item }: NavDropdownProps) {
       </button>
 
       <div
-        className={`absolute top-full left-0 mt-2 min-w-[220px] bg-brand-card border border-brand-border rounded-md shadow-xl z-50 py-2 transition-all duration-200 ${
+        className={`absolute top-full left-0 mt-2 min-w-[240px] bg-brand-card border border-brand-border rounded-md shadow-xl z-50 py-2 transition-all duration-200 ${
           open
             ? "visible opacity-100 pointer-events-auto"
             : "invisible opacity-0 pointer-events-none"
