@@ -53,7 +53,8 @@ type SectionProps = { content: PracticeAreaPageContent; update: Updater };
 
 function useHeadingTag(content: PracticeAreaPageContent, update: Updater) {
   return {
-    get: (key: string) => content.headingTags?.[key] ?? "h2",
+    get: (key: string) =>
+      content.headingTags?.[key] ?? (key === "hero.sectionLabel" ? "h1" : "h2"),
     set: (key: string, tag: string) =>
       update("headingTags", { ...content.headingTags, [key]: tag }),
   };

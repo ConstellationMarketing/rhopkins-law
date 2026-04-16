@@ -2,7 +2,6 @@ import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
 import type { Database } from "../client/lib/database.types";
-import { defaultPracticeAreaPageContent } from "../../../client/lib/cms/practiceAreaPageTypes";
 import {
   buildBlogPostPath,
   getPublicPageRoutes,
@@ -67,64 +66,8 @@ interface Redirect {
   status_code: number;
 }
 
-async function ensurePracticeAreaPage() {
-  if (!supabaseServiceRoleKey) {
-    console.log("[ensurePracticeAreaPage] No service role key — skipping.");
-    return;
-  }
-
-  const practiceAreaUrl = "/practice-areas/practice-area/";
-
-  const { data: existing, error: checkError } = await supabase
-    .from("pages")
-    .select("id")
-    .eq("url_path", practiceAreaUrl)
-    .maybeSingle();
-
-  if (checkError) {
-    console.error(
-      "[ensurePracticeAreaPage] Error checking for page:",
-      checkError.message,
-    );
-    return;
-  }
-
-  if (existing) {
-    console.log(
-      `[ensurePracticeAreaPage] Page ${practiceAreaUrl} already exists (id=${existing.id}). Nothing to do.`,
-    );
-    return;
-  }
-
-  const { data: inserted, error: insertError } = await supabase
-    .from("pages")
-    .insert({
-      title: "Practice Area",
-      url_path: practiceAreaUrl,
-      page_type: "practice",
-      status: "published",
-      content: defaultPracticeAreaPageContent as unknown as Record<string, unknown>,
-    })
-    .select("id")
-    .single();
-
-  if (insertError || !inserted) {
-    console.error(
-      "[ensurePracticeAreaPage] Failed to insert page:",
-      insertError?.message ?? "unknown error",
-    );
-    return;
-  }
-
-  console.log(
-    `[ensurePracticeAreaPage] Restored ${practiceAreaUrl} (id=${inserted.id}) with default content.`,
-  );
-}
-
 async function generateSSG() {
   console.log("Starting SSG generation...");
-
-  await ensurePracticeAreaPage();
 
   const { data: siteSettingsData } = await supabase
     .from("site_settings")
