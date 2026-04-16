@@ -1,16 +1,101 @@
-import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface NavDropdownItem {
   label: string;
   href: string;
   openInNewTab?: boolean;
-  children?: { label: string; href: string; openInNewTab?: boolean }[];
+  children?: NavDropdownItem[];
 }
 
 interface NavDropdownProps {
   item: NavDropdownItem;
+}
+
+interface NavDropdownLinkProps {
+  item: NavDropdownItem;
+  className: string;
+  onClick?: () => void;
+  tabIndex?: number;
+}
+
+function NavDropdownLink({ item, className, onClick, tabIndex }: NavDropdownLinkProps) {
+  return (
+    <Link
+      to={item.href}
+      target={item.openInNewTab ? "_blank" : undefined}
+      rel={item.openInNewTab ? "noopener noreferrer" : undefined}
+      className={className}
+      onClick={onClick}
+      tabIndex={tabIndex}
+    >
+      {item.label}
+    </Link>
+  );
+}
+
+function NestedDropdownItem({
+  item,
+  parentOpen,
+  onNavigate,
+}: {
+  item: NavDropdownItem;
+  parentOpen: boolean;
+  onNavigate: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const hasChildren = Boolean(item.children?.length);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <div className="flex items-stretch">
+        <NavDropdownLink
+          item={item}
+          className="flex-1 px-5 py-2.5 font-outfit text-[16px] text-white/90 hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap"
+          tabIndex={parentOpen ? 0 : -1}
+          onClick={onNavigate}
+        />
+        {hasChildren && (
+          <button
+            type="button"
+            className="px-3 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+            aria-label={open ? "Collapse submenu" : "Expand submenu"}
+            tabIndex={parentOpen ? 0 : -1}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setOpen((current) => !current);
+            }}
+          >
+            <ChevronRight className={`w-4 h-4 transition-transform ${open ? "scale-110" : ""}`} />
+          </button>
+        )}
+      </div>
+
+      {hasChildren && (
+        <div
+          className={`absolute left-full top-0 ml-1 min-w-[220px] bg-brand-card border border-brand-border rounded-md shadow-xl z-[60] py-2 transition-all duration-200 ${
+            open
+              ? "visible opacity-100 pointer-events-auto"
+              : "invisible opacity-0 pointer-events-none"
+          }`}
+        >
+          {item.children!.map((child, index) => (
+            <NestedDropdownItem
+              key={`${child.href}-${index}`}
+              item={child}
+              parentOpen={open}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function NavDropdown({ item }: NavDropdownProps) {
@@ -27,16 +112,16 @@ export default function NavDropdown({ item }: NavDropdownProps) {
     timeoutRef.current = setTimeout(() => setOpen(false), 150);
   };
 
-  // Close on outside click (safety net)
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
+    const handler = (event: MouseEvent) => {
       if (
         containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
+        !containerRef.current.contains(event.target as Node)
       ) {
         setOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -48,35 +133,39 @@ export default function NavDropdown({ item }: NavDropdownProps) {
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <Link
-        to={item.href}
-        className="font-outfit text-[20px] text-white py-[31px] mr-[20px] whitespace-nowrap hover:opacity-80 transition-opacity duration-400 inline-flex items-center gap-1"
+      <NavDropdownLink
+        item={item}
+        className="font-outfit text-[16px] text-white py-[4px] whitespace-nowrap hover:opacity-80 transition-opacity duration-400"
+      />
+      <button
+        type="button"
+        className="ml-1 text-white hover:opacity-80 transition-opacity duration-400"
+        aria-label={open ? "Collapse submenu" : "Expand submenu"}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen((current) => !current);
+        }}
       >
-        {item.label}
         <ChevronDown
           className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
-      </Link>
+      </button>
 
       <div
-        className={`absolute top-full left-0 mt-0 min-w-[220px] bg-brand-card border border-brand-border rounded-md shadow-xl z-50 py-2 transition-all duration-200 ${
+        className={`absolute top-full left-0 mt-2 min-w-[220px] bg-brand-card border border-brand-border rounded-md shadow-xl z-50 py-2 transition-all duration-200 ${
           open
             ? "visible opacity-100 pointer-events-auto"
             : "invisible opacity-0 pointer-events-none"
         }`}
       >
-        {item.children!.map((child, idx) => (
-          <Link
-            key={idx}
-            to={child.href}
-            target={child.openInNewTab ? "_blank" : undefined}
-            rel={child.openInNewTab ? "noopener noreferrer" : undefined}
-            className="block px-5 py-2.5 font-outfit text-[16px] text-white/90 hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap"
-            tabIndex={open ? 0 : -1}
-            onClick={() => setOpen(false)}
-          >
-            {child.label}
-          </Link>
+        {item.children!.map((child, index) => (
+          <NestedDropdownItem
+            key={`${child.href}-${index}`}
+            item={child}
+            parentOpen={open}
+            onNavigate={() => setOpen(false)}
+          />
         ))}
       </div>
     </div>

@@ -469,7 +469,7 @@ export default function AdminSiteSettings() {
             <CardHeader>
               <CardTitle>Navigation Menu</CardTitle>
               <CardDescription>
-                Links displayed in the header navigation bar
+                Links displayed in the header navigation bar. Parent items can be clickable and also include child and grandchild dropdown items.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -1120,14 +1120,31 @@ function GlobalSchemaValidator({ json }: { json: string }) {
 function NavigationChildrenEditor({
   navChildren,
   onChange,
+  level = 1,
 }: {
   navChildren: NavigationChildItem[];
   onChange: (children: NavigationChildItem[]) => void;
+  level?: number;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(navChildren.length > 0);
+
+  const itemLabel =
+    level === 1 ? "Child" : level === 2 ? "Grandchild" : "Nested";
+  const summaryLabel = `${itemLabel} Items`;
+  const addLabel =
+    level === 1
+      ? "Add Child Item"
+      : level === 2
+        ? "Add Grandchild Item"
+        : "Add Nested Item";
+  const indentClass = level === 1 ? "ml-8" : "ml-4";
 
   const addChild = () => {
-    onChange([...navChildren, { label: "", href: "", openInNewTab: false }]);
+    setOpen(true);
+    onChange([
+      ...navChildren,
+      { label: "", href: "", openInNewTab: false, children: [] },
+    ]);
   };
 
   const updateChild = (index: number, updates: Partial<NavigationChildItem>) => {
@@ -1145,47 +1162,54 @@ function NavigationChildrenEditor({
       <CollapsibleTrigger asChild>
         <button
           type="button"
-          className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 ml-8"
+          className={`flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 ${indentClass}`}
         >
           <ChevronDown
             className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`}
           />
-          Dropdown Items ({navChildren.length})
+          {summaryLabel} ({navChildren.length})
         </button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="ml-8 mt-2 space-y-2 border-l-2 border-blue-200 pl-4">
+        <div className={`${indentClass} mt-2 space-y-2 border-l-2 border-blue-200 pl-4`}>
           {navChildren.map((child, idx) => (
-            <div key={idx} className="flex items-center gap-2">
-              <Input
-                value={child.label}
-                onChange={(e) => updateChild(idx, { label: e.target.value })}
-                placeholder="Label"
-                className="flex-1"
-              />
-              <Input
-                value={child.href}
-                onChange={(e) => updateChild(idx, { href: e.target.value })}
-                placeholder="/page-url"
-                className="flex-1"
-              />
-              <div className="flex items-center gap-1">
-                <Switch
-                  checked={child.openInNewTab || false}
-                  onCheckedChange={(checked) =>
-                    updateChild(idx, { openInNewTab: checked })
-                  }
+            <div key={idx} className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Input
+                  value={child.label}
+                  onChange={(e) => updateChild(idx, { label: e.target.value })}
+                  placeholder="Label"
+                  className="flex-1"
                 />
-                <span className="text-xs text-gray-500">New tab</span>
+                <Input
+                  value={child.href}
+                  onChange={(e) => updateChild(idx, { href: e.target.value })}
+                  placeholder="/page-url"
+                  className="flex-1"
+                />
+                <div className="flex items-center gap-1">
+                  <Switch
+                    checked={child.openInNewTab || false}
+                    onCheckedChange={(checked) =>
+                      updateChild(idx, { openInNewTab: checked })
+                    }
+                  />
+                  <span className="text-xs text-gray-500">New tab</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeChild(idx)}
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeChild(idx)}
-                className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
+              <NavigationChildrenEditor
+                navChildren={child.children || []}
+                onChange={(children) => updateChild(idx, { children })}
+                level={level + 1}
+              />
             </div>
           ))}
           <Button
@@ -1195,7 +1219,7 @@ function NavigationChildrenEditor({
             className="w-full"
           >
             <Plus className="h-3 w-3 mr-1" />
-            Add Sub-Item
+            {addLabel}
           </Button>
         </div>
       </CollapsibleContent>

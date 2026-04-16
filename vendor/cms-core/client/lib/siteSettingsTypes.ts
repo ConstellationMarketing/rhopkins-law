@@ -4,6 +4,7 @@ export interface NavigationChildItem {
   label: string;
   href: string;
   openInNewTab?: boolean;
+  children?: NavigationChildItem[];
 }
 
 export interface NavigationItem {

@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
 
+export interface NavigationMenuItem {
+  label: string;
+  href: string;
+  openInNewTab?: boolean;
+  children?: NavigationMenuItem[];
+}
+
 export interface SiteSettings {
   siteName: string;
   logoUrl: string;
@@ -11,13 +18,7 @@ export interface SiteSettings {
   headerCtaText: string;
   headerCtaUrl: string;
   headerServiceText: string;
-  navigationItems: {
-    label: string;
-    href: string;
-    order?: number;
-    openInNewTab?: boolean;
-    children?: { label: string; href: string; openInNewTab?: boolean }[];
-  }[];
+  navigationItems: (NavigationMenuItem & { order?: number })[];
   footerAboutLinks: { label: string; href?: string }[];
   footerPracticeLinks: { label: string; href?: string }[];
   footerAboutLabel: string;

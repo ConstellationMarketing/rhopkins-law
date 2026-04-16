@@ -195,18 +195,23 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
 
 /* ── Mobile nav item with collapsible children ── */
 
-interface MobileNavItemProps {
-  item: {
-    label: string;
-    href: string;
-    openInNewTab?: boolean;
-    children?: { label: string; href: string; openInNewTab?: boolean }[];
-  };
-  hasChildren?: boolean;
+interface MobileNavNode {
+  label: string;
+  href: string;
+  openInNewTab?: boolean;
+  children?: MobileNavNode[];
 }
 
-function MobileNavItem({ item, hasChildren }: MobileNavItemProps) {
+interface MobileNavItemProps {
+  item: MobileNavNode;
+  hasChildren?: boolean;
+  depth?: number;
+}
+
+function MobileNavItem({ item, hasChildren, depth = 0 }: MobileNavItemProps) {
   const [expanded, setExpanded] = useState(false);
+  const paddingLeft = depth === 0 ? "px-[5%]" : depth === 1 ? "pl-[10%] pr-[5%]" : "pl-[15%] pr-[5%]";
+  const textClass = depth === 0 ? "text-[20px] text-white" : depth === 1 ? "text-[17px] text-white/80" : "text-[15px] text-white/70";
 
   if (!hasChildren) {
     return (
@@ -214,7 +219,7 @@ function MobileNavItem({ item, hasChildren }: MobileNavItemProps) {
         to={item.href}
         target={item.openInNewTab ? "_blank" : undefined}
         rel={item.openInNewTab ? "noopener noreferrer" : undefined}
-        className="font-outfit text-[20px] text-white py-[10px] px-[5%] border-b border-black/5 hover:opacity-80 transition-opacity"
+        className={`block font-outfit py-[10px] ${paddingLeft} ${textClass} border-b border-black/5 hover:opacity-80 transition-opacity`}
       >
         {item.label}
       </Link>
@@ -226,7 +231,9 @@ function MobileNavItem({ item, hasChildren }: MobileNavItemProps) {
       <div className="flex items-center border-b border-black/5">
         <Link
           to={item.href}
-          className="font-outfit text-[20px] text-white py-[10px] px-[5%] hover:opacity-80 transition-opacity flex-1"
+          target={item.openInNewTab ? "_blank" : undefined}
+          rel={item.openInNewTab ? "noopener noreferrer" : undefined}
+          className={`font-outfit py-[10px] ${paddingLeft} ${textClass} hover:opacity-80 transition-opacity flex-1`}
         >
           {item.label}
         </Link>
@@ -241,17 +248,14 @@ function MobileNavItem({ item, hasChildren }: MobileNavItemProps) {
           />
         </button>
       </div>
-      <div className={`pl-[10%] py-1 ${expanded ? "block" : "hidden"}`}>
+      <div className={`${expanded ? "block" : "hidden"}`}>
         {item.children!.map((child, idx) => (
-          <Link
-            key={idx}
-            to={child.href}
-            target={child.openInNewTab ? "_blank" : undefined}
-            rel={child.openInNewTab ? "noopener noreferrer" : undefined}
-            className="block font-outfit text-[17px] text-white/80 py-[8px] hover:text-white transition-colors"
-          >
-            {child.label}
-          </Link>
+          <MobileNavItem
+            key={`${child.href}-${idx}`}
+            item={child}
+            hasChildren={Boolean(child.children?.length)}
+            depth={depth + 1}
+          />
         ))}
       </div>
     </div>
