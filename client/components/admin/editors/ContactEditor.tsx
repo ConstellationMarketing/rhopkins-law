@@ -64,8 +64,12 @@ function HeroSection({ content, update }: SectionProps) {
         <ImageField
           label="Hero Image"
           value={hero.heroImage || ""}
-          onChange={(v) => set({ heroImage: v })}
-          onAltAutoFill={(altText) => set({ heroImageAlt: altText })}
+          onChange={(v, details) =>
+            set({
+              heroImage: v,
+              heroImageAlt: details?.altText || hero.heroImageAlt,
+            })
+          }
         />
         <div>
           <Label>Hero Image Alt Text</Label>

@@ -71,8 +71,12 @@ function HeroSection({ content, update }: SectionProps) {
         <ImageField
           label="Hero Image"
           value={hero.heroImage}
-          onChange={(v) => set({ heroImage: v })}
-          onAltAutoFill={(altText) => set({ heroImageAlt: altText })}
+          onChange={(v, details) =>
+            set({
+              heroImage: v,
+              heroImageAlt: details?.altText || hero.heroImageAlt,
+            })
+          }
         />
         <div>
           <Label>Hero Image Alt Text</Label>
@@ -101,8 +105,9 @@ function PartnerLogosSection({ content, update }: SectionProps) {
             <ImageField
               label="Logo Image"
               value={item.src}
-              onChange={(url) => upd({ ...item, src: url })}
-              onAltAutoFill={(altText) => upd({ ...item, alt: altText })}
+              onChange={(url, details) =>
+                upd({ ...item, src: url, alt: details?.altText || item.alt })
+              }
               folder="logos"
             />
             <div>
@@ -159,8 +164,12 @@ function AboutSectionEditor({ content, update }: SectionProps) {
         <ImageField
           label="Attorney Image"
           value={about.attorneyImage}
-          onChange={(url) => set({ attorneyImage: url })}
-          onAltAutoFill={(altText) => set({ attorneyImageAlt: altText })}
+          onChange={(url, details) =>
+            set({
+              attorneyImage: url,
+              attorneyImageAlt: details?.altText || about.attorneyImageAlt,
+            })
+          }
           folder="team"
         />
         <div>
@@ -222,8 +231,9 @@ function AttorneySpotlightEditor({ content, update }: SectionProps) {
         <ImageField
           label="Attorney Image"
           value={s.image}
-          onChange={(url) => set({ image: url })}
-          onAltAutoFill={(altText) => set({ imageAlt: altText })}
+          onChange={(url, details) =>
+            set({ image: url, imageAlt: details?.altText || s.imageAlt })
+          }
           folder="team"
         />
         <div>
@@ -324,8 +334,9 @@ function PracticeAreasItemsSection({ content, update }: SectionProps) {
             <ImageField
               label="Image"
               value={item.image}
-              onChange={(url) => upd({ ...item, image: url })}
-              onAltAutoFill={(altText) => upd({ ...item, imageAlt: altText })}
+              onChange={(url, details) =>
+                upd({ ...item, image: url, imageAlt: details?.altText || item.imageAlt })
+              }
               folder="practice-areas"
             />
             <div>
@@ -375,8 +386,9 @@ function AwardsSection({ content, update }: SectionProps) {
               <ImageField
                 label="Logo Image"
                 value={item.src}
-                onChange={(url) => upd({ ...item, src: url })}
-                onAltAutoFill={(altText) => upd({ ...item, alt: altText })}
+                onChange={(url, details) =>
+                  upd({ ...item, src: url, alt: details?.altText || item.alt })
+                }
                 folder="awards"
               />
               <div>
@@ -414,8 +426,12 @@ function TestimonialsSection({ content, update }: SectionProps) {
         <ImageField
           label="Background Image"
           value={t.backgroundImage}
-          onChange={(url) => set({ backgroundImage: url })}
-          onAltAutoFill={(altText) => set({ backgroundImageAlt: altText })}
+          onChange={(url, details) =>
+            set({
+              backgroundImage: url,
+              backgroundImageAlt: details?.altText || t.backgroundImageAlt,
+            })
+          }
           folder="backgrounds"
         />
         <div>
@@ -437,8 +453,13 @@ function TestimonialsSection({ content, update }: SectionProps) {
               <ImageField
                 label="Rating Image"
                 value={item.ratingImage}
-                onChange={(url) => upd({ ...item, ratingImage: url })}
-                onAltAutoFill={(altText) => upd({ ...item, ratingImageAlt: altText })}
+                onChange={(url, details) =>
+                  upd({
+                    ...item,
+                    ratingImage: url,
+                    ratingImageAlt: details?.altText || item.ratingImageAlt,
+                  })
+                }
                 folder="logos"
               />
               <div>
@@ -539,8 +560,13 @@ function GoogleReviewsSection({ content, update }: SectionProps) {
               <ImageField
                 label="Rating Image"
                 value={item.ratingImage}
-                onChange={(url) => upd({ ...item, ratingImage: url })}
-                onAltAutoFill={(altText) => upd({ ...item, ratingImageAlt: altText })}
+                onChange={(url, details) =>
+                  upd({
+                    ...item,
+                    ratingImage: url,
+                    ratingImageAlt: details?.altText || item.ratingImageAlt,
+                  })
+                }
                 folder="logos"
               />
               <div>
@@ -575,8 +601,12 @@ function FaqSectionEditor({ content, update }: SectionProps) {
         <ImageField
           label="Video Thumbnail"
           value={faq.videoThumbnail}
-          onChange={(url) => set({ videoThumbnail: url })}
-          onAltAutoFill={(altText) => set({ videoThumbnailAlt: altText })}
+          onChange={(url, details) =>
+            set({
+              videoThumbnail: url,
+              videoThumbnailAlt: details?.altText || faq.videoThumbnailAlt,
+            })
+          }
           folder="backgrounds"
         />
         <div>
@@ -631,8 +661,9 @@ function ContactSectionEditor({ content, update }: SectionProps) {
         <ImageField
           label="Background Image"
           value={c.image}
-          onChange={(url) => set({ image: url })}
-          onAltAutoFill={(altText) => set({ imageAlt: altText })}
+          onChange={(url, details) =>
+            set({ image: url, imageAlt: details?.altText || c.imageAlt })
+          }
           folder="backgrounds"
         />
         <div>

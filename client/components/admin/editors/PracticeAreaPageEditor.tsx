@@ -93,8 +93,12 @@ function HeroSection({ content, update }: SectionProps) {
         <ImageField
           label="Background Image (Optional)"
           value={hero.backgroundImage || ""}
-          onChange={(url) => set({ backgroundImage: url })}
-          onAltAutoFill={(altText) => set({ backgroundImageAlt: altText })}
+          onChange={(url, details) =>
+            set({
+              backgroundImage: url,
+              backgroundImageAlt: details?.altText || hero.backgroundImageAlt,
+            })
+          }
           folder="practice-areas"
         />
         <div>
@@ -183,9 +187,12 @@ function SocialProofSection({ content, update }: SectionProps) {
                   <ImageField
                     label="Rating Image"
                     value={item.ratingImage}
-                    onChange={(url) => upd({ ...item, ratingImage: url })}
-                    onAltAutoFill={(altText) =>
-                      upd({ ...item, ratingImageAlt: altText })
+                    onChange={(url, details) =>
+                      upd({
+                        ...item,
+                        ratingImage: url,
+                        ratingImageAlt: details?.altText || item.ratingImageAlt,
+                      })
                     }
                     folder="testimonials"
                   />
@@ -226,8 +233,9 @@ function SocialProofSection({ content, update }: SectionProps) {
                   <ImageField
                     label="Logo Image"
                     value={item.src}
-                    onChange={(url) => upd({ ...item, src: url })}
-                    onAltAutoFill={(altText) => upd({ ...item, alt: altText })}
+                    onChange={(url, details) =>
+                      upd({ ...item, src: url, alt: details?.altText || item.alt })
+                    }
                     folder="awards"
                   />
                   <div>
@@ -279,8 +287,9 @@ function ContentSectionsEditor({ content, update }: SectionProps) {
             <ImageField
               label="Section Image"
               value={item.image}
-              onChange={(url) => upd({ ...item, image: url })}
-              onAltAutoFill={(altText) => upd({ ...item, imageAlt: altText })}
+              onChange={(url, details) =>
+                upd({ ...item, image: url, imageAlt: details?.altText || item.imageAlt })
+              }
               folder="practice-areas"
             />
             <div>

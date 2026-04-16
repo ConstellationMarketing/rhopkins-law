@@ -95,17 +95,19 @@ export function ArrayEditor<T extends Record<string, unknown>>({
 /* ------------------------------------------------------------------ */
 /*  ImageField – wraps ImageUploader with a label                      */
 /* ------------------------------------------------------------------ */
+export interface ImageFieldChangeDetails {
+  altText?: string;
+}
+
 export function ImageField({
   label,
   value,
   onChange,
-  onAltAutoFill,
   folder = "uploads",
 }: {
   label: string;
   value: string;
-  onChange: (url: string) => void;
-  onAltAutoFill?: (altText: string) => void;
+  onChange: (url: string, details?: ImageFieldChangeDetails) => void;
   folder?: string;
 }) {
   return (
@@ -113,8 +115,9 @@ export function ImageField({
       <Label>{label}</Label>
       <ImageUploader
         value={value}
-        onChange={onChange}
-        onSelectionDetails={({ title }) => onAltAutoFill?.(title)}
+        onChange={(url, details) =>
+          onChange(url, details?.title ? { altText: details.title } : undefined)
+        }
         folder={folder}
       />
     </div>

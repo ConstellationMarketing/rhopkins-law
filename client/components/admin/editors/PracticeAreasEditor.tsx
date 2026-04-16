@@ -62,8 +62,12 @@ function HeroSection({ content, update }: SectionProps) {
         <ImageField
           label="Hero Image"
           value={hero.heroImage || ""}
-          onChange={(v) => set({ heroImage: v })}
-          onAltAutoFill={(altText) => set({ heroImageAlt: altText })}
+          onChange={(v, details) =>
+            set({
+              heroImage: v,
+              heroImageAlt: details?.altText || hero.heroImageAlt,
+            })
+          }
         />
         <div>
           <Label>Hero Image Alt Text</Label>
@@ -153,8 +157,9 @@ function GridSection({ content, update }: SectionProps) {
               <ImageField
                 label="Background Image"
                 value={item.image}
-                onChange={(url) => upd({ ...item, image: url })}
-                onAltAutoFill={(altText) => upd({ ...item, imageAlt: altText })}
+                onChange={(url, details) =>
+                  upd({ ...item, image: url, imageAlt: details?.altText || item.imageAlt })
+                }
                 folder="practice-areas"
               />
               <div>

@@ -66,8 +66,12 @@ function HeroSection({ content, update }: SectionProps) {
         <ImageField
           label="Hero Image"
           value={hero.heroImage || ""}
-          onChange={(v) => set({ heroImage: v })}
-          onAltAutoFill={(altText) => set({ heroImageAlt: altText })}
+          onChange={(v, details) =>
+            set({
+              heroImage: v,
+              heroImageAlt: details?.altText || hero.heroImageAlt,
+            })
+          }
         />
         <div>
           <Label>Hero Image Alt Text</Label>
@@ -122,8 +126,12 @@ function AboutSectionEditor({ content, update }: SectionProps) {
         <ImageField
           label="Attorney Image"
           value={about.attorneyImage}
-          onChange={(url) => set({ attorneyImage: url })}
-          onAltAutoFill={(altText) => set({ attorneyImageAlt: altText })}
+          onChange={(url, details) =>
+            set({
+              attorneyImage: url,
+              attorneyImageAlt: details?.altText || about.attorneyImageAlt,
+            })
+          }
           folder="team"
         />
         <div>
@@ -185,8 +193,9 @@ function AttorneySpotlightEditor({ content, update }: SectionProps) {
         <ImageField
           label="Attorney Image"
           value={s.image}
-          onChange={(url) => set({ image: url })}
-          onAltAutoFill={(altText) => set({ imageAlt: altText })}
+          onChange={(url, details) =>
+            set({ image: url, imageAlt: details?.altText || s.imageAlt })
+          }
           folder="team"
         />
         <div>
@@ -249,8 +258,9 @@ function TeamSection({ content, update }: SectionProps) {
               <ImageField
                 label="Photo"
                 value={item.image}
-                onChange={(url) => upd({ ...item, image: url })}
-                onAltAutoFill={(altText) => upd({ ...item, imageAlt: altText })}
+                onChange={(url, details) =>
+                  upd({ ...item, image: url, imageAlt: details?.altText || item.imageAlt })
+                }
                 folder="team"
               />
               <div>

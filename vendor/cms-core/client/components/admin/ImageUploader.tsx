@@ -16,8 +16,7 @@ interface ImageSelectionDetails {
 
 interface ImageUploaderProps {
   value?: string;
-  onChange: (url: string) => void;
-  onSelectionDetails?: (details: ImageSelectionDetails) => void;
+  onChange: (url: string, details?: ImageSelectionDetails) => void;
   onRemove?: () => void;
   bucket?: string;
   folder?: string;
@@ -63,7 +62,6 @@ function getImageTitleFromUrl(url: string): string {
 export default function ImageUploader({
   value,
   onChange,
-  onSelectionDetails,
   onRemove,
   bucket = "media",
   folder = "uploads",
@@ -78,13 +76,10 @@ export default function ImageUploader({
 
   const emitSelection = useCallback(
     (url: string, titleSource?: string | null) => {
-      onChange(url);
       const title = formatImageTitle(titleSource || "") || getImageTitleFromUrl(url);
-      if (title) {
-        onSelectionDetails?.({ url, title });
-      }
+      onChange(url, title ? { url, title } : undefined);
     },
-    [onChange, onSelectionDetails],
+    [onChange],
   );
 
   const handleUpload = useCallback(

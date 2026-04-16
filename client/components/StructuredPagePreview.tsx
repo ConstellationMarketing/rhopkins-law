@@ -1,78 +1,85 @@
 /**
  * StructuredPagePreview
  *
- * Renders a read-only preview of structured page content (Home, About, Contact,
- * Practice Areas) inside the admin "Preview" tab. Each page type is detected
- * by the shape of the content object and rendered with lightweight section cards.
+ * Renders a read-only preview of structured page content inside the admin
+ * preview tab and anywhere structured CMS objects are rendered.
  */
 
-import type {
-  HomePageContent,
-  AboutPageContent,
-  ContactPageContent,
-  PracticeAreasPageContent,
-} from "@/lib/pageContentTypes";
-import type { PracticeAreaPageContent } from "../lib/cms/practiceAreaPageTypes";
+import type { HomePageContent } from "@/lib/cms/homePageTypes";
+import type { AboutPageContent } from "@/lib/cms/aboutPageTypes";
+import type { ContactPageContent } from "@/lib/cms/contactPageTypes";
+import type { PracticeAreasPageContent } from "@/lib/cms/practiceAreasPageTypes";
+import type { PracticeAreaPageContent } from "@/lib/cms/practiceAreaPageTypes";
 
-/* ------------------------------------------------------------------ */
-/*  Type guards                                                        */
-/* ------------------------------------------------------------------ */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
-function isHomeContent(c: unknown): c is HomePageContent {
+function isHomeContent(content: unknown): content is HomePageContent {
   return (
-    typeof c === "object" &&
-    c !== null &&
-    "hero" in c &&
-    "features" in c &&
-    "mission" in c
+    isRecord(content) &&
+    isRecord(content.hero) &&
+    Array.isArray(content.partnerLogos) &&
+    isRecord(content.about) &&
+    isRecord(content.attorneySpotlight) &&
+    isRecord(content.homeCta) &&
+    isRecord(content.practiceAreasIntro) &&
+    Array.isArray(content.practiceAreas) &&
+    isRecord(content.awards) &&
+    isRecord(content.testimonials) &&
+    isRecord(content.process) &&
+    isRecord(content.googleReviews) &&
+    isRecord(content.faq) &&
+    isRecord(content.contact)
   );
 }
 
-function isAboutContent(c: unknown): c is AboutPageContent {
+function isAboutContent(content: unknown): content is AboutPageContent {
   return (
-    typeof c === "object" &&
-    c !== null &&
-    "hero" in c &&
-    "story" in c &&
-    "approach" in c
+    isRecord(content) &&
+    isRecord(content.hero) &&
+    isRecord(content.about) &&
+    isRecord(content.attorneySpotlight) &&
+    isRecord(content.team) &&
+    isRecord(content.values) &&
+    isRecord(content.stats) &&
+    isRecord(content.whyChooseUs) &&
+    isRecord(content.cta)
   );
 }
 
-function isContactContent(c: unknown): c is ContactPageContent {
+function isContactContent(content: unknown): content is ContactPageContent {
   return (
-    typeof c === "object" &&
-    c !== null &&
-    "hero" in c &&
-    "info" in c &&
-    "form" in c &&
-    "officeHours" in c
+    isRecord(content) &&
+    isRecord(content.hero) &&
+    isRecord(content.contactIntro) &&
+    isRecord(content.form) &&
+    isRecord(content.officeHours) &&
+    isRecord(content.process) &&
+    isRecord(content.visitOffice) &&
+    isRecord(content.cta)
   );
 }
 
-function isPracticeAreasContent(c: unknown): c is PracticeAreasPageContent {
+function isPracticeAreasContent(content: unknown): content is PracticeAreasPageContent {
   return (
-    typeof c === "object" &&
-    c !== null &&
-    "hero" in c &&
-    "areas" in c &&
-    "options" in c
+    isRecord(content) &&
+    isRecord(content.hero) &&
+    isRecord(content.intro) &&
+    isRecord(content.grid) &&
+    isRecord(content.cta)
   );
 }
 
-function isPracticeAreaPageContent(c: unknown): c is Partial<PracticeAreaPageContent> {
+function isPracticeAreaPageContent(content: unknown): content is PracticeAreaPageContent {
   return (
-    typeof c === "object" &&
-    c !== null &&
-    "hero" in c &&
-    "socialProof" in c &&
-    "contentSections" in c &&
-    "faq" in c
+    isRecord(content) &&
+    isRecord(content.hero) &&
+    isRecord(content.socialProof) &&
+    Array.isArray(content.contentSections) &&
+    isRecord(content.faq)
   );
 }
-
-/* ------------------------------------------------------------------ */
-/*  Shared primitives                                                  */
-/* ------------------------------------------------------------------ */
 
 function PreviewSection({
   title,
@@ -101,6 +108,7 @@ function PreviewField({
   value: string | number | undefined | null;
 }) {
   if (!value && value !== 0) return null;
+
   return (
     <p className="text-sm text-gray-700 mb-1">
       <span className="font-medium text-gray-500">{label}:</span> {value}
@@ -110,6 +118,7 @@ function PreviewField({
 
 function PreviewImage({ src, alt }: { src?: string; alt?: string }) {
   if (!src) return null;
+
   return (
     <img
       src={src}
@@ -121,65 +130,55 @@ function PreviewImage({ src, alt }: { src?: string; alt?: string }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Page previews                                                      */
-/* ------------------------------------------------------------------ */
-
 function HomePreview({ content }: { content: HomePageContent }) {
   return (
     <div className="space-y-4">
       <PreviewSection title="Hero">
-        <PreviewField label="Title" value={content.hero.title} />
-        <PreviewField label="Subtitle" value={content.hero.subtitle} />
-        <PreviewField label="CTA" value={content.hero.ctaText} />
-        <PreviewImage src={content.hero.backgroundImage} alt="Hero background" />
+        <PreviewField label="H1 Title" value={content.hero.h1Title} />
+        <PreviewField label="Headline" value={content.hero.headline} />
+        <PreviewField label="Highlighted Text" value={content.hero.highlightedText} />
+        <PreviewImage src={content.hero.heroImage} alt={content.hero.heroImageAlt} />
       </PreviewSection>
 
-      <PreviewSection title="Features">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {content.features.map((f, i) => (
-            <div key={i} className="bg-gray-50 rounded p-3">
-              <p className="font-medium text-gray-800">{f.title}</p>
-              <p className="text-sm text-gray-600 mt-1">{f.description}</p>
-            </div>
-          ))}
-        </div>
+      <PreviewSection title="About Section">
+        <PreviewField label="Heading" value={content.about.heading} />
+        <PreviewField label="Contact Label" value={content.about.contactLabel} />
+        <PreviewImage
+          src={content.about.attorneyImage}
+          alt={content.about.attorneyImageAlt}
+        />
       </PreviewSection>
 
-      <PreviewSection title="Mission">
-        <PreviewField label="Heading" value={content.mission.heading} />
-        {content.mission.paragraphs.map((p, i) => (
-          <p key={i} className="text-sm text-gray-600 mb-2">{p}</p>
-        ))}
-        <PreviewImage src={content.mission.image} alt="Mission" />
+      <PreviewSection title="Attorney Spotlight">
+        <PreviewField label="Heading" value={content.attorneySpotlight.heading} />
+        <PreviewField label="Attorney Name" value={content.attorneySpotlight.attorneyName} />
+        <PreviewImage
+          src={content.attorneySpotlight.image}
+          alt={content.attorneySpotlight.imageAlt}
+        />
       </PreviewSection>
 
-      <PreviewSection title="Attorney">
-        <PreviewField label="Name" value={content.attorney.name} />
-        <PreviewField label="Title" value={content.attorney.title} />
-        <p className="text-sm text-gray-600 mt-1">{content.attorney.bio}</p>
-        <PreviewImage src={content.attorney.photo} alt={content.attorney.name} />
+      <PreviewSection title="Practice Areas">
+        <PreviewField label="Section Heading" value={content.practiceAreasIntro.heading} />
+        <PreviewField label="Areas" value={content.practiceAreas.length} />
       </PreviewSection>
 
-      <PreviewSection title="Speak With Us">
-        <PreviewField label="Heading" value={content.speakWithUs.heading} />
-        <p className="text-sm text-gray-600">{content.speakWithUs.description}</p>
+      <PreviewSection title="Awards & Testimonials">
+        <PreviewField label="Award Logos" value={content.awards.logos.length} />
+        <PreviewField label="Testimonials" value={content.testimonials.items.length} />
+        <PreviewImage
+          src={content.testimonials.backgroundImage}
+          alt={content.testimonials.backgroundImageAlt}
+        />
       </PreviewSection>
 
-      <PreviewSection title="Client Stories">
-        <PreviewField label="Heading" value={content.clientStories.heading} />
-        <PreviewField label="Videos" value={`${content.clientStories.videos.length} video(s)`} />
-      </PreviewSection>
-
-      <PreviewSection title="Services">
-        <PreviewField label="Heading" value={content.services.heading} />
-        <div className="flex flex-wrap gap-2 mt-2">
-          {content.services.items.map((s, i) => (
-            <span key={i} className="bg-slate-100 text-sm px-2 py-1 rounded">
-              {s.title}
-            </span>
-          ))}
-        </div>
+      <PreviewSection title="FAQ & Contact">
+        <PreviewField label="FAQ Items" value={content.faq.items.length} />
+        <PreviewImage
+          src={content.faq.videoThumbnail}
+          alt={content.faq.videoThumbnailAlt}
+        />
+        <PreviewImage src={content.contact.image} alt={content.contact.imageAlt} />
       </PreviewSection>
     </div>
   );
@@ -189,46 +188,35 @@ function AboutPreview({ content }: { content: AboutPageContent }) {
   return (
     <div className="space-y-4">
       <PreviewSection title="Hero">
-        <PreviewField label="Title" value={content.hero.title} />
-        <PreviewImage src={content.hero.backgroundImage} alt="Hero" />
+        <PreviewField label="Section Label" value={content.hero.sectionLabel} />
+        <PreviewField label="Tagline" value={content.hero.tagline} />
+        <PreviewImage src={content.hero.heroImage} alt={content.hero.heroImageAlt} />
       </PreviewSection>
 
-      <PreviewSection title="Our Story">
-        {content.story.paragraphs.map((p, i) => (
-          <p key={i} className="text-sm text-gray-600 mb-2">{p}</p>
-        ))}
-        <PreviewImage src={content.story.image} alt="Story" />
+      <PreviewSection title="About Section">
+        <PreviewField label="Heading" value={content.about.heading} />
+        <PreviewImage
+          src={content.about.attorneyImage}
+          alt={content.about.attorneyImageAlt}
+        />
       </PreviewSection>
 
-      <PreviewSection title="Attorney">
-        <PreviewField label="Name" value={content.attorney.name} />
-        <PreviewField label="Title" value={content.attorney.title} />
-        <PreviewImage src={content.attorney.photo} alt={content.attorney.name} />
+      <PreviewSection title="Attorney Spotlight">
+        <PreviewField label="Heading" value={content.attorneySpotlight.heading} />
+        <PreviewImage
+          src={content.attorneySpotlight.image}
+          alt={content.attorneySpotlight.imageAlt}
+        />
       </PreviewSection>
 
-      <PreviewSection title="Our Approach">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {content.approach.map((a, i) => (
-            <div key={i} className="bg-gray-50 rounded p-3">
-              <p className="font-medium text-gray-800">{a.title}</p>
-              <p className="text-sm text-gray-600 mt-1">{a.description}</p>
-            </div>
-          ))}
-        </div>
+      <PreviewSection title="Team & Values">
+        <PreviewField label="Team Members" value={content.team.members.length} />
+        <PreviewField label="Values" value={content.values.items.length} />
       </PreviewSection>
 
-      <PreviewSection title="Testimonials">
-        {content.testimonials.map((t, i) => (
-          <div key={i} className="bg-gray-50 rounded p-3 mb-2">
-            <p className="text-sm text-gray-600 italic">"{t.quote}"</p>
-            <p className="text-sm font-medium mt-1">{t.name} — {t.caseType}</p>
-          </div>
-        ))}
-      </PreviewSection>
-
-      <PreviewSection title="CTA">
-        <PreviewField label="Heading" value={content.cta.heading} />
-        <PreviewField label="Phone" value={content.cta.phone} />
+      <PreviewSection title="Stats & CTA">
+        <PreviewField label="Stats" value={content.stats.stats.length} />
+        <PreviewField label="CTA Heading" value={content.cta.heading} />
       </PreviewSection>
     </div>
   );
@@ -238,29 +226,24 @@ function ContactPreview({ content }: { content: ContactPageContent }) {
   return (
     <div className="space-y-4">
       <PreviewSection title="Hero">
-        <PreviewField label="Title" value={content.hero.title} />
-        <PreviewField label="Subtitle" value={content.hero.subtitle} />
-        <PreviewImage src={content.hero.backgroundImage} alt="Hero" />
+        <PreviewField label="Section Label" value={content.hero.sectionLabel} />
+        <PreviewField label="Tagline" value={content.hero.tagline} />
+        <PreviewImage src={content.hero.heroImage} alt={content.hero.heroImageAlt} />
       </PreviewSection>
 
-      <PreviewSection title="Contact Info">
-        <PreviewField label="Phone" value={content.info.phone} />
-        <PreviewField label="Note" value={content.info.phoneNote} />
-        <PreviewField label="Address" value={content.info.address.join(", ")} />
+      <PreviewSection title="Contact Intro & Form">
+        <PreviewField label="Intro Heading" value={content.contactIntro.heading} />
+        <PreviewField label="Form Heading" value={content.form.heading} />
       </PreviewSection>
 
-      <PreviewSection title="Office Hours">
-        {content.officeHours.map((h, i) => (
-          <PreviewField key={i} label={h.label} value={h.hours} />
-        ))}
-        {content.hoursNote && (
-          <p className="text-sm text-gray-500 mt-1 italic">{content.hoursNote}</p>
-        )}
+      <PreviewSection title="Office Hours & Process">
+        <PreviewField label="Office Hour Rows" value={content.officeHours.items.length} />
+        <PreviewField label="Process Steps" value={content.process.steps.length} />
       </PreviewSection>
 
-      <PreviewSection title="CTA">
-        <PreviewField label="Heading" value={content.cta.heading} />
-        <PreviewField label="Phone" value={content.cta.phone} />
+      <PreviewSection title="Visit Office & CTA">
+        <PreviewField label="Visit Office Heading" value={content.visitOffice.heading} />
+        <PreviewField label="CTA Heading" value={content.cta.heading} />
       </PreviewSection>
     </div>
   );
@@ -270,34 +253,19 @@ function PracticeAreasPreview({ content }: { content: PracticeAreasPageContent }
   return (
     <div className="space-y-4">
       <PreviewSection title="Hero">
-        <PreviewField label="Title" value={content.hero.title} />
-        <PreviewImage src={content.hero.backgroundImage} alt="Hero" />
+        <PreviewField label="Section Label" value={content.hero.sectionLabel} />
+        <PreviewField label="Tagline" value={content.hero.tagline} />
+        <PreviewImage src={content.hero.heroImage} alt={content.hero.heroImageAlt} />
       </PreviewSection>
 
-      <PreviewSection title="Introduction">
-        <p className="text-sm text-gray-600">{content.intro}</p>
+      <PreviewSection title="Intro">
+        <PreviewField label="Heading" value={content.intro.heading} />
+        <PreviewField label="Description" value={content.intro.description} />
       </PreviewSection>
 
-      <PreviewSection title="Practice Areas">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {content.areas.map((a, i) => (
-            <div key={i} className="bg-gray-50 rounded p-3">
-              <p className="font-medium text-gray-800">{a.name}</p>
-              <p className="text-sm text-gray-600 mt-1">{a.description}</p>
-            </div>
-          ))}
-        </div>
-      </PreviewSection>
-
-      <PreviewSection title="Understanding Your Options">
-        <PreviewField label="Heading" value={content.options.heading} />
-        <p className="text-sm text-gray-600 mt-1">{content.options.text}</p>
-        <PreviewImage src={content.options.image} alt="Options" />
-      </PreviewSection>
-
-      <PreviewSection title="CTA">
-        <PreviewField label="Heading" value={content.cta.heading} />
-        <PreviewField label="Phone" value={content.cta.phone} />
+      <PreviewSection title="Grid">
+        <PreviewField label="Heading" value={content.grid.heading} />
+        <PreviewField label="Areas" value={content.grid.areas.length} />
       </PreviewSection>
     </div>
   );
@@ -306,47 +274,50 @@ function PracticeAreasPreview({ content }: { content: PracticeAreasPageContent }
 function PracticeAreaPagePreview({
   content,
 }: {
-  content: Partial<PracticeAreaPageContent>;
+  content: PracticeAreaPageContent;
 }) {
   return (
     <div className="space-y-4">
       <PreviewSection title="Hero">
-        <PreviewField label="Section label" value={content.hero?.sectionLabel} />
-        <PreviewField label="Tagline" value={content.hero?.tagline} />
-        <PreviewImage src={content.hero?.backgroundImage} alt="Practice hero" />
+        <PreviewField label="Section Label" value={content.hero.sectionLabel} />
+        <PreviewField label="Tagline" value={content.hero.tagline} />
+        <PreviewImage
+          src={content.hero.backgroundImage}
+          alt={content.hero.backgroundImageAlt}
+        />
       </PreviewSection>
 
       <PreviewSection title="Social Proof">
-        <PreviewField label="Mode" value={content.socialProof?.mode} />
+        <PreviewField label="Mode" value={content.socialProof.mode} />
         <PreviewField
           label="Testimonials"
-          value={content.socialProof?.testimonials?.length}
+          value={content.socialProof.testimonials.length}
         />
         <PreviewField
-          label="Award logos"
-          value={content.socialProof?.awards?.logos?.length}
+          label="Award Logos"
+          value={content.socialProof.awards.logos.length}
         />
       </PreviewSection>
 
       <PreviewSection title="Content Sections">
-        <PreviewField
-          label="Sections"
-          value={content.contentSections?.length}
-        />
+        <PreviewField label="Sections" value={content.contentSections.length} />
+        {content.contentSections.slice(0, 3).map((section, index) => (
+          <PreviewImage
+            key={`${section.image}-${index}`}
+            src={section.image}
+            alt={section.imageAlt}
+          />
+        ))}
       </PreviewSection>
 
       <PreviewSection title="FAQ">
-        <PreviewField label="Enabled" value={content.faq?.enabled ? "Yes" : "No"} />
-        <PreviewField label="Heading" value={content.faq?.heading} />
-        <PreviewField label="Items" value={content.faq?.items?.length} />
+        <PreviewField label="Enabled" value={content.faq.enabled ? "Yes" : "No"} />
+        <PreviewField label="Heading" value={content.faq.heading} />
+        <PreviewField label="Items" value={content.faq.items.length} />
       </PreviewSection>
     </div>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/*  Main export                                                        */
-/* ------------------------------------------------------------------ */
 
 interface StructuredPagePreviewProps {
   content: unknown;
@@ -358,20 +329,23 @@ export default function StructuredPagePreview({
   if (isHomeContent(content)) {
     return <HomePreview content={content} />;
   }
+
   if (isAboutContent(content)) {
     return <AboutPreview content={content} />;
   }
+
   if (isContactContent(content)) {
     return <ContactPreview content={content} />;
   }
+
   if (isPracticeAreasContent(content)) {
     return <PracticeAreasPreview content={content} />;
   }
+
   if (isPracticeAreaPageContent(content)) {
     return <PracticeAreaPagePreview content={content} />;
   }
 
-  // Unknown structured content — show raw JSON
   return (
     <div className="p-4">
       <p className="text-sm text-gray-500 mb-2">Structured content preview:</p>
