@@ -13,6 +13,7 @@ interface CallBoxProps {
   variant?: "light" | "dark"; // light = black text on light bg, dark = white text on dark bg
   /** When true, the icon square uses crimson accent colour */
   accentIcon?: boolean;
+  phoneTextClassName?: string;
 }
 
 /** Strip all non-digit characters for use in tel: href */
@@ -29,6 +30,7 @@ export default function CallBox({
   className = "",
   variant = "light",
   accentIcon = false,
+  phoneTextClassName = "text-white",
 }: CallBoxProps) {
   const isPhone = !!phone;
 
@@ -45,10 +47,14 @@ export default function CallBox({
             <Icon className="w-[30px] h-[30px] text-white" strokeWidth={1.5} />
           </span>
           <div className="flex-1">
-            <p className="font-outfit text-[16px] md:text-[18px] leading-tight text-white pb-[4px]">
+            <p
+              className={`font-outfit text-[16px] md:text-[18px] leading-tight pb-[4px] ${phoneTextClassName}`}
+            >
               {title}
             </p>
-            <p className="font-outfit text-[18px] md:text-[24px] text-white leading-none whitespace-nowrap">
+            <p
+              className={`font-outfit text-[18px] md:text-[24px] leading-none whitespace-nowrap ${phoneTextClassName}`}
+            >
               {subtitle}
             </p>
           </div>

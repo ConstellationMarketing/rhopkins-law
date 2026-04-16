@@ -53,6 +53,7 @@ export default function PracticeAreaContentSection({
                     title={phoneLabel}
                     subtitle={phoneDisplay}
                     phone={phoneNumber}
+                    phoneTextClassName="text-brand-accent"
                   />
                   <CallBox
                     icon={Calendar}
