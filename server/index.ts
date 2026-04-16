@@ -23,6 +23,7 @@ let qaReportHandler: any;
 let bulkImportHandler: any;
 let bulkImportFetchHandler: any;
 let imageCacheMigrationHandler: any;
+let publishHandler: any;
 
 // Flag prevents retry loop on every request when a handler fails to load
 let handlersLoaded = false;
@@ -52,7 +53,7 @@ const loadHandlers = async () => {
     }
   };
 
-  const [searchReplace, inviteUser, deleteUser, triggerQa, qaGetLatestRun, qaRunStatus, qaListRuns, qaReport, bulkImport, bulkImportFetch, imageCacheMigration] =
+  const [searchReplace, inviteUser, deleteUser, triggerQa, qaGetLatestRun, qaRunStatus, qaListRuns, qaReport, bulkImport, bulkImportFetch, imageCacheMigration, publishFn] =
     await Promise.all([
       tryLoad("search-replace"),
       tryLoad("invite-user"),
@@ -65,6 +66,7 @@ const loadHandlers = async () => {
       tryLoad("bulk-import"),
       tryLoad("bulk-import-fetch"),
       tryLoad("image-cache-migration"),
+      tryLoad("publish"),
     ]);
 
   searchReplaceHandler = searchReplace?.handler ?? null;
@@ -78,6 +80,7 @@ const loadHandlers = async () => {
   bulkImportHandler = bulkImport?.handler ?? null;
   bulkImportFetchHandler = bulkImportFetch?.handler ?? null;
   imageCacheMigrationHandler = imageCacheMigration?.handler ?? null;
+  publishHandler = publishFn?.handler ?? null;
 };
 
 export function createServer() {
@@ -113,6 +116,44 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Dev adapter for publish Netlify function
+  app.post("/.netlify/functions/publish", async (req, res) => {
+    if (!publishHandler) {
+      return res.status(503).json({ error: "Netlify functions not available" });
+    }
+    try {
+      const result = await publishHandler(
+        {
+          httpMethod: "POST",
+          headers: req.headers as Record<string, string>,
+          body: JSON.stringify(req.body),
+          rawUrl: req.url,
+          rawQuery: "",
+          path: req.path,
+          queryStringParameters: null,
+          multiValueQueryStringParameters: null,
+          multiValueHeaders: {},
+          isBase64Encoded: false,
+        } as any,
+        {} as any,
+      );
+      if (result) {
+        res.status(result.statusCode || 200);
+        if (result.headers) {
+          for (const [key, value] of Object.entries(result.headers)) {
+            if (value) res.setHeader(key, String(value));
+          }
+        }
+        res.send(result.body);
+      } else {
+        res.status(500).json({ error: "No response from handler" });
+      }
+    } catch (err) {
+      console.error("Publish dev proxy error:", err);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
   // Dev adapter for Netlify functions
   app.post("/.netlify/functions/search-replace", async (req, res) => {

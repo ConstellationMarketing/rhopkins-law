@@ -48,7 +48,12 @@ export const handler: Handler = async (event: HandlerEvent) => {
   }
 
   const token = authHeader.replace('Bearer ', '');
-  const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+  const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 
   // Verify the token with Supabase
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
@@ -58,6 +63,20 @@ export const handler: Handler = async (event: HandlerEvent) => {
       statusCode: 401,
       headers: corsHeaders,
       body: JSON.stringify({ error: 'Invalid or expired token' }),
+    };
+  }
+
+  const { data: cmsUser } = await supabase
+    .from('cms_users')
+    .select('role')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!cmsUser || cmsUser.role !== 'admin') {
+    return {
+      statusCode: 403,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: 'Only admins can publish the site' }),
     };
   }
 

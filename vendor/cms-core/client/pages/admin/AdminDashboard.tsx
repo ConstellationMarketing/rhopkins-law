@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, ArrowRightLeft, Plus, Loader2 } from 'lucide-react';
+import { FileText, ArrowRightLeft, Plus, Loader2, Rocket } from 'lucide-react';
+import { toast } from 'sonner';
+import { triggerRebuild } from '../../lib/triggerRebuild';
+import { useUserRole } from '../../hooks/useUserRole';
 
 interface Stats {
   totalPages: number;
@@ -15,6 +18,9 @@ interface Stats {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [publishing, setPublishing] = useState(false);
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+
   useEffect(() => {
     fetchStats();
   }, []);
@@ -38,6 +44,19 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const handlePublishSite = async () => {
+    setPublishing(true);
+    const result = await triggerRebuild();
+
+    if (result.ok) {
+      toast.success('Netlify deploy triggered. The site will update when the build completes.');
+    } else {
+      toast.error(result.error || 'Failed to trigger Netlify deploy');
+    }
+
+    setPublishing(false);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -48,9 +67,21 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Welcome to the CMS admin panel</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-500 mt-1">Welcome to the CMS admin panel</p>
+        </div>
+        {!roleLoading && isAdmin && (
+          <Button onClick={handlePublishSite} disabled={publishing}>
+            {publishing ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Rocket className="mr-2 h-4 w-4" />
+            )}
+            Publish Site
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
