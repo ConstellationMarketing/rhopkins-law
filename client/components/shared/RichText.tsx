@@ -12,6 +12,9 @@
 import { useMemo, type HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import CmsFormRenderer from "@site/components/shared/CmsFormRenderer";
+import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
+import { getPublicEnv } from "@site/lib/runtimeEnv";
+import { normalizeHtmlAnchorHrefs } from "@site/lib/seo";
 
 const FORM_SHORTCODE_RE = /\{\{form:([a-f0-9-]+)\}\}/gi;
 
@@ -27,10 +30,16 @@ export default function RichText({
   inline = false,
   ...rest
 }: RichTextProps) {
-  if (!html) return null;
+  const { settings } = useSiteSettings();
+  const siteUrl = settings.siteUrl || getPublicEnv("VITE_SITE_URL") || "";
+  const normalizedHtml = useMemo(
+    () => normalizeHtmlAnchorHrefs(html, siteUrl),
+    [html, siteUrl],
+  );
 
-  const hasShortcodes = FORM_SHORTCODE_RE.test(html);
-  // Reset regex lastIndex after test
+  if (!normalizedHtml) return null;
+
+  const hasShortcodes = FORM_SHORTCODE_RE.test(normalizedHtml);
   FORM_SHORTCODE_RE.lastIndex = 0;
 
   if (!hasShortcodes) {
@@ -39,12 +48,12 @@ export default function RichText({
       <Tag
         {...rest}
         className={cn("rich-text", rest.className)}
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: normalizedHtml }}
       />
     );
   }
 
-  return <RichTextWithForms html={html} inline={inline} {...rest} />;
+  return <RichTextWithForms html={normalizedHtml} inline={inline} {...rest} />;
 }
 
 /**
@@ -86,16 +95,14 @@ function parseSegments(html: string): Segment[] {
   let match: RegExpExecArray | null;
 
   while ((match = re.exec(html)) !== null) {
-    // HTML before this match
     if (match.index > lastIndex) {
       segments.push({ type: "html", content: html.slice(lastIndex, match.index) });
     }
-    // The form shortcode
+
     segments.push({ type: "form", content: match[1] });
     lastIndex = re.lastIndex;
   }
 
-  // Remaining HTML after last match
   if (lastIndex < html.length) {
     segments.push({ type: "html", content: html.slice(lastIndex) });
   }

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
+import RichText from "@site/components/shared/RichText";
 
 function getLucideIcon(name: string): React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>> | null {
   if (!name) return null;
@@ -144,9 +145,9 @@ export default function Footer() {
               </h3>
             )}
             {col3Html ? (
-              <div
+              <RichText
+                html={col3Html}
                 className="text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] prose prose-invert max-w-none [&_a]:text-brand-accent [&_a]:hover:underline"
-                dangerouslySetInnerHTML={{ __html: col3Html }}
               />
             ) : null}
           </div>

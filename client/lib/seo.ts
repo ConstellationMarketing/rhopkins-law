@@ -50,6 +50,14 @@ const MANAGED_META_PROPERTIES = [
   'og:image',
 ];
 
+const SAFE_NON_HTTP_PROTOCOL_RE = /^(mailto|tel):/i;
+const ABSOLUTE_HTTP_URL_RE = /^https?:\/\//i;
+const PROTOCOL_RELATIVE_URL_RE = /^\/\//;
+const SITE_RELATIVE_PATH_RE = /^\/(?!\/)/;
+const HASH_OR_QUERY_RE = /^(#|\?)/;
+const MALFORMED_HTTP_PATH_RE = /^https?:\/\/\/+(.+)$/i;
+const CUSTOM_PROTOCOL_RE = /^[a-z][a-z\d+.-]*:/i;
+
 function cleanValue(value?: string | null): string | undefined {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
@@ -88,6 +96,67 @@ export function normalizeSeoPath(pathname?: string | null): string {
   }
 
   return pathname.endsWith('/') ? pathname : `${pathname}/`;
+}
+
+export function normalizeCmsLinkHref(
+  href?: string | null,
+  siteUrl?: string | null,
+): string | undefined {
+  const cleaned = cleanValue(href);
+  const normalizedSiteUrl = normalizeSiteUrl(siteUrl);
+
+  if (!cleaned) {
+    return undefined;
+  }
+
+  if (HASH_OR_QUERY_RE.test(cleaned)) {
+    return cleaned;
+  }
+
+  if (SAFE_NON_HTTP_PROTOCOL_RE.test(cleaned) || ABSOLUTE_HTTP_URL_RE.test(cleaned)) {
+    return cleaned;
+  }
+
+  if (PROTOCOL_RELATIVE_URL_RE.test(cleaned)) {
+    return `https:${cleaned}`;
+  }
+
+  const malformedPathMatch = cleaned.match(MALFORMED_HTTP_PATH_RE);
+  if (malformedPathMatch) {
+    const normalizedPath = `/${malformedPathMatch[1].replace(/^\/+/, '')}`;
+    return normalizedSiteUrl ? `${normalizedSiteUrl}${normalizedPath}` : normalizedPath;
+  }
+
+  if (SITE_RELATIVE_PATH_RE.test(cleaned)) {
+    return normalizedSiteUrl ? `${normalizedSiteUrl}${cleaned}` : cleaned;
+  }
+
+  if (CUSTOM_PROTOCOL_RE.test(cleaned)) {
+    return '#';
+  }
+
+  return `https://${cleaned.replace(/^\/+/, '')}`;
+}
+
+export function normalizeHtmlAnchorHrefs(
+  html?: string | null,
+  siteUrl?: string | null,
+): string {
+  if (!html) {
+    return '';
+  }
+
+  return html.replace(
+    /(<a\b[^>]*\bhref\s*=\s*)(["'])(.*?)\2/gi,
+    (match, prefix: string, quote: string, href: string) => {
+      const normalizedHref = normalizeCmsLinkHref(href, siteUrl);
+      if (!normalizedHref) {
+        return match;
+      }
+
+      return `${prefix}${quote}${normalizedHref}${quote}`;
+    },
+  );
 }
 
 export function resolveSeo(input: ResolveSeoInput): ResolvedSeo {

@@ -9,6 +9,9 @@ import TextAlign from "@tiptap/extension-text-align";
 import { Mark, mergeAttributes } from "@tiptap/core";
 import { supabase } from "@/lib/supabase";
 import { compressToWebP } from "@/lib/imageCompression";
+import { useSiteSettings } from "@site/contexts/SiteSettingsContext";
+import { getPublicEnv } from "@site/lib/runtimeEnv";
+import { normalizeCmsLinkHref } from "@site/lib/seo";
 import { toast } from "sonner";
 import {
   Bold,
@@ -78,10 +81,12 @@ export default function RichTextEditor({
   placeholder = "Start typing…",
   minHeight = "120px",
 }: RichTextEditorProps) {
+  const { settings } = useSiteSettings();
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const siteUrl = settings.siteUrl || getPublicEnv("VITE_SITE_URL") || "";
 
   const editor = useEditor({
     extensions: [
@@ -159,15 +164,15 @@ export default function RichTextEditor({
 
   const applyLink = useCallback(() => {
     if (!editor) return;
-    if (linkUrl.trim()) {
-      const href = linkUrl.trim().startsWith("http")
-        ? linkUrl.trim()
-        : `https://${linkUrl.trim()}`;
+
+    const href = normalizeCmsLinkHref(linkUrl, siteUrl);
+    if (href) {
       editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
     }
+
     setShowLinkInput(false);
     setLinkUrl("");
-  }, [editor, linkUrl]);
+  }, [editor, linkUrl, siteUrl]);
 
   const removeLink = useCallback(() => {
     if (!editor) return;

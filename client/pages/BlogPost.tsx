@@ -5,6 +5,7 @@ import Layout from "@site/components/layout/Layout";
 import BlogPostHero from "@site/components/blog/BlogPostHero";
 import BlogSidebar from "@site/components/blog/BlogSidebar";
 import RecentPosts from "@site/components/blog/RecentPosts";
+import RichText from "@site/components/shared/RichText";
 import { ArrowLeft } from "lucide-react";
 import NotFound from "./NotFound";
 import { getCmsPreloadedRouteData } from "@site/lib/cms/preloadedState";
@@ -124,13 +125,13 @@ export default function BlogPost() {
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-14">
             <article className="flex-1 min-w-0 lg:max-w-[70%]">
               {post.body ? (
-                <div
+                <RichText
+                  html={post.body}
                   className="prose prose-lg max-w-none
                     prose-headings:font-semibold prose-headings:text-gray-900
                     prose-a:text-[#2a4a7a] prose-a:underline hover:prose-a:text-[#a1134c]
                     prose-blockquote:border-l-4 prose-blockquote:border-[#a1134c] prose-blockquote:text-gray-600
                     prose-img:rounded-lg prose-img:shadow-md"
-                  dangerouslySetInnerHTML={{ __html: post.body }}
                 />
               ) : post.excerpt ? (
                 <p className="text-xl text-gray-600 leading-relaxed border-l-4 border-[#a1134c] pl-4">

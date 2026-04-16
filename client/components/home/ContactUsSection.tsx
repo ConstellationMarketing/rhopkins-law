@@ -1,6 +1,7 @@
 import type { ContactContent } from "@site/lib/cms/homePageTypes";
 import DynamicHeading from "@site/components/shared/DynamicHeading";
 import CmsFormRenderer from "@site/components/shared/CmsFormRenderer";
+import RichText from "@site/components/shared/RichText";
 
 interface ContactUsSectionProps {
   content?: ContactContent;
@@ -66,9 +67,9 @@ export default function ContactUsSection({ content, headingTag }: ContactUsSecti
               {data.tagline && (
                 <div className="hidden lg:flex lg:w-[55%] flex-col justify-end">
                   <div className="bg-brand-dark py-6 px-8 text-left">
-                    <div
+                    <RichText
+                      html={data.tagline}
                       className="font-playfair text-[clamp(1.5rem,4vw,48px)] leading-tight text-white font-bold highlight-underline"
-                      dangerouslySetInnerHTML={{ __html: data.tagline }}
                     />
                   </div>
                 </div>
@@ -78,9 +79,9 @@ export default function ContactUsSection({ content, headingTag }: ContactUsSecti
             {/* Tagline on mobile — appears above the form */}
             {data.tagline && (
               <div className="lg:hidden pt-[30px] md:pt-[40px] px-2">
-                <div
+                <RichText
+                  html={data.tagline}
                   className="font-playfair text-[24px] md:text-[32px] leading-tight text-white font-bold text-center highlight-underline"
-                  dangerouslySetInnerHTML={{ __html: data.tagline }}
                 />
               </div>
             )}
