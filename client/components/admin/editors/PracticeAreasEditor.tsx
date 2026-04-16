@@ -63,6 +63,7 @@ function HeroSection({ content, update }: SectionProps) {
           label="Hero Image"
           value={hero.heroImage || ""}
           onChange={(v) => set({ heroImage: v })}
+          onAltAutoFill={(altText) => set({ heroImageAlt: altText })}
         />
         <div>
           <Label>Hero Image Alt Text</Label>
@@ -149,7 +150,13 @@ function GridSection({ content, update }: SectionProps) {
                 <Input value={item.title} onChange={(e) => upd({ ...item, title: e.target.value })} />
               </div>
               <RichTextField label="Description" value={item.description} onChange={(v) => upd({ ...item, description: v })} />
-              <ImageField label="Background Image" value={item.image} onChange={(url) => upd({ ...item, image: url })} folder="practice-areas" />
+              <ImageField
+                label="Background Image"
+                value={item.image}
+                onChange={(url) => upd({ ...item, image: url })}
+                onAltAutoFill={(altText) => upd({ ...item, imageAlt: altText })}
+                folder="practice-areas"
+              />
               <div>
                 <Label>Image Alt Text</Label>
                 <Input value={item.imageAlt} onChange={(e) => upd({ ...item, imageAlt: e.target.value })} placeholder="Describe the background image" />

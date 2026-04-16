@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 interface MediaPickerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelect: (url: string) => void;
+  onSelect: (media: Media) => void;
   currentValue?: string;
 }
 
@@ -68,10 +68,17 @@ export default function MediaPickerDialog({
   });
 
   const handleConfirm = () => {
-    if (selectedUrl) {
-      onSelect(selectedUrl);
-      onOpenChange(false);
+    if (!selectedUrl) {
+      return;
     }
+
+    const selectedMedia = mediaItems.find((media) => media.public_url === selectedUrl);
+    if (!selectedMedia) {
+      return;
+    }
+
+    onSelect(selectedMedia);
+    onOpenChange(false);
   };
 
   return (

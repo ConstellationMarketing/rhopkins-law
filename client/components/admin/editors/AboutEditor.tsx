@@ -67,6 +67,7 @@ function HeroSection({ content, update }: SectionProps) {
           label="Hero Image"
           value={hero.heroImage || ""}
           onChange={(v) => set({ heroImage: v })}
+          onAltAutoFill={(altText) => set({ heroImageAlt: altText })}
         />
         <div>
           <Label>Hero Image Alt Text</Label>
@@ -118,7 +119,13 @@ function AboutSectionEditor({ content, update }: SectionProps) {
             <Input value={about.contactText} onChange={(e) => set({ contactText: e.target.value })} />
           </div>
         </div>
-        <ImageField label="Attorney Image" value={about.attorneyImage} onChange={(url) => set({ attorneyImage: url })} folder="team" />
+        <ImageField
+          label="Attorney Image"
+          value={about.attorneyImage}
+          onChange={(url) => set({ attorneyImage: url })}
+          onAltAutoFill={(altText) => set({ attorneyImageAlt: altText })}
+          folder="team"
+        />
         <div>
           <Label>Attorney Image Alt</Label>
           <Input value={about.attorneyImageAlt} onChange={(e) => set({ attorneyImageAlt: e.target.value })} />
@@ -175,7 +182,13 @@ function AttorneySpotlightEditor({ content, update }: SectionProps) {
             <Input value={s.buttonLink} onChange={(e) => set({ buttonLink: e.target.value })} placeholder="/about/" />
           </div>
         </div>
-        <ImageField label="Attorney Image" value={s.image} onChange={(url) => set({ image: url })} folder="team" />
+        <ImageField
+          label="Attorney Image"
+          value={s.image}
+          onChange={(url) => set({ image: url })}
+          onAltAutoFill={(altText) => set({ imageAlt: altText })}
+          folder="team"
+        />
         <div>
           <Label>Image Alt Text</Label>
           <Input value={s.imageAlt} onChange={(e) => set({ imageAlt: e.target.value })} placeholder="Describe the image" />
@@ -233,7 +246,13 @@ function TeamSection({ content, update }: SectionProps) {
                 </div>
               </div>
               <RichTextField label="Bio" value={item.bio} onChange={(v) => upd({ ...item, bio: v })} />
-              <ImageField label="Photo" value={item.image} onChange={(url) => upd({ ...item, image: url })} folder="team" />
+              <ImageField
+                label="Photo"
+                value={item.image}
+                onChange={(url) => upd({ ...item, image: url })}
+                onAltAutoFill={(altText) => upd({ ...item, imageAlt: altText })}
+                folder="team"
+              />
               <div>
                 <Label>Photo Alt Text</Label>
                 <Input value={item.imageAlt} onChange={(e) => upd({ ...item, imageAlt: e.target.value })} placeholder="Describe the photo" />

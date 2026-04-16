@@ -65,6 +65,7 @@ function HeroSection({ content, update }: SectionProps) {
           label="Hero Image"
           value={hero.heroImage || ""}
           onChange={(v) => set({ heroImage: v })}
+          onAltAutoFill={(altText) => set({ heroImageAlt: altText })}
         />
         <div>
           <Label>Hero Image Alt Text</Label>

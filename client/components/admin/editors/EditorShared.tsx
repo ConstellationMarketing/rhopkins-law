@@ -99,17 +99,24 @@ export function ImageField({
   label,
   value,
   onChange,
+  onAltAutoFill,
   folder = "uploads",
 }: {
   label: string;
   value: string;
   onChange: (url: string) => void;
+  onAltAutoFill?: (altText: string) => void;
   folder?: string;
 }) {
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <ImageUploader value={value} onChange={onChange} folder={folder} />
+      <ImageUploader
+        value={value}
+        onChange={onChange}
+        onSelectionDetails={({ title }) => onAltAutoFill?.(title)}
+        folder={folder}
+      />
     </div>
   );
 }

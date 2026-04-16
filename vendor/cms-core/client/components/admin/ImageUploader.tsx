@@ -9,9 +9,15 @@ import MediaPickerDialog from "./MediaPickerDialog";
 
 const isPdfUrl = (url?: string) => !!url && url.toLowerCase().includes(".pdf");
 
+interface ImageSelectionDetails {
+  url: string;
+  title: string;
+}
+
 interface ImageUploaderProps {
   value?: string;
   onChange: (url: string) => void;
+  onSelectionDetails?: (details: ImageSelectionDetails) => void;
   onRemove?: () => void;
   bucket?: string;
   folder?: string;
@@ -19,9 +25,45 @@ interface ImageUploaderProps {
   placeholder?: string;
 }
 
+function formatImageTitle(rawValue: string): string {
+  const withoutExtension = rawValue.replace(/\.[^.]+$/, "");
+  const normalized = withoutExtension
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!normalized) {
+    return "";
+  }
+
+  return normalized
+    .split(" ")
+    .map((word) => {
+      if (!word) return word;
+      if (word === word.toUpperCase()) return word;
+      if (word === word.toLowerCase()) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      return word;
+    })
+    .join(" ");
+}
+
+function getImageTitleFromUrl(url: string): string {
+  try {
+    const pathname = decodeURIComponent(new URL(url).pathname);
+    const fileName = pathname.split("/").filter(Boolean).pop() || "";
+    return formatImageTitle(fileName);
+  } catch {
+    const fileName = decodeURIComponent(url.split("?")[0].split("#")[0].split("/").pop() || "");
+    return formatImageTitle(fileName);
+  }
+}
+
 export default function ImageUploader({
   value,
   onChange,
+  onSelectionDetails,
   onRemove,
   bucket = "media",
   folder = "uploads",
@@ -33,6 +75,17 @@ export default function ImageUploader({
   const [error, setError] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const emitSelection = useCallback(
+    (url: string, titleSource?: string | null) => {
+      onChange(url);
+      const title = formatImageTitle(titleSource || "") || getImageTitleFromUrl(url);
+      if (title) {
+        onSelectionDetails?.({ url, title });
+      }
+    },
+    [onChange, onSelectionDetails],
+  );
 
   const handleUpload = useCallback(
     async (file: File) => {
@@ -84,7 +137,7 @@ export default function ImageUploader({
         const publicUrl = urlData.publicUrl;
 
         // Set the field value immediately
-        onChange(publicUrl);
+        emitSelection(publicUrl, file.name);
 
         // Best-effort: also register in media table so it appears in /admin/media
         try {
@@ -119,7 +172,7 @@ export default function ImageUploader({
         setUploading(false);
       }
     },
-    [bucket, folder, onChange],
+    [bucket, emitSelection, folder],
   );
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -309,7 +362,7 @@ export default function ImageUploader({
         <Input
           type="url"
           value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => emitSelection(e.target.value)}
           placeholder="https://example.com/image.jpg"
           className="text-xs h-8"
         />
@@ -318,7 +371,7 @@ export default function ImageUploader({
       <MediaPickerDialog
         open={pickerOpen}
         onOpenChange={setPickerOpen}
-        onSelect={(url) => onChange(url)}
+        onSelect={(media) => emitSelection(media.public_url, media.file_name)}
         currentValue={value}
       />
     </div>

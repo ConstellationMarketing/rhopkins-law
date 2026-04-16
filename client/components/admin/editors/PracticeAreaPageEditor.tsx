@@ -94,6 +94,7 @@ function HeroSection({ content, update }: SectionProps) {
           label="Background Image (Optional)"
           value={hero.backgroundImage || ""}
           onChange={(url) => set({ backgroundImage: url })}
+          onAltAutoFill={(altText) => set({ backgroundImageAlt: altText })}
           folder="practice-areas"
         />
         <div>
@@ -183,6 +184,9 @@ function SocialProofSection({ content, update }: SectionProps) {
                     label="Rating Image"
                     value={item.ratingImage}
                     onChange={(url) => upd({ ...item, ratingImage: url })}
+                    onAltAutoFill={(altText) =>
+                      upd({ ...item, ratingImageAlt: altText })
+                    }
                     folder="testimonials"
                   />
                   <div>
@@ -223,6 +227,7 @@ function SocialProofSection({ content, update }: SectionProps) {
                     label="Logo Image"
                     value={item.src}
                     onChange={(url) => upd({ ...item, src: url })}
+                    onAltAutoFill={(altText) => upd({ ...item, alt: altText })}
                     folder="awards"
                   />
                   <div>
@@ -275,6 +280,7 @@ function ContentSectionsEditor({ content, update }: SectionProps) {
               label="Section Image"
               value={item.image}
               onChange={(url) => upd({ ...item, image: url })}
+              onAltAutoFill={(altText) => upd({ ...item, imageAlt: altText })}
               folder="practice-areas"
             />
             <div>
