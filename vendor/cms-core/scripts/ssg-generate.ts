@@ -22,6 +22,7 @@ import {
   resolveBlogPageData,
   resolveBlogPostData,
   resolveContactPageData,
+  isPracticeAreaPageRow,
   resolveDynamicPageData,
   resolveHomePageData,
   resolvePracticeAreaPageData,
@@ -147,7 +148,7 @@ async function generateSSG() {
   const { data: pages, error: pagesError } = await supabase
     .from("pages")
     .select(
-      "id, title, url_path, meta_title, meta_description, canonical_url, og_title, og_description, og_image, noindex, updated_at, content, schema_type, schema_data",
+      "id, title, url_path, page_type, meta_title, meta_description, canonical_url, og_title, og_description, og_image, noindex, updated_at, content, schema_type, schema_data",
     )
     .eq("status", "published");
 
@@ -259,7 +260,7 @@ function buildPagePreloadedState(
         routeData: { blog: resolveBlogPageData(page) },
       };
     default:
-      if (normalizedPath.startsWith("/practice-areas/")) {
+      if (isPracticeAreaPageRow(page)) {
         return {
           currentPath: normalizedPath,
           siteSettings,

@@ -16,6 +16,7 @@ import { defaultPracticeAreasContent } from "./practiceAreasPageTypes";
 export interface CmsPageRow {
   title?: string | null;
   content?: unknown;
+  page_type?: string | null;
   meta_title?: string | null;
   meta_description?: string | null;
   canonical_url?: string | null;
@@ -120,6 +121,30 @@ export function resolvePracticeAreasPageData(
     content,
     meta: mapPageMeta(row),
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function isPracticeAreaPageContent(
+  content: unknown,
+): content is Partial<PracticeAreaPageContent> {
+  if (!isRecord(content)) {
+    return false;
+  }
+
+  return (
+    isRecord(content.hero) &&
+    isRecord(content.socialProof) &&
+    Array.isArray(content.contentSections) &&
+    isRecord(content.faq)
+  );
+}
+
+export function isPracticeAreaPageRow(row?: CmsPageRow | null): boolean {
+  const pageType = typeof row?.page_type === "string" ? row.page_type.toLowerCase() : "";
+  return pageType === "practice" || isPracticeAreaPageContent(row?.content);
 }
 
 export function resolvePracticeAreaPageData(row: CmsPageRow) {

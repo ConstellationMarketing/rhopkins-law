@@ -1,12 +1,84 @@
 import { useParams } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import Layout from "@site/components/layout/Layout";
 import Seo from "@site/components/Seo";
-import { usePracticeAreaPageContent } from "@site/hooks/usePracticeAreaPageContent";
 import PracticeAreaHero from "@site/components/practice/PracticeAreaHero";
 import PracticeAreaSocialProof from "@site/components/practice/PracticeAreaSocialProof";
 import PracticeAreaContentSection from "@site/components/practice/PracticeAreaContentSection";
 import PracticeAreaFaq from "@site/components/practice/PracticeAreaFaq";
-import { Loader2 } from "lucide-react";
+import { usePracticeAreaPageContent } from "@site/hooks/usePracticeAreaPageContent";
+import type { PageMeta } from "@site/lib/cms/pageMeta";
+import type { PracticeAreaPageContent } from "@site/lib/cms/practiceAreaPageTypes";
+
+interface PracticeAreaPageViewProps {
+  content: PracticeAreaPageContent;
+  meta: PageMeta;
+  title: string;
+}
+
+export function PracticeAreaPageView({
+  content,
+  meta,
+  title,
+}: PracticeAreaPageViewProps) {
+  return (
+    <Layout>
+      <Seo
+        title={meta.meta_title || title || undefined}
+        description={meta.meta_description || undefined}
+        canonical={meta.canonical_url || undefined}
+        noindex={meta.noindex}
+        ogTitle={meta.og_title || undefined}
+        ogDescription={meta.og_description || undefined}
+        ogImage={meta.og_image || undefined}
+        schemaType={meta.schema_type}
+        schemaData={meta.schema_data}
+        pageContent={content}
+      />
+
+      <div className="relative -mt-[180px] bg-brand-dark">
+        {content.hero.backgroundImage && (
+          <>
+            <img
+              src={content.hero.backgroundImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              style={{ backgroundColor: "rgba(6, 29, 27, 0.85)" }}
+            />
+          </>
+        )}
+
+        <div className="h-[180px]" />
+
+        <PracticeAreaHero
+          content={content.hero}
+          headingTags={content.headingTags}
+        />
+
+        <PracticeAreaSocialProof
+          content={content.socialProof}
+          headingTags={content.headingTags}
+        />
+      </div>
+
+      {content.contentSections.map((section, index) => (
+        <PracticeAreaContentSection
+          key={index}
+          section={section}
+          index={index}
+        />
+      ))}
+
+      <PracticeAreaFaq
+        content={content.faq}
+        headingTags={content.headingTags}
+      />
+    </Layout>
+  );
+}
 
 export default function PracticeAreaPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -41,64 +113,5 @@ export default function PracticeAreaPage() {
     );
   }
 
-  return (
-    <Layout>
-      <Seo
-        title={meta.meta_title || title || undefined}
-        description={meta.meta_description || undefined}
-        canonical={meta.canonical_url || undefined}
-        noindex={meta.noindex}
-        ogTitle={meta.og_title || undefined}
-        ogDescription={meta.og_description || undefined}
-        ogImage={meta.og_image || undefined}
-        schemaType={meta.schema_type}
-        schemaData={meta.schema_data}
-        pageContent={content}
-      />
-
-      {/* Wrapper: background image spans hero + awards, extends behind header */}
-      {/* Header height = 30px spacer + ~82px bar + 30px pb ≈ 142px; using 160px for safe full coverage */}
-      <div className="relative -mt-[180px] bg-brand-dark">
-        {content.hero.backgroundImage && (
-          <>
-            <img
-              src={content.hero.backgroundImage}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            <div
-              className="absolute inset-0"
-              style={{ backgroundColor: "rgba(6, 29, 27, 0.85)" }}
-            />
-          </>
-        )}
-
-        {/* Spacer to compensate for the -mt-[180px] so hero content sits below header */}
-        <div className="h-[180px]" />
-
-        <PracticeAreaHero
-          content={content.hero}
-          headingTags={content.headingTags}
-        />
-
-        <PracticeAreaSocialProof
-          content={content.socialProof}
-          headingTags={content.headingTags}
-        />
-      </div>
-
-      {content.contentSections.map((section, index) => (
-        <PracticeAreaContentSection
-          key={index}
-          section={section}
-          index={index}
-        />
-      ))}
-
-      <PracticeAreaFaq
-        content={content.faq}
-        headingTags={content.headingTags}
-      />
-    </Layout>
-  );
+  return <PracticeAreaPageView content={content} meta={meta} title={title} />;
 }

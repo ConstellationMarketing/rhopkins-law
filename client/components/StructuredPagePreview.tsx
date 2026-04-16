@@ -12,6 +12,7 @@ import type {
   ContactPageContent,
   PracticeAreasPageContent,
 } from "@/lib/pageContentTypes";
+import type { PracticeAreaPageContent } from "../lib/cms/practiceAreaPageTypes";
 
 /* ------------------------------------------------------------------ */
 /*  Type guards                                                        */
@@ -55,6 +56,17 @@ function isPracticeAreasContent(c: unknown): c is PracticeAreasPageContent {
     "hero" in c &&
     "areas" in c &&
     "options" in c
+  );
+}
+
+function isPracticeAreaPageContent(c: unknown): c is Partial<PracticeAreaPageContent> {
+  return (
+    typeof c === "object" &&
+    c !== null &&
+    "hero" in c &&
+    "socialProof" in c &&
+    "contentSections" in c &&
+    "faq" in c
   );
 }
 
@@ -291,6 +303,47 @@ function PracticeAreasPreview({ content }: { content: PracticeAreasPageContent }
   );
 }
 
+function PracticeAreaPagePreview({
+  content,
+}: {
+  content: Partial<PracticeAreaPageContent>;
+}) {
+  return (
+    <div className="space-y-4">
+      <PreviewSection title="Hero">
+        <PreviewField label="Section label" value={content.hero?.sectionLabel} />
+        <PreviewField label="Tagline" value={content.hero?.tagline} />
+        <PreviewImage src={content.hero?.backgroundImage} alt="Practice hero" />
+      </PreviewSection>
+
+      <PreviewSection title="Social Proof">
+        <PreviewField label="Mode" value={content.socialProof?.mode} />
+        <PreviewField
+          label="Testimonials"
+          value={content.socialProof?.testimonials?.length}
+        />
+        <PreviewField
+          label="Award logos"
+          value={content.socialProof?.awards?.logos?.length}
+        />
+      </PreviewSection>
+
+      <PreviewSection title="Content Sections">
+        <PreviewField
+          label="Sections"
+          value={content.contentSections?.length}
+        />
+      </PreviewSection>
+
+      <PreviewSection title="FAQ">
+        <PreviewField label="Enabled" value={content.faq?.enabled ? "Yes" : "No"} />
+        <PreviewField label="Heading" value={content.faq?.heading} />
+        <PreviewField label="Items" value={content.faq?.items?.length} />
+      </PreviewSection>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Main export                                                        */
 /* ------------------------------------------------------------------ */
@@ -313,6 +366,9 @@ export default function StructuredPagePreview({
   }
   if (isPracticeAreasContent(content)) {
     return <PracticeAreasPreview content={content} />;
+  }
+  if (isPracticeAreaPageContent(content)) {
+    return <PracticeAreaPagePreview content={content} />;
   }
 
   // Unknown structured content — show raw JSON
