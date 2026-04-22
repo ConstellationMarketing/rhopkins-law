@@ -112,15 +112,15 @@ export default function Footer() {
         </div>
 
         <div className="lg:w-[20%] lg:mr-[3%]">
-          <div className="font-outfit text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] text-white">
+          <div className="font-outfit text-[20px] font-light leading-tight text-white">
             {col2Label && (
-              <h3 className="font-playfair text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px] font-bold flex items-center gap-2 justify-center lg:justify-start">
+              <h3 className="font-playfair text-[28px] leading-tight text-white pb-[10px] font-bold flex items-center gap-2 justify-center lg:justify-start">
                 {Col2Icon && <Col2Icon className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] flex-shrink-0" strokeWidth={1.5} />}
                 {col2Label}
               </h3>
             )}
             {resourceLinks.length > 0 ? (
-              <ul className="text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] space-y-1">
+              <ul className="text-[20px] font-light leading-tight space-y-1">
                 {resourceLinks.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -137,9 +137,9 @@ export default function Footer() {
         </div>
 
         <div className="lg:w-[20%] lg:mr-[3%]">
-          <div className="font-outfit text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] text-white">
+          <div className="font-outfit text-[20px] font-light leading-tight text-white">
             {col3Label && (
-              <h3 className="font-playfair text-[28px] md:text-[36px] leading-tight md:leading-[36px] text-white pb-[10px] font-bold flex items-center gap-2 justify-center lg:justify-start">
+              <h3 className="font-playfair text-[28px] leading-tight text-white pb-[10px] font-bold flex items-center gap-2 justify-center lg:justify-start">
                 {Col3Icon && <Col3Icon className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] flex-shrink-0" strokeWidth={1.5} />}
                 {col3Label}
               </h3>
@@ -147,7 +147,7 @@ export default function Footer() {
             {col3Html ? (
               <RichText
                 html={col3Html}
-                className="text-[18px] md:text-[24px] font-light leading-tight md:leading-[36px] prose prose-invert max-w-none [&_a]:text-brand-accent [&_a]:hover:underline"
+                className="text-[20px] font-light leading-tight prose prose-invert max-w-none [&_a]:text-brand-accent [&_a]:hover:underline"
               />
             ) : null}
           </div>
