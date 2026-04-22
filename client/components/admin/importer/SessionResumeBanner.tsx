@@ -25,7 +25,7 @@ import {
   abandonSession,
 } from "@site/lib/importer/sessionPersistence";
 import type { MigrationSession } from "@site/lib/importer/recipeTypes";
-import { supabase } from "../../../../vendor/cms-core/client/lib/supabase";
+import { getAccessTokenSafe } from "../../../../vendor/cms-core/client/lib/supabase";
 
 interface SessionResumeBannerProps {
   onResume: (session: MigrationSession) => void;
@@ -49,8 +49,8 @@ export default function SessionResumeBanner({
   const loadSessions = async () => {
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const list = await listActiveSessions(session?.access_token);
+      const token = await getAccessTokenSafe();
+      const list = await listActiveSessions(token);
       setSessions(list);
     } catch (err) {
       console.error("Failed to load sessions:", err);
@@ -61,8 +61,8 @@ export default function SessionResumeBanner({
 
   const handleDiscard = async (sessionId: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      await abandonSession(sessionId, session?.access_token);
+      const token = await getAccessTokenSafe();
+      await abandonSession(sessionId, token);
       setSessions((prev) => prev.filter((s) => s.id !== sessionId));
     } catch (err) {
       console.error("Failed to discard session:", err);

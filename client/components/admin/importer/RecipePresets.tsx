@@ -28,7 +28,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { listRecipes, deleteRecipe } from "@site/lib/importer/sessionPersistence";
-import { supabase } from "../../../../vendor/cms-core/client/lib/supabase";
+import { getAccessTokenSafe } from "../../../../vendor/cms-core/client/lib/supabase";
 
 export default function RecipePresets() {
   const [recipes, setRecipes] = useState<
@@ -52,8 +52,8 @@ export default function RecipePresets() {
   const loadRecipes = async () => {
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const list = await listRecipes(undefined, session?.access_token);
+      const token = await getAccessTokenSafe();
+      const list = await listRecipes(undefined, token);
       setRecipes(list);
     } catch (err) {
       console.error("Failed to load recipes:", err);
@@ -64,8 +64,8 @@ export default function RecipePresets() {
 
   const handleDelete = async (id: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      await deleteRecipe(id, session?.access_token);
+      const token = await getAccessTokenSafe();
+      await deleteRecipe(id, token);
       setRecipes((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
       console.error("Failed to delete recipe:", err);

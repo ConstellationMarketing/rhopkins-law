@@ -51,7 +51,7 @@ import {
   completeSession,
   touchRecipe,
 } from "@site/lib/importer/sessionPersistence";
-import { supabase } from "../../../../vendor/cms-core/client/lib/supabase";
+import { getAccessTokenSafe } from "../../../../vendor/cms-core/client/lib/supabase";
 
 interface StepImportRunProps {
   templateType: TemplateType;
@@ -170,8 +170,7 @@ export default function StepImportRun({
     onImportingChange(true);
 
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
+      const token = await getAccessTokenSafe();
       if (!token) {
         setError("Authentication required. Please log in again.");
         onImportingChange(false);

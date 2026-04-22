@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getAccessTokenSafe } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -128,10 +128,7 @@ export default function AdminImageCacheMigration() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const getAuthToken = async (): Promise<string | null> => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    return session?.access_token || null;
+    return (await getAccessTokenSafe()) || null;
   };
 
   const requestMigration = async (body: Record<string, unknown>) => {

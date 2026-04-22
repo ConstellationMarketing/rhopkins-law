@@ -19,7 +19,7 @@ import type {
 } from "@site/lib/importer/types";
 import { parseCSV } from "@site/lib/importer/csvParser";
 import { parseJSON } from "@site/lib/importer/apiParser";
-import { supabase } from "../../../../vendor/cms-core/client/lib/supabase";
+import { getAccessTokenSafe } from "../../../../vendor/cms-core/client/lib/supabase";
 
 interface StepSourceSelectProps {
   templateType: TemplateType;
@@ -111,8 +111,7 @@ export default function StepSourceSelect({
     try {
       if (useServerFetch) {
         // Server-side fetch via Netlify function
-        const { data: sessionData } = await supabase.auth.getSession();
-        const token = sessionData?.session?.access_token;
+        const token = await getAccessTokenSafe();
 
         const headersObj: Record<string, string> = {};
         if (apiHeaders.trim()) {

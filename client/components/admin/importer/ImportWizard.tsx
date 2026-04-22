@@ -40,7 +40,7 @@ import {
   flushSave,
   loadSession,
 } from "@site/lib/importer/sessionPersistence";
-import { supabase } from "../../../../vendor/cms-core/client/lib/supabase";
+import { getAccessTokenSafe } from "../../../../vendor/cms-core/client/lib/supabase";
 
 interface ImportWizardProps {
   /** Session to resume (passed from SessionResumeBanner) */
@@ -58,8 +58,8 @@ export default function ImportWizard({
 
   // Fetch access token on mount
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      accessTokenRef.current = session?.access_token;
+    void getAccessTokenSafe().then((token) => {
+      accessTokenRef.current = token;
     });
   }, []);
 

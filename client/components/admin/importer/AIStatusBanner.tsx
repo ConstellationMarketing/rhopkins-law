@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Brain, Cpu, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
-import { supabase } from "../../../../vendor/cms-core/client/lib/supabase";
+import { getAccessTokenSafe } from "../../../../vendor/cms-core/client/lib/supabase";
 
 interface AIStatusBannerProps {
   onAvailabilityChange?: (available: boolean) => void;
@@ -24,8 +24,7 @@ export default function AIStatusBanner({
   const checkAvailability = async () => {
     setChecking(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
+      const token = await getAccessTokenSafe();
 
       const response = await fetch("/.netlify/functions/ai-migration-assist", {
         method: "POST",
