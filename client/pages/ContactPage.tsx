@@ -198,7 +198,7 @@ export default function ContactPage() {
                   </span>
                   <span className="font-playfair text-[28px] md:text-[36px] leading-tight">Load Map</span>
                   <span className="font-outfit text-[16px] md:text-[18px] text-white/75 max-w-[520px]">
-                    Load the interactive Google Map only when needed to keep the page faster.
+                    24 Veterans Square, Media, PA, 19063. Click to Load the Map.
                   </span>
                 </button>
               )}
