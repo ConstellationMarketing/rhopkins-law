@@ -169,7 +169,7 @@ export function resolveSeo(input: ResolveSeoInput): ResolvedSeo {
     cleanValue(input.canonical) ||
     (siteUrl ? `${siteUrl}${normalizedPathname}` : undefined);
   const image = cleanValue(input.image) || (siteUrl ? `${siteUrl}/og-image.jpg` : undefined);
-  const resolvedTitle = title && siteName && title !== siteName ? `${title} | ${siteName}` : title;
+  const resolvedTitle = title;
   const noindex = Boolean(input.noindex || input.siteSettings?.siteNoindex);
 
   return {

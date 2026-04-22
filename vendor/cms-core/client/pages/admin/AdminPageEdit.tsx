@@ -12,7 +12,13 @@ import { defaultPracticeAreasContent } from "@site/lib/cms/practiceAreasPageType
 import type { PracticeAreasPageContent } from "@site/lib/cms/practiceAreasPageTypes";
 import { defaultPracticeAreaPageContent } from "@site/lib/cms/practiceAreaPageTypes";
 import type { PracticeAreaPageContent } from "@site/lib/cms/practiceAreaPageTypes";
+import { clearHomeContentCache } from "@site/hooks/useHomeContent";
+import { clearAboutContentCache } from "@site/hooks/useAboutContent";
+import { clearContactContentCache } from "@site/hooks/useContactContent";
+import { clearPracticeAreasContentCache } from "@site/hooks/usePracticeAreasContent";
 import { clearPracticeAreaPageCache } from "@site/hooks/usePracticeAreaPageContent";
+import { clearBlogContentCache } from "@site/hooks/useBlogContent";
+import { clearDynamicPageCache } from "@site/pages/DynamicPage";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,7 +50,6 @@ import SchemaTypeSelector from "../../components/admin/SchemaTypeSelector";
 import SchemaPreview from "../../components/admin/SchemaPreview";
 import ImageUploader from "../../components/admin/ImageUploader";
 import { clearPageCache } from "../../hooks/usePageContent";
-import type { PageKey } from "../../lib/pageContentTypes";
 import RevisionPanel, { createPageRevision } from "../../components/admin/RevisionPanel";
 import URLChangeRedirectModal from "../../components/admin/URLChangeRedirectModal";
 import type { PageRevision } from "@/lib/database.types";
@@ -54,6 +59,106 @@ import { toast } from "sonner";
 // Strip trailing slash for path comparisons (except root "/")
 function normalizePath(p: string): string {
   return p === "/" ? p : p.replace(/\/+$/, "");
+}
+
+function normalizePublishedPath(path?: string | null): string {
+  if (!path) {
+    return "";
+  }
+
+  return path === "/" ? "/" : `${normalizePath(path)}/`;
+}
+
+function getPracticeAreaSlug(path?: string | null): string | null {
+  const normalizedPath = normalizePath(path ?? "");
+
+  if (!normalizedPath.startsWith("/practice-areas/")) {
+    return null;
+  }
+
+  const slug = normalizedPath.replace(/^\/practice-areas\//, "");
+  return slug || null;
+}
+
+function invalidatePublicPageCaches(...paths: Array<string | null | undefined>) {
+  const uniquePaths = Array.from(
+    new Set(
+      paths
+        .map((path) => normalizePublishedPath(path))
+        .filter((path): path is string => Boolean(path)),
+    ),
+  );
+
+  for (const path of uniquePaths) {
+    clearDynamicPageCache(path);
+
+    switch (normalizePath(path)) {
+      case "/":
+        clearHomeContentCache();
+        clearPageCache("/");
+        break;
+      case "/about":
+        clearAboutContentCache();
+        clearPageCache("/about");
+        break;
+      case "/contact":
+        clearContactContentCache();
+        clearPageCache("/contact");
+        break;
+      case "/practice-areas":
+        clearPracticeAreasContentCache();
+        clearPageCache("/practice-areas");
+        break;
+      case "/blog":
+        clearBlogContentCache();
+        break;
+      default:
+        break;
+    }
+
+    const practiceAreaSlug = getPracticeAreaSlug(path);
+    if (practiceAreaSlug) {
+      clearPracticeAreaPageCache(practiceAreaSlug);
+    }
+  }
+}
+
+function jsonValueChanged(previousValue: unknown, nextValue: unknown): boolean {
+  return JSON.stringify(previousValue ?? null) !== JSON.stringify(nextValue ?? null);
+}
+
+function shouldTriggerPublishedPageRebuild(previousPage: Page | null, nextPage: Page): boolean {
+  const nextIsPublished = nextPage.status === "published";
+
+  if (!previousPage) {
+    return nextIsPublished;
+  }
+
+  const previousIsPublished = previousPage.status === "published";
+
+  if (previousIsPublished !== nextIsPublished) {
+    return true;
+  }
+
+  if (!previousIsPublished && !nextIsPublished) {
+    return false;
+  }
+
+  return (
+    normalizePublishedPath(previousPage.url_path) !== normalizePublishedPath(nextPage.url_path) ||
+    previousPage.title !== nextPage.title ||
+    previousPage.page_type !== nextPage.page_type ||
+    previousPage.meta_title !== nextPage.meta_title ||
+    previousPage.meta_description !== nextPage.meta_description ||
+    previousPage.canonical_url !== nextPage.canonical_url ||
+    previousPage.og_title !== nextPage.og_title ||
+    previousPage.og_description !== nextPage.og_description ||
+    previousPage.og_image !== nextPage.og_image ||
+    Boolean(previousPage.noindex) !== Boolean(nextPage.noindex) ||
+    previousPage.schema_type !== nextPage.schema_type ||
+    jsonValueChanged(previousPage.schema_data, nextPage.schema_data) ||
+    jsonValueChanged(previousPage.content, nextPage.content)
+  );
 }
 
 // Generic deep merge utility for content normalization
@@ -106,8 +211,7 @@ export default function AdminPageEdit() {
   const [page, setPage] = useState<Page | null>(null);
   const [activeTab, setActiveTab] = useState("content");
   const [originalUrlPath, setOriginalUrlPath] = useState<string>("");
-  const [previousStatus, setPreviousStatus] = useState<string>("");
-  const [previousNoindex, setPreviousNoindex] = useState<boolean>(false);
+  const [originalPageSnapshot, setOriginalPageSnapshot] = useState<Page | null>(null);
   const [showRedirectModal, setShowRedirectModal] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
   const { settings: siteSettings } = useSiteSettings();
@@ -133,8 +237,7 @@ export default function AdminPageEdit() {
 
     setPage(data);
     setOriginalUrlPath(data.url_path);
-    setPreviousStatus(data.status);
-    setPreviousNoindex(data.noindex ?? false);
+    setOriginalPageSnapshot(data);
     setLoading(false);
   };
 
@@ -163,6 +266,22 @@ export default function AdminPageEdit() {
       ? '/'
       : page.url_path.replace(/\/+$/, '') + '/';
 
+    const publishedAt =
+      page.status === "published" && !page.published_at
+        ? new Date().toISOString()
+        : page.published_at;
+
+    const savedPageSnapshot: Page = {
+      ...page,
+      url_path: normalizedSaveUrlPath,
+      published_at: publishedAt,
+    };
+
+    const shouldTriggerRebuild = shouldTriggerPublishedPageRebuild(
+      originalPageSnapshot,
+      savedPageSnapshot,
+    );
+
     const { error } = await supabase
       .from("pages")
       .update({
@@ -180,10 +299,7 @@ export default function AdminPageEdit() {
         schema_type: page.schema_type,
         schema_data: page.schema_data,
         status: page.status,
-        published_at:
-          page.status === "published" && !page.published_at
-            ? new Date().toISOString()
-            : page.published_at,
+        published_at: publishedAt,
       } as Record<string, unknown>)
       .eq("id", page.id);
 
@@ -191,24 +307,13 @@ export default function AdminPageEdit() {
       console.error("Error saving page:", error);
       toast.error("Failed to save page: " + error.message);
     } else {
-      // Clear the page cache so the frontend fetches fresh content
-      const savedNormPath = normalizePath(page.url_path);
-      if (savedNormPath === "/" || savedNormPath === "/about" || savedNormPath === "/contact" || savedNormPath === "/practice-areas") {
-        clearPageCache(savedNormPath as PageKey);
-      }
-      // Clear individual practice area page cache
-      if (page.url_path?.startsWith("/practice-areas/")) {
-        const slug = page.url_path.replace("/practice-areas/", "");
-        clearPracticeAreaPageCache(slug);
-      }
-      // Update tracking state after successful save with normalized path
-      setPage(prev => prev ? { ...prev, url_path: normalizedSaveUrlPath } : prev);
-      setOriginalUrlPath(normalizedSaveUrlPath);
-      setPreviousStatus(page.status);
+      invalidatePublicPageCaches(originalUrlPath, normalizedSaveUrlPath);
 
-      // Trigger rebuild if noindex changed on a published page
-      // (draft pages are not in the SSG output, so no rebuild needed)
-      if (previousNoindex !== page.noindex && page.status === "published") {
+      setPage((prev) => (prev ? { ...prev, url_path: normalizedSaveUrlPath, published_at: publishedAt } : prev));
+      setOriginalUrlPath(normalizedSaveUrlPath);
+      setOriginalPageSnapshot(savedPageSnapshot);
+
+      if (shouldTriggerRebuild) {
         triggerRebuild().then((result) => {
           if (result.ok) {
             toast.success("Page saved. Site rebuild triggered — changes will be live after the deploy completes.");
@@ -220,7 +325,6 @@ export default function AdminPageEdit() {
         toast.success("Page saved successfully!");
       }
 
-      setPreviousNoindex(page.noindex ?? false);
       setPendingSave(false);
     }
     setSaving(false);

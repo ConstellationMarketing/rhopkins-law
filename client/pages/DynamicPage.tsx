@@ -38,6 +38,15 @@ type CmsPage = DynamicCmsPage | PracticeCmsPage;
 
 const pageCache = new Map<string, CmsPage>();
 
+export function clearDynamicPageCache(path?: string) {
+  if (path) {
+    pageCache.delete(normalizeCmsPath(path));
+    return;
+  }
+
+  pageCache.clear();
+}
+
 function resolvePreloadedPage(queryPath: string): CmsPage | null {
   const routeData = getCmsPreloadedRouteData(queryPath);
 

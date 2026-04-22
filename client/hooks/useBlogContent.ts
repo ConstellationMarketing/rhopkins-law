@@ -111,3 +111,9 @@ export function useBlogContent(): UseBlogContentResult {
 
   return { hero, recentPosts, meta, isLoading };
 }
+
+export function clearBlogContentCache() {
+  cachedHero = null;
+  cachedRecentPosts = null;
+  cachedMeta = null;
+}
