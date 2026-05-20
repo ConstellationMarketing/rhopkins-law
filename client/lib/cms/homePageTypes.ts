@@ -56,6 +56,19 @@ export interface PracticeAreasIntroContent {
   heading: string;
 }
 
+export interface AreasWeServeCounty {
+  title: string;
+  description: string;
+  link?: string;
+}
+
+export interface AreasWeServeContent {
+  heading: string;
+  subtitle: string;
+  counties: AreasWeServeCounty[];
+  closingText: string;
+}
+
 export interface AwardsContent {
   sectionLabel: string;
   heading: string;
@@ -160,6 +173,7 @@ export interface HomePageContent {
   partnerLogos: PartnerLogo[];
   about: AboutContent;
   attorneySpotlight: AttorneySpotlightContent;
+  areasWeServe: AreasWeServeContent;
   homeCta: HomeCTAContent;
   practiceAreasIntro: PracticeAreasIntroContent;
   practiceAreas: PracticeAreaItem[];
@@ -210,6 +224,12 @@ export const defaultHomeContent: HomePageContent = {
     imageAlt: "",
     attorneyName: "",
     attorneyTitle: "",
+  },
+  areasWeServe: {
+    heading: "",
+    subtitle: "",
+    counties: [],
+    closingText: "",
   },
   homeCta: {
     heading: "",

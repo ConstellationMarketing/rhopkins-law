@@ -22,6 +22,7 @@ function isHomeContent(content: unknown): content is HomePageContent {
     Array.isArray(content.partnerLogos) &&
     isRecord(content.about) &&
     isRecord(content.attorneySpotlight) &&
+    (content.areasWeServe === undefined || isRecord(content.areasWeServe)) &&
     isRecord(content.homeCta) &&
     isRecord(content.practiceAreasIntro) &&
     Array.isArray(content.practiceAreas) &&
@@ -131,6 +132,13 @@ function PreviewImage({ src, alt }: { src?: string; alt?: string }) {
 }
 
 function HomePreview({ content }: { content: HomePageContent }) {
+  const areasWeServe = content.areasWeServe || {
+    heading: "",
+    subtitle: "",
+    counties: [],
+    closingText: "",
+  };
+
   return (
     <div className="space-y-4">
       <PreviewSection title="Hero">
@@ -157,6 +165,12 @@ function HomePreview({ content }: { content: HomePageContent }) {
           src={content.attorneySpotlight.image}
           alt={content.attorneySpotlight.imageAlt}
         />
+      </PreviewSection>
+
+      <PreviewSection title="Areas We Serve">
+        <PreviewField label="Heading" value={areasWeServe.heading} />
+        <PreviewField label="County Cards" value={areasWeServe.counties.length} />
+        <PreviewField label="Closing Text" value={areasWeServe.closingText} />
       </PreviewSection>
 
       <PreviewSection title="Practice Areas">

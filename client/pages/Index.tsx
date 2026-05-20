@@ -2,6 +2,7 @@ import Seo from "@site/components/Seo";
 import Layout from "@site/components/layout/Layout";
 import AboutSection from "@site/components/home/AboutSection";
 import AttorneySpotlightSection from "@site/components/home/AttorneySpotlightSection";
+import AreasWeServeSection from "@site/components/home/AreasWeServeSection";
 import HomeCTASection from "@site/components/home/HomeCTASection";
 import PracticeAreasSection from "@site/components/home/PracticeAreasSection";
 import PracticeAreasGrid from "@site/components/home/PracticeAreasGrid";
@@ -205,6 +206,10 @@ export default function Index() {
         </div>
       </div>
 
+      <AreasWeServeSection
+        content={content.areasWeServe}
+        headingTag={content.headingTags?.["areasWeServe.heading"]}
+      />
       <HomeCTASection content={content.homeCta} />
       <PracticeAreasSection content={content.practiceAreasIntro} />
       <PracticeAreasGrid areas={content.practiceAreas} />

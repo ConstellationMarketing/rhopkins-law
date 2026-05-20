@@ -17,6 +17,7 @@ export default function HomeEditor({ content, onChange }: HomeEditorProps) {
       <PartnerLogosSection content={content} update={update} />
       <AboutSectionEditor content={content} update={update} />
       <AttorneySpotlightEditor content={content} update={update} />
+      <AreasWeServeEditor content={content} update={update} />
       <HomeCTAEditor content={content} update={update} />
       <PracticeAreasIntroSection content={content} update={update} />
       <PracticeAreasItemsSection content={content} update={update} />
@@ -257,6 +258,78 @@ function AttorneySpotlightEditor({ content, update }: SectionProps) {
             <Label>Attorney Title</Label>
             <Input value={s.attorneyTitle} onChange={(e) => set({ attorneyTitle: e.target.value })} placeholder="e.g. Divorce Attorney" />
           </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+function AreasWeServeEditor({ content, update }: SectionProps) {
+  const areasWeServe = content.areasWeServe;
+  const set = (patch: Partial<typeof areasWeServe>) =>
+    update("areasWeServe", { ...areasWeServe, ...patch });
+  const ht = useHeadingTag(content, update);
+
+  return (
+    <Section title="Areas We Serve Section" defaultOpen={false}>
+      <div className="grid gap-4">
+        <HeadingField
+          label="Heading"
+          value={areasWeServe.heading}
+          onChange={(v) => set({ heading: v })}
+          tag={ht.get("areasWeServe.heading")}
+          onTagChange={(t) => ht.set("areasWeServe.heading", t)}
+        />
+        <div>
+          <Label>Subtitle</Label>
+          <Textarea
+            value={areasWeServe.subtitle}
+            onChange={(e) => set({ subtitle: e.target.value })}
+            placeholder="Short intro text shown under the heading"
+          />
+        </div>
+        <ArrayEditor
+          items={areasWeServe.counties}
+          onChange={(items) => set({ counties: items })}
+          itemLabel="County"
+          newItem={() => ({ title: "", description: "", link: "" })}
+          renderItem={(item, _, upd) => (
+            <div className="grid gap-3">
+              <div>
+                <Label>County Name</Label>
+                <Input
+                  value={item.title}
+                  onChange={(e) => upd({ ...item, title: e.target.value })}
+                  placeholder="Delaware County"
+                />
+              </div>
+              <div>
+                <Label>Description</Label>
+                <Textarea
+                  value={item.description}
+                  onChange={(e) => upd({ ...item, description: e.target.value })}
+                  placeholder="Including Media, Springfield, Upper Darby..."
+                />
+              </div>
+              <div>
+                <Label>Optional Link</Label>
+                <Input
+                  value={item.link || ""}
+                  onChange={(e) => upd({ ...item, link: e.target.value })}
+                  placeholder="/contact/"
+                />
+              </div>
+            </div>
+          )}
+        />
+        <div>
+          <Label>Closing Text</Label>
+          <Textarea
+            value={areasWeServe.closingText}
+            onChange={(e) => set({ closingText: e.target.value })}
+            placeholder="Short paragraph shown below the county row"
+          />
         </div>
       </div>
     </Section>

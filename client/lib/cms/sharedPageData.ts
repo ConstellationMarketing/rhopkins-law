@@ -296,6 +296,13 @@ function mergeHomeContentWithDefaults(
       ...defaults.attorneySpotlight,
       ...cmsContent.attorneySpotlight,
     },
+    areasWeServe: {
+      ...defaults.areasWeServe,
+      ...cmsContent.areasWeServe,
+      counties: cmsContent.areasWeServe?.counties?.length
+        ? cmsContent.areasWeServe.counties
+        : defaults.areasWeServe.counties,
+    },
     homeCta: {
       ...defaults.homeCta,
       ...cmsContent.homeCta,
