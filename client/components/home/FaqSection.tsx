@@ -30,14 +30,14 @@ export default function FaqSection({ content }: FaqSectionProps) {
       <div className="max-w-[1080px] mx-auto w-[95%] md:w-[85%] lg:w-[80%] py-[20px] md:py-[27px]">
         <div className="text-center">
           {data.heading && (
-            <h2 className="font-playfair text-[32px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black pb-[10px]">
+            <h2 className="font-playfair text-[28px] md:text-[48px] lg:text-[54px] leading-tight md:leading-[54px] text-black pb-[10px]">
               {data.heading}
             </h2>
           )}
           {data.description && (
             <RichText
               html={data.description}
-              className="font-outfit text-[16px] md:text-[24px] leading-[24px] md:leading-[36px] text-black text-center"
+              className="font-outfit text-[15px] md:text-[24px] leading-[23px] md:leading-[36px] text-black text-center"
             />
           )}
         </div>
@@ -70,7 +70,7 @@ export default function FaqSection({ content }: FaqSectionProps) {
             >
               <button
                 onClick={() => toggleFaq(index)}
-                className={`w-full font-outfit text-[28px] leading-[28px] px-[20px] py-[20px] text-left flex items-center justify-between cursor-pointer ${
+                className={`w-full font-outfit text-[20px] md:text-[28px] leading-[26px] md:leading-[28px] px-[20px] py-[20px] text-left flex items-center justify-between cursor-pointer ${
                   openIndex === index ? "text-white" : "text-[rgb(67,67,67)]"
                 }`}
               >
@@ -84,7 +84,7 @@ export default function FaqSection({ content }: FaqSectionProps) {
               {openIndex === index && (
                 <RichText
                   html={faq.answer}
-                  className="font-outfit text-[22px] leading-[33px] font-light px-[20px] pb-[20px] pt-[20px] text-white"
+                  className="font-outfit text-[16px] md:text-[22px] leading-[24px] md:leading-[33px] font-light px-[20px] pb-[20px] pt-[20px] text-white"
                 />
               )}
             </div>
