@@ -65,7 +65,7 @@ export default function FaqSection({ content }: FaqSectionProps) {
             <div
               key={index}
               className={`border-[0.8px] border-[rgb(217,217,217)] ${
-                index < faqs.length - 1 ? "mb-[5.82%]" : ""
+                index < faqs.length - 1 ? "mb-3 md:mb-4" : ""
               } ${openIndex === index ? "bg-brand-dark" : "bg-white"}`}
             >
               <button
