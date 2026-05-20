@@ -137,6 +137,7 @@ function HomePreview({ content }: { content: HomePageContent }) {
         <PreviewField label="H1 Title" value={content.hero.h1Title} />
         <PreviewField label="Headline" value={content.hero.headline} />
         <PreviewField label="Highlighted Text" value={content.hero.highlightedText} />
+        <PreviewField label="Description" value={content.hero.description} />
         <PreviewImage src={content.hero.heroImage} alt={content.hero.heroImageAlt} />
       </PreviewSection>
 

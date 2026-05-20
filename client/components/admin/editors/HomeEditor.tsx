@@ -68,6 +68,14 @@ function HeroSection({ content, update }: SectionProps) {
           <Input value={hero.highlightedText} onChange={(e) => set({ highlightedText: e.target.value })} />
           <p className="text-xs text-gray-500 mt-1">Enter the exact portion of the headline to display in accent color</p>
         </div>
+        <div>
+          <Label>Description</Label>
+          <Textarea
+            value={hero.description}
+            onChange={(e) => set({ description: e.target.value })}
+            placeholder="Short supporting text shown under the headline and above the CTA buttons"
+          />
+        </div>
         <ImageField
           label="Hero Image"
           value={hero.heroImage}

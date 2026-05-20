@@ -84,6 +84,11 @@ export default function Index() {
                       </>
                     )}
                 </p>
+                {heroContent.description?.trim() && (
+                  <p className="mt-[18px] max-w-[720px] font-outfit text-[18px] md:text-[22px] leading-[28px] md:leading-[34px] text-white/85 whitespace-pre-line">
+                    {heroContent.description}
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-8 items-stretch mb-[30px] md:mb-[40px]">

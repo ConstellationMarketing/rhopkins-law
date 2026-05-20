@@ -5,6 +5,7 @@ export interface HeroContent {
   h1Title: string; // H1 title text (all caps, ~20px) between headline and phone button
   headline: string;
   highlightedText: string;
+  description: string;
   phone: string;
   phoneLabel: string;
   heroImage: string;
@@ -178,6 +179,7 @@ export const defaultHomeContent: HomePageContent = {
     h1Title: "",
     headline: "",
     highlightedText: "",
+    description: "",
     phone: "",
     phoneLabel: "",
     heroImage: "",
