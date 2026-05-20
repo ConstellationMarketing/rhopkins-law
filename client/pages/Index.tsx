@@ -57,7 +57,7 @@ export default function Index() {
         className="w-full overflow-hidden"
         style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 28%, #060d1a 100%)" }}
       >
-        <div className="max-w-[2560px] mx-auto w-[95%] pt-[170px] lg:pt-[155px]">
+        <div className="max-w-[2560px] mx-auto w-[95%] pt-[190px] lg:pt-[175px]">
           <div className="flex flex-col lg:flex-row lg:items-end gap-4 lg:gap-[3%]">
             <div className="lg:w-[65.667%] pb-[20px] md:pb-[60px]">
               <div className="mb-[30px] md:mb-[40px]">
