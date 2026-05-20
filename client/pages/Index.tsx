@@ -4,6 +4,7 @@ import AboutSection from "@site/components/home/AboutSection";
 import AttorneySpotlightSection from "@site/components/home/AttorneySpotlightSection";
 import AreasWeServeSection from "@site/components/home/AreasWeServeSection";
 import HomeCTASection from "@site/components/home/HomeCTASection";
+import WhyChooseUsSection from "@site/components/home/WhyChooseUsSection";
 import PracticeAreasSection from "@site/components/home/PracticeAreasSection";
 import PracticeAreasGrid from "@site/components/home/PracticeAreasGrid";
 import AwardsSection from "@site/components/home/AwardsSection";
@@ -211,6 +212,10 @@ export default function Index() {
         headingTag={content.headingTags?.["areasWeServe.heading"]}
       />
       <HomeCTASection content={content.homeCta} />
+      <WhyChooseUsSection
+        content={content.whyChooseUs}
+        headingTag={content.headingTags?.["whyChooseUs.heading"]}
+      />
       <PracticeAreasSection content={content.practiceAreasIntro} />
       <PracticeAreasGrid areas={content.practiceAreas} />
 

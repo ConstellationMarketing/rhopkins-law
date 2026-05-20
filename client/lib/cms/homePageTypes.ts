@@ -167,6 +167,11 @@ export interface HomeCTAContent {
   };
 }
 
+export interface WhyChooseUsContent {
+  heading: string;
+  description: string;
+}
+
 // Complete homepage content structure
 export interface HomePageContent {
   hero: HeroContent;
@@ -175,6 +180,7 @@ export interface HomePageContent {
   attorneySpotlight: AttorneySpotlightContent;
   areasWeServe: AreasWeServeContent;
   homeCta: HomeCTAContent;
+  whyChooseUs: WhyChooseUsContent;
   practiceAreasIntro: PracticeAreasIntroContent;
   practiceAreas: PracticeAreaItem[];
   awards: AwardsContent;
@@ -239,6 +245,10 @@ export const defaultHomeContent: HomePageContent = {
       sublabel: "",
       link: "",
     },
+  },
+  whyChooseUs: {
+    heading: "",
+    description: "",
   },
   practiceAreasIntro: {
     sectionLabel: "",

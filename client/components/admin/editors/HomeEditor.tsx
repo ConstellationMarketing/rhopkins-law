@@ -19,6 +19,7 @@ export default function HomeEditor({ content, onChange }: HomeEditorProps) {
       <AttorneySpotlightEditor content={content} update={update} />
       <AreasWeServeEditor content={content} update={update} />
       <HomeCTAEditor content={content} update={update} />
+      <WhyChooseUsEditor content={content} update={update} />
       <PracticeAreasIntroSection content={content} update={update} />
       <PracticeAreasItemsSection content={content} update={update} />
       <AwardsSection content={content} update={update} />
@@ -366,6 +367,34 @@ function HomeCTAEditor({ content, update }: SectionProps) {
             <Input value={cta.secondaryButton.link} onChange={(e) => set({ secondaryButton: { ...cta.secondaryButton, link: e.target.value } })} />
           </div>
         </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+function WhyChooseUsEditor({ content, update }: SectionProps) {
+  const whyChooseUs = content.whyChooseUs;
+  const set = (patch: Partial<typeof whyChooseUs>) =>
+    update("whyChooseUs", { ...whyChooseUs, ...patch });
+  const ht = useHeadingTag(content, update);
+
+  return (
+    <Section title="Why Choose Us Section" defaultOpen={false}>
+      <div className="grid gap-4">
+        <HeadingField
+          label="Heading"
+          value={whyChooseUs.heading}
+          onChange={(v) => set({ heading: v })}
+          tag={ht.get("whyChooseUs.heading")}
+          onTagChange={(t) => ht.set("whyChooseUs.heading", t)}
+        />
+        <RichTextField
+          label="Content"
+          value={whyChooseUs.description}
+          onChange={(v) => set({ description: v })}
+          placeholder="Add several paragraphs of centered supporting copy"
+        />
       </div>
     </Section>
   );

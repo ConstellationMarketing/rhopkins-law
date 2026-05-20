@@ -24,6 +24,7 @@ function isHomeContent(content: unknown): content is HomePageContent {
     isRecord(content.attorneySpotlight) &&
     (content.areasWeServe === undefined || isRecord(content.areasWeServe)) &&
     isRecord(content.homeCta) &&
+    (content.whyChooseUs === undefined || isRecord(content.whyChooseUs)) &&
     isRecord(content.practiceAreasIntro) &&
     Array.isArray(content.practiceAreas) &&
     isRecord(content.awards) &&
@@ -138,6 +139,10 @@ function HomePreview({ content }: { content: HomePageContent }) {
     counties: [],
     closingText: "",
   };
+  const whyChooseUs = content.whyChooseUs || {
+    heading: "",
+    description: "",
+  };
 
   return (
     <div className="space-y-4">
@@ -171,6 +176,11 @@ function HomePreview({ content }: { content: HomePageContent }) {
         <PreviewField label="Heading" value={areasWeServe.heading} />
         <PreviewField label="County Cards" value={areasWeServe.counties.length} />
         <PreviewField label="Closing Text" value={areasWeServe.closingText} />
+      </PreviewSection>
+
+      <PreviewSection title="Why Choose Us">
+        <PreviewField label="Heading" value={whyChooseUs.heading} />
+        <PreviewField label="Content" value={whyChooseUs.description} />
       </PreviewSection>
 
       <PreviewSection title="Practice Areas">

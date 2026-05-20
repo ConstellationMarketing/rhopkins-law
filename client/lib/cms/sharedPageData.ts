@@ -311,6 +311,10 @@ function mergeHomeContentWithDefaults(
         ...cmsContent.homeCta?.secondaryButton,
       },
     },
+    whyChooseUs: {
+      ...defaults.whyChooseUs,
+      ...cmsContent.whyChooseUs,
+    },
     contact: { ...defaults.contact, ...cmsContent.contact },
   };
 }
