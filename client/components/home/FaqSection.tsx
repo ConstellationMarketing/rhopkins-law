@@ -25,7 +25,7 @@ export default function FaqSection({ content }: FaqSectionProps) {
   };
 
   return (
-    <div className="bg-white pt-[30px] md:pt-[54px]">
+    <div className="bg-white pt-[30px] md:pt-[54px] pb-[40px] md:pb-[60px]">
       {/* Header Section */}
       <div className="max-w-[1080px] mx-auto w-[95%] md:w-[85%] lg:w-[80%] py-[20px] md:py-[27px]">
         <div className="text-center">
