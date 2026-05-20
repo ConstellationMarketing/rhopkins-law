@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
+import type { User } from "@supabase/supabase-js";
+import { getSessionSafe, supabase } from "../lib/supabase";
 
 export type UserRole = "admin" | "editor" | null;
 
@@ -26,23 +27,16 @@ export function useUserRole(): UseUserRoleResult {
   useEffect(() => {
     let isMounted = true;
 
-    async function fetchUserRole() {
+    async function fetchUserRole(nextUser?: User | null) {
       try {
-        // Get current authenticated user
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-
-        if (authError) {
-          throw authError;
-        }
+        const user = nextUser === undefined ? (await getSessionSafe())?.user ?? null : nextUser;
 
         if (!user) {
           if (isMounted) {
             setRole(null);
             setUserId(null);
             setUserEmail(null);
+            setError(null);
             setIsLoading(false);
           }
           return;
@@ -51,6 +45,7 @@ export function useUserRole(): UseUserRoleResult {
         if (isMounted) {
           setUserId(user.id);
           setUserEmail(user.email || null);
+          setError(null);
         }
 
         // Check cache
@@ -109,9 +104,9 @@ export function useUserRole(): UseUserRoleResult {
     // Subscribe to auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       roleCache = null; // Clear cache on auth change
-      fetchUserRole();
+      fetchUserRole(session?.user ?? null);
     });
 
     return () => {
