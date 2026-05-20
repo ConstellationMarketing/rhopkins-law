@@ -17,7 +17,7 @@ export default function WhyChooseUsSection({
 
   return (
     <section className="w-full" style={{ backgroundColor: "#EFF0EB" }}>
-      <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[80%] pt-[120px] md:pt-[160px] pb-[100px] md:pb-[130px]">
+      <div className="max-w-[2560px] mx-auto w-[95%] md:w-[90%] lg:w-[80%] pt-[120px] md:pt-[160px] pb-[120px] md:pb-[160px]">
         <div className="max-w-[1040px] mx-auto text-center">
           {content.heading?.trim() && (
             <div className="mb-[24px] md:mb-[36px]">
