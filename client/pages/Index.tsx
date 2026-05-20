@@ -57,7 +57,7 @@ export default function Index() {
         className="w-full overflow-hidden"
         style={{ background: "linear-gradient(to right, #365d96 0%, #365d96 28%, #060d1a 100%)" }}
       >
-        <div className="max-w-[2560px] mx-auto w-[95%] pt-[120px] lg:pt-[105px]">
+        <div className="max-w-[2560px] mx-auto w-[95%] pt-[145px] lg:pt-[130px]">
           <div className="flex flex-col lg:flex-row lg:items-end gap-4 lg:gap-[3%]">
             <div className="lg:w-[65.667%] pb-[20px] md:pb-[60px]">
               <div className="mb-[30px] md:mb-[40px]">
@@ -85,7 +85,7 @@ export default function Index() {
                     )}
                 </p>
                 {heroContent.description?.trim() && (
-                  <p className="mt-[18px] max-w-[720px] font-outfit text-[18px] md:text-[22px] leading-[28px] md:leading-[34px] text-white/85 whitespace-pre-line">
+                  <p className="mt-[18px] max-w-[720px] font-outfit text-[16px] md:text-[18px] leading-[24px] md:leading-[30px] text-white/85 whitespace-pre-line">
                     {heroContent.description}
                   </p>
                 )}
