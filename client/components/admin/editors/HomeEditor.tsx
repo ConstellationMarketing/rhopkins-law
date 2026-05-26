@@ -420,6 +420,24 @@ function PracticeAreasIntroSection({ content, update }: SectionProps) {
           <Label>Text</Label>
           <Input value={intro.heading} onChange={(e) => set({ heading: e.target.value })} />
         </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Button Text</Label>
+            <Input
+              value={intro.buttonText || ""}
+              onChange={(e) => set({ buttonText: e.target.value })}
+              placeholder="View All Practice Areas"
+            />
+          </div>
+          <div>
+            <Label>Button Link</Label>
+            <Input
+              value={intro.buttonLink || ""}
+              onChange={(e) => set({ buttonLink: e.target.value })}
+              placeholder="/practice-areas/"
+            />
+          </div>
+        </div>
       </div>
     </Section>
   );

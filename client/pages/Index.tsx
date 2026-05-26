@@ -217,7 +217,11 @@ export default function Index() {
         headingTag={content.headingTags?.["whyChooseUs.heading"]}
       />
       <PracticeAreasSection content={content.practiceAreasIntro} />
-      <PracticeAreasGrid areas={content.practiceAreas} />
+      <PracticeAreasGrid
+        areas={content.practiceAreas}
+        buttonText={content.practiceAreasIntro.buttonText}
+        buttonLink={content.practiceAreasIntro.buttonLink}
+      />
 
       <div style={deferredSectionStyle}>
         <AwardsSection content={content.awards} headingTag={content.headingTags?.["awards.sectionLabel"]} />

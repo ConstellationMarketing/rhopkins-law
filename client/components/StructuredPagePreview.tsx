@@ -185,6 +185,7 @@ function HomePreview({ content }: { content: HomePageContent }) {
 
       <PreviewSection title="Practice Areas">
         <PreviewField label="Section Heading" value={content.practiceAreasIntro.heading} />
+        <PreviewField label="Button Text" value={content.practiceAreasIntro.buttonText} />
         <PreviewField label="Areas" value={content.practiceAreas.length} />
       </PreviewSection>
 

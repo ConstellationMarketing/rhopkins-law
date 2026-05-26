@@ -1,14 +1,25 @@
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { PracticeAreaItem } from "@site/lib/cms/homePageTypes";
 import PracticeAreaCard from "@site/components/practice/PracticeAreaCard";
 
 interface PracticeAreasGridProps {
   areas?: PracticeAreaItem[];
+  buttonText?: string;
+  buttonLink?: string;
 }
 
-export default function PracticeAreasGrid({ areas }: PracticeAreasGridProps) {
+export default function PracticeAreasGrid({
+  areas,
+  buttonText,
+  buttonLink,
+}: PracticeAreasGridProps) {
   if (!areas || areas.length === 0) {
     return null;
   }
+
+  const ctaText = buttonText?.trim() || "";
+  const ctaLink = buttonLink?.trim() || "";
 
   return (
     <div
@@ -30,6 +41,19 @@ export default function PracticeAreasGrid({ areas }: PracticeAreasGridProps) {
             />
           ))}
         </div>
+
+        {ctaText && ctaLink && (
+          <div className="mt-[32px] md:mt-[40px] flex justify-center">
+            <Link
+              to={ctaLink}
+              className="inline-flex items-center gap-2 font-outfit text-[16px] text-white uppercase tracking-wide px-[24px] py-[18px] hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: "#365D96" }}
+            >
+              {ctaText}
+              <ArrowRight className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

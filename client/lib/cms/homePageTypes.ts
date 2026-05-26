@@ -54,6 +54,8 @@ export interface PracticeAreaItem {
 export interface PracticeAreasIntroContent {
   sectionLabel: string;
   heading: string;
+  buttonText: string;
+  buttonLink: string;
 }
 
 export interface AreasWeServeCounty {
@@ -253,9 +255,8 @@ export const defaultHomeContent: HomePageContent = {
   practiceAreasIntro: {
     sectionLabel: "",
     heading: "",
+    buttonText: "",
     buttonLink: "",
-    buttonTextLine1: "",
-    buttonTextLine2: "",
   },
   practiceAreas: [],
   awards: {
