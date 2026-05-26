@@ -37,7 +37,7 @@ export default function FaqSection({ content }: FaqSectionProps) {
           {data.description && (
             <RichText
               html={data.description}
-              className="font-outfit text-[15px] md:text-[24px] leading-[23px] md:leading-[36px] text-black text-center"
+              className="font-outfit text-[16px] md:text-[20px] leading-[24px] md:leading-[30px] text-black text-center"
             />
           )}
         </div>
@@ -65,27 +65,34 @@ export default function FaqSection({ content }: FaqSectionProps) {
             <div
               key={index}
               className={`border-[0.8px] border-[rgb(217,217,217)] ${
-                index < faqs.length - 1 ? "mb-3 md:mb-4" : ""
+                index < faqs.length - 1 ? "mb-2 md:mb-3" : ""
               } ${openIndex === index ? "bg-brand-dark" : "bg-white"}`}
             >
-              <button
-                onClick={() => toggleFaq(index)}
-                className={`w-full font-outfit text-[20px] md:text-[28px] leading-[26px] md:leading-[28px] px-[20px] py-[20px] text-left flex items-center justify-between cursor-pointer ${
-                  openIndex === index ? "text-white" : "text-[rgb(67,67,67)]"
-                }`}
-              >
-                <span className="pr-[50px]">{faq.question}</span>
-                <ChevronDown
-                  className={`h-6 w-6 flex-shrink-0 transition-transform duration-200 ${
-                    openIndex === index ? "rotate-180" : ""
+              <h3 className="font-playfair text-[22px] md:text-[30px] leading-snug">
+                <button
+                  type="button"
+                  onClick={() => toggleFaq(index)}
+                  aria-expanded={openIndex === index}
+                  aria-controls={`faq-answer-${index}`}
+                  className={`w-full font-playfair text-[22px] md:text-[30px] leading-snug px-[20px] py-[20px] text-left flex items-center justify-between cursor-pointer ${
+                    openIndex === index ? "text-white" : "text-[rgb(67,67,67)]"
                   }`}
-                />
-              </button>
+                >
+                  <span className="pr-[50px]">{faq.question}</span>
+                  <ChevronDown
+                    className={`h-6 w-6 flex-shrink-0 transition-transform duration-200 ${
+                      openIndex === index ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+              </h3>
               {openIndex === index && (
-                <RichText
-                  html={faq.answer}
-                  className="font-outfit text-[16px] md:text-[22px] leading-[24px] md:leading-[33px] font-light px-[20px] pb-[20px] pt-[20px] text-white"
-                />
+                <div id={`faq-answer-${index}`}>
+                  <RichText
+                    html={faq.answer}
+                    className="font-outfit text-[16px] md:text-[20px] leading-[24px] md:leading-[30px] px-[20px] pb-[20px] pt-[20px] text-white"
+                  />
+                </div>
               )}
             </div>
           ))}
