@@ -26,6 +26,8 @@ export interface CmsPageRow {
   noindex?: boolean | null;
   schema_type?: string | null;
   schema_data?: Record<string, unknown> | null;
+  published_at?: string | null;
+  show_published_date?: boolean | null;
 }
 
 export interface BlogHeroData {
@@ -55,6 +57,8 @@ export function mapPageMeta(row?: CmsPageRow | null): PageMeta {
     noindex: Boolean(row?.noindex),
     schema_type: row?.schema_type,
     schema_data: row?.schema_data,
+    published_at: row?.published_at ?? null,
+    show_published_date: row?.show_published_date ?? false,
   };
 }
 

@@ -105,6 +105,7 @@ export interface Page {
   schema_data: Record<string, unknown> | null;
   status: PageStatus;
   published_at: string | null;
+  show_published_date: boolean;
   updated_at: string;
   created_at: string;
 }

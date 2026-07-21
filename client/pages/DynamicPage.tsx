@@ -131,7 +131,7 @@ export default function DynamicPage() {
 
       try {
         const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/pages?url_path=eq.${encodeURIComponent(queryPath)}&status=eq.published&select=title,content,page_type,meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,schema_type,schema_data`,
+          `${SUPABASE_URL}/rest/v1/pages?url_path=eq.${encodeURIComponent(queryPath)}&status=eq.published&select=title,content,page_type,meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,schema_type,schema_data,published_at,show_published_date`,
           {
             headers: {
               apikey: SUPABASE_ANON_KEY,
@@ -218,7 +218,11 @@ export default function DynamicPage() {
         schemaData={page.meta.schema_data || undefined}
         pageContent={page.content}
       />
-      <BlockRenderer content={page.content as any} />
+      <BlockRenderer
+        content={page.content as any}
+        publishedAt={page.meta.published_at}
+        showPublishedDate={page.meta.show_published_date}
+      />
     </Layout>
   );
 }

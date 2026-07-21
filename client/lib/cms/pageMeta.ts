@@ -9,6 +9,8 @@ export interface PageMeta {
   noindex?: boolean;
   schema_type?: string | null;
   schema_data?: Record<string, unknown> | null;
+  published_at?: string | null;
+  show_published_date?: boolean | null;
 }
 
 /** Empty default – used when CMS returns no meta */

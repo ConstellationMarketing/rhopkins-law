@@ -91,7 +91,7 @@ async function generateSSG() {
   const { data: pages, error: pagesError } = await supabase
     .from("pages")
     .select(
-      "id, title, url_path, page_type, meta_title, meta_description, canonical_url, og_title, og_description, og_image, noindex, updated_at, content, schema_type, schema_data",
+      "id, title, url_path, page_type, meta_title, meta_description, canonical_url, og_title, og_description, og_image, noindex, updated_at, content, schema_type, schema_data, published_at, show_published_date",
     )
     .eq("status", "published");
 

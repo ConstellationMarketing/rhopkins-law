@@ -15,11 +15,15 @@ import LegacyBlock from "@site/components/blocks/LegacyBlock";
 interface BlockRendererProps {
   content: ContentBlock[];
   isPreview?: boolean;
+  publishedAt?: string | null;
+  showPublishedDate?: boolean | null;
 }
 
 export default function BlockRenderer({
   content,
   isPreview = false,
+  publishedAt,
+  showPublishedDate,
 }: BlockRendererProps) {
   if (!content) {
     return (
@@ -42,11 +46,27 @@ export default function BlockRenderer({
     );
   }
 
+  // Calculate the index among content-section blocks only
+  let contentSectionIndex = -1;
+
   return (
     <div>
-      {content.map((block, index) => (
-        <RenderBlock key={index} block={block} index={index} isPreview={isPreview} />
-      ))}
+      {content.map((block, index) => {
+        if (block.type === "content-section") {
+          contentSectionIndex++;
+        }
+        return (
+          <RenderBlock
+            key={index}
+            block={block}
+            index={index}
+            contentSectionIndex={block.type === "content-section" ? contentSectionIndex : -1}
+            isPreview={isPreview}
+            publishedAt={publishedAt}
+            showPublishedDate={showPublishedDate}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -54,11 +74,17 @@ export default function BlockRenderer({
 function RenderBlock({
   block,
   index,
+  contentSectionIndex,
   isPreview,
+  publishedAt,
+  showPublishedDate,
 }: {
   block: ContentBlock;
   index: number;
+  contentSectionIndex: number;
   isPreview: boolean;
+  publishedAt?: string | null;
+  showPublishedDate?: boolean | null;
 }) {
   switch (block.type) {
     case "hero":
@@ -66,7 +92,14 @@ function RenderBlock({
     case "heading":
       return <HeadingBlock block={block} />;
     case "content-section":
-      return <ContentSectionBlock block={block} index={index} />;
+      return (
+        <ContentSectionBlock
+          block={block}
+          index={index}
+          publishedAt={publishedAt}
+          showPublishedDate={contentSectionIndex === 0 ? showPublishedDate : false}
+        />
+      );
     case "cta":
       return <CTABlock block={block} />;
     case "team-members":

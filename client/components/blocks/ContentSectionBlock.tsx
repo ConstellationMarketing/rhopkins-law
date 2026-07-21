@@ -3,13 +3,16 @@ import type { ContentBlock } from "@site/lib/blocks";
 import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
 import CallBox from "@site/components/shared/CallBox";
 import RichText from "@site/components/shared/RichText";
+import PublishedDateBadge from "@site/components/shared/PublishedDateBadge";
 
 interface ContentSectionBlockProps {
   block: Extract<ContentBlock, { type: "content-section" }>;
   index: number;
+  publishedAt?: string | null;
+  showPublishedDate?: boolean | null;
 }
 
-export default function ContentSectionBlock({ block, index }: ContentSectionBlockProps) {
+export default function ContentSectionBlock({ block, index, publishedAt, showPublishedDate }: ContentSectionBlockProps) {
   const { phoneNumber, phoneDisplay, phoneLabel } = useGlobalPhone();
   const imageOnLeft = block.imagePosition === "left";
   const showCTAs = block.showCTAs !== false;
@@ -23,6 +26,9 @@ export default function ContentSectionBlock({ block, index }: ContentSectionBloc
         >
           {/* Rich Text Content */}
           <div className={hasSidebar ? "lg:w-[60%]" : "w-full"}>
+            {index === 0 && showPublishedDate && publishedAt && (
+              <PublishedDateBadge date={publishedAt} />
+            )}
             <RichText
               html={block.body}
               className="font-outfit text-[16px] md:text-[18px] leading-[26px] md:leading-[30px] text-black/90 prose prose-lg max-w-none

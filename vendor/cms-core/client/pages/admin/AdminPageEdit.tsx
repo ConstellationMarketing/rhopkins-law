@@ -300,6 +300,7 @@ export default function AdminPageEdit() {
         schema_data: page.schema_data,
         status: page.status,
         published_at: publishedAt,
+        show_published_date: page.show_published_date ?? false,
       } as Record<string, unknown>)
       .eq("id", page.id);
 
@@ -793,12 +794,40 @@ export default function AdminPageEdit() {
                 </p>
               </div>
 
-              {page.published_at && (
-                <p className="text-sm text-gray-500">
-                  First published:{" "}
-                  {new Date(page.published_at).toLocaleString()}
+              <div className="space-y-2">
+                <Label htmlFor="publishedAt">Published Date</Label>
+                <Input
+                  id="publishedAt"
+                  type="date"
+                  value={
+                    page.published_at
+                      ? new Date(page.published_at).toISOString().slice(0, 10)
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    updatePage({
+                      published_at: val
+                        ? new Date(val).toISOString()
+                        : page.published_at,
+                    });
+                  }}
+                />
+                <p className="text-xs text-gray-500">
+                  This date is shown on the page when "Show published date" is enabled below.
                 </p>
-              )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={!!page.show_published_date}
+                  onCheckedChange={(checked) =>
+                    updatePage({ show_published_date: checked })
+                  }
+                />
+                <Label>Show published date on page</Label>
+              </div>
+
               <p className="text-sm text-gray-500">
                 Last updated: {new Date(page.updated_at).toLocaleString()}
               </p>

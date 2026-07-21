@@ -86,7 +86,7 @@ export function usePracticeAreaPageContent(
         }
 
         const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/pages?url_path=eq.${encodeURIComponent(nextUrlPath)}&status=eq.published&select=title,content,meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,schema_type,schema_data`,
+          `${SUPABASE_URL}/rest/v1/pages?url_path=eq.${encodeURIComponent(nextUrlPath)}&status=eq.published&select=title,content,meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,schema_type,schema_data,published_at,show_published_date`,
           {
             headers: {
               apikey: SUPABASE_ANON_KEY,

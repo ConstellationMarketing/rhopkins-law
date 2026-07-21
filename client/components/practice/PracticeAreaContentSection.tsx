@@ -3,15 +3,20 @@ import type { PracticeAreaContentSectionItem } from "@site/lib/cms/practiceAreaP
 import { useGlobalPhone } from "@site/contexts/SiteSettingsContext";
 import CallBox from "@site/components/shared/CallBox";
 import RichText from "@site/components/shared/RichText";
+import PublishedDateBadge from "@site/components/shared/PublishedDateBadge";
 
 interface PracticeAreaContentSectionProps {
   section: PracticeAreaContentSectionItem;
   index: number;
+  publishedAt?: string | null;
+  showPublishedDate?: boolean | null;
 }
 
 export default function PracticeAreaContentSection({
   section,
   index,
+  publishedAt,
+  showPublishedDate,
 }: PracticeAreaContentSectionProps) {
   const { phoneNumber, phoneDisplay, phoneLabel } = useGlobalPhone();
   const imageOnLeft = section.imagePosition === "left";
@@ -25,6 +30,9 @@ export default function PracticeAreaContentSection({
         >
           {/* Rich Text Content - larger column (full width when no sidebar) */}
           <div className={showCTAs || section.image ? "lg:w-[60%]" : "w-full"}>
+            {index === 0 && showPublishedDate && publishedAt && (
+              <PublishedDateBadge date={publishedAt} />
+            )}
             <RichText
               html={section.body}
               className="font-outfit text-[16px] md:text-[18px] leading-[26px] md:leading-[30px] text-black/90 prose prose-lg max-w-none

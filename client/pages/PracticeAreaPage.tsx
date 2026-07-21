@@ -69,6 +69,8 @@ export function PracticeAreaPageView({
           key={index}
           section={section}
           index={index}
+          publishedAt={meta.published_at}
+          showPublishedDate={meta.show_published_date}
         />
       ))}
 
